@@ -1015,9 +1015,9 @@ if (!defined('ABSPATH')) exit;
                 <!-- Photo panels -->
                 <div class="nav-photo nav-photo--default is-default" id="navPhotoDefault" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
                 <div class="nav-photo" data-photo="0" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
-                <div class="nav-photo" data-photo="1" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
-                <div class="nav-photo" data-photo="2" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
-                <div class="nav-photo" data-photo="3" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
+                <div class="nav-photo" data-photo="1" style="background-image: url('/wp-content/uploads/2026/02/tuscon-at-sunset.jpg');"></div>
+                <div class="nav-photo" data-photo="2" style="background-image: url('/wp-content/uploads/2026/02/flagstaff-hike.jpg');"></div>
+                <div class="nav-photo" data-photo="3" style="background-image: url('/wp-content/uploads/2026/02/tuscon-at-sunset.jpg');"></div>
                 <div class="nav-caption" id="navCaption">
                     <div class="nav-caption__title" id="navCaptionTitle">Photo 01</div>
                     <div class="nav-caption__credit">MLC</div>
