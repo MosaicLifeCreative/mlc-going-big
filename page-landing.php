@@ -388,7 +388,8 @@ if (!defined('ABSPATH')) exit;
             background-size: cover;
             background-position: center;
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 1s ease;
+            transform: scale(1);
         }
 
         .nav-photo.is-active {
@@ -396,16 +397,17 @@ if (!defined('ABSPATH')) exit;
             z-index: 1;
         }
 
+        .nav-photo.is-sliding {
+            animation: kenBurns 7s ease-out forwards;
+        }
+
         .nav-photo.is-default {
             opacity: 0.4;
         }
 
-        .nav-overlay__gradient {
-            position: absolute;
-            inset: 0;
-            z-index: 2;
-            background: linear-gradient(to right, rgba(14, 14, 18, 0.97) 0%, rgba(14, 14, 18, 0.3) 40%, transparent 70%);
-            pointer-events: none;
+        @keyframes kenBurns {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
         }
 
         .nav-caption {
@@ -1010,13 +1012,12 @@ if (!defined('ABSPATH')) exit;
             </div>
 
             <div class="nav-overlay__right">
-                <!-- Photo panels - placeholder URLs for now -->
+                <!-- Photo panels -->
                 <div class="nav-photo nav-photo--default is-default" id="navPhotoDefault" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
                 <div class="nav-photo" data-photo="0" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
                 <div class="nav-photo" data-photo="1" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
                 <div class="nav-photo" data-photo="2" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
                 <div class="nav-photo" data-photo="3" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
-                <div class="nav-overlay__gradient"></div>
                 <div class="nav-caption" id="navCaption">
                     <div class="nav-caption__title" id="navCaptionTitle">Photo 01</div>
                     <div class="nav-caption__credit">MLC</div>
@@ -1125,10 +1126,10 @@ if (!defined('ABSPATH')) exit;
 
             // Nav photos - placeholder URLs (replace with WordPress media URLs)
             navPhotos: [
-                { url: "https://fresh.mosaiclifecreative.com/wp-content/uploads/2026/02/buffalo-park-scaled.jpg", caption: "Photo 01", credit: "MLC" },
-                { url: "https://fresh.mosaiclifecreative.com/wp-content/uploads/2026/02/buffalo-park-scaled.jpg", caption: "Photo 02", credit: "MLC" },
-                { url: "https://fresh.mosaiclifecreative.com/wp-content/uploads/2026/02/buffalo-park-scaled.jpg", caption: "Photo 03", credit: "MLC" },
-                { url: "https://fresh.mosaiclifecreative.com/wp-content/uploads/2026/02/buffalo-park-scaled.jpg", caption: "Photo 04", credit: "MLC" }
+                { url: "/wp-content/uploads/2026/02/buffalo-park-scaled.jpg", caption: "Photo 01", credit: "MLC" },
+                { url: "/wp-content/uploads/2026/02/buffalo-park-scaled.jpg", caption: "Photo 02", credit: "MLC" },
+                { url: "/wp-content/uploads/2026/02/buffalo-park-scaled.jpg", caption: "Photo 03", credit: "MLC" },
+                { url: "/wp-content/uploads/2026/02/buffalo-park-scaled.jpg", caption: "Photo 04", credit: "MLC" }
             ],
 
             // Chatbot flows
@@ -1188,7 +1189,9 @@ if (!defined('ABSPATH')) exit;
             navOpen: false,
             hoveredNav: null,
             chatStage: 'open',
-            chatTyping: false
+            chatTyping: false,
+            slideshowIndex: 0,
+            slideshowInterval: null
         };
 
         // ─── DOM ELEMENTS ───────────────────────────────────────────
@@ -1240,37 +1243,90 @@ if (!defined('ABSPATH')) exit;
         function openNav() {
             state.navOpen = true;
             els.navOverlay.classList.add('is-open');
+            startSlideshow();
         }
 
         function closeNav() {
             state.navOpen = false;
             state.hoveredNav = null;
             els.navOverlay.classList.remove('is-open');
+            stopSlideshow();
             updateNavPhotos();
+        }
+
+        function startSlideshow() {
+            if (state.slideshowInterval) return;
+
+            // Show first slide immediately
+            state.slideshowIndex = 0;
+            showSlide(state.slideshowIndex);
+
+            // Start interval for subsequent slides
+            state.slideshowInterval = setInterval(() => {
+                // Only advance if not hovering a nav item
+                if (state.hoveredNav === null) {
+                    state.slideshowIndex = (state.slideshowIndex + 1) % CONFIG.navPhotos.length;
+                    showSlide(state.slideshowIndex);
+                }
+            }, 7000);
+        }
+
+        function stopSlideshow() {
+            if (state.slideshowInterval) {
+                clearInterval(state.slideshowInterval);
+                state.slideshowInterval = null;
+            }
+            // Reset all photos
+            els.navPhotos.forEach(photo => {
+                photo.classList.remove('is-active', 'is-sliding');
+            });
+            els.navPhotoDefault.classList.add('is-default');
+        }
+
+        function showSlide(index) {
+            // Hide default
+            els.navPhotoDefault.classList.remove('is-default');
+
+            // Remove active/sliding from all photos
+            els.navPhotos.forEach(photo => {
+                photo.classList.remove('is-active', 'is-sliding');
+            });
+
+            // Show and animate the current slide
+            const activePhoto = document.querySelector(`.nav-photo[data-photo="${index}"]`);
+            if (activePhoto) {
+                activePhoto.classList.add('is-active', 'is-sliding');
+            }
+
+            // Update caption
+            els.navCaption.classList.add('is-visible');
+            els.navCaptionTitle.textContent = CONFIG.navPhotos[index].caption;
         }
 
         function updateNavPhotos() {
             const idx = state.hoveredNav;
 
-            // Hide all photos
-            els.navPhotos.forEach(photo => {
-                photo.classList.remove('is-active');
-            });
-
             if (idx !== null) {
-                // Show hovered photo
+                // Hovering - show hovered photo, pause slideshow visually
+                els.navPhotos.forEach(photo => {
+                    photo.classList.remove('is-active', 'is-sliding');
+                });
+                els.navPhotoDefault.classList.remove('is-default');
+
                 const photoIdx = idx % CONFIG.navPhotos.length;
                 const activePhoto = document.querySelector(`.nav-photo[data-photo="${photoIdx}"]`);
                 if (activePhoto) {
-                    activePhoto.classList.add('is-active');
+                    activePhoto.classList.add('is-active', 'is-sliding');
                 }
-                els.navPhotoDefault.classList.remove('is-default');
 
                 // Update caption
                 els.navCaption.classList.add('is-visible');
                 els.navCaptionTitle.textContent = CONFIG.navPhotos[photoIdx].caption;
+            } else if (state.navOpen) {
+                // Not hovering but nav is open - resume slideshow from current index
+                showSlide(state.slideshowIndex);
             } else {
-                // Show default
+                // Nav closed - show default
                 els.navPhotoDefault.classList.add('is-default');
                 els.navCaption.classList.remove('is-visible');
             }
