@@ -566,19 +566,11 @@ if (!defined('ABSPATH')) exit;
             padding: 12px 24px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
             pointer-events: none;
         }
 
-        .footer__brand {
-            color: #bbb;
-            font-size: 10px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            opacity: 0.5;
-        }
-
-        .footer__right {
+        .footer__center {
             display: flex;
             align-items: center;
             gap: 12px;
@@ -1019,11 +1011,11 @@ if (!defined('ABSPATH')) exit;
 
             <div class="nav-overlay__right">
                 <!-- Photo panels - placeholder URLs for now -->
-                <div class="nav-photo nav-photo--default is-default" id="navPhotoDefault" style="background-image: url('https://placehold.co/800x1200/18181b/7C3AED?text=Photo+01');"></div>
-                <div class="nav-photo" data-photo="0" style="background-image: url('https://placehold.co/800x1200/18181b/7C3AED?text=Photo+01');"></div>
-                <div class="nav-photo" data-photo="1" style="background-image: url('https://placehold.co/800x1200/18181b/06B6D4?text=Photo+02');"></div>
-                <div class="nav-photo" data-photo="2" style="background-image: url('https://placehold.co/800x1200/18181b/EC4899?text=Photo+03');"></div>
-                <div class="nav-photo" data-photo="3" style="background-image: url('https://placehold.co/800x1200/18181b/7C3AED?text=Photo+04');"></div>
+                <div class="nav-photo nav-photo--default is-default" id="navPhotoDefault" style="background-image: url('https://fresh.mosaiclifecreative.com/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
+                <div class="nav-photo" data-photo="0" style="background-image: url('https://fresh.mosaiclifecreative.com/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
+                <div class="nav-photo" data-photo="1" style="background-image: url('https://fresh.mosaiclifecreative.com/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
+                <div class="nav-photo" data-photo="2" style="background-image: url('https://fresh.mosaiclifecreative.com/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
+                <div class="nav-photo" data-photo="3" style="background-image: url('https://fresh.mosaiclifecreative.com/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
                 <div class="nav-overlay__gradient"></div>
                 <div class="nav-caption" id="navCaption">
                     <div class="nav-caption__title" id="navCaptionTitle">Photo 01</div>
@@ -1053,8 +1045,7 @@ if (!defined('ABSPATH')) exit;
 
         <!-- Footer with Countdown -->
         <div class="footer">
-            <div class="footer__brand">MLC</div>
-            <div class="footer__right">
+            <div class="footer__center">
                 <button class="hunt-enter-btn" id="huntEnterBtn">&#x25CF; ENTER</button>
                 <div class="countdown" id="countdown">00:00:00</div>
             </div>
@@ -1134,10 +1125,10 @@ if (!defined('ABSPATH')) exit;
 
             // Nav photos - placeholder URLs (replace with WordPress media URLs)
             navPhotos: [
-                { url: "https://placehold.co/800x1200/18181b/7C3AED?text=Photo+01", caption: "Photo 01", credit: "MLC" },
-                { url: "https://placehold.co/800x1200/18181b/06B6D4?text=Photo+02", caption: "Photo 02", credit: "MLC" },
-                { url: "https://placehold.co/800x1200/18181b/EC4899?text=Photo+03", caption: "Photo 03", credit: "MLC" },
-                { url: "https://placehold.co/800x1200/18181b/7C3AED?text=Photo+04", caption: "Photo 04", credit: "MLC" }
+                { url: "https://fresh.mosaiclifecreative.com/wp-content/uploads/2026/02/buffalo-park-scaled.jpg", caption: "Photo 01", credit: "MLC" },
+                { url: "https://fresh.mosaiclifecreative.com/wp-content/uploads/2026/02/buffalo-park-scaled.jpg", caption: "Photo 02", credit: "MLC" },
+                { url: "https://fresh.mosaiclifecreative.com/wp-content/uploads/2026/02/buffalo-park-scaled.jpg", caption: "Photo 03", credit: "MLC" },
+                { url: "https://fresh.mosaiclifecreative.com/wp-content/uploads/2026/02/buffalo-park-scaled.jpg", caption: "Photo 04", credit: "MLC" }
             ],
 
             // Chatbot flows
