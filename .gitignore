@@ -1,0 +1,30 @@
+# SFTP & IDE
+.vscode/
+.idea/
+*.code-workspace
+sftp.json
+
+# OS
+.DS_Store
+Thumbs.db
+.env.local
+
+# WordPress Sensitive
+config.php
+wp-config.php
+wp-config-local.php
+
+# Generated
+node_modules/
+vendor/
+*.log
+.tmp/
+dist/
+
+# Compiled
+*.css.map
+*.js.map
+
+# Local Testing
+_scratch/
+_testing/
