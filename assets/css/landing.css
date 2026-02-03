@@ -340,7 +340,7 @@ html, body {
     background-position: center;
     opacity: 0;
     transition: opacity 1s ease;
-    animation: kenBurns 7s ease-in-out infinite;
+    animation: kenBurns 6s ease-in-out forwards;
     z-index: 1;
 }
 

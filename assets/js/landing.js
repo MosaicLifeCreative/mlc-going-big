@@ -29,7 +29,7 @@
             { caption: "Photo 04", credit: "MLC" }
         ],
 
-        slideshowDuration: 7000, // 7 seconds per photo
+        slideshowDuration: 6000, // 7 seconds per photo
 
         // Chatbot flows
         chatFlows: {
@@ -144,12 +144,22 @@
             els.navPhotoDefault.classList.remove('is-visible');
         }
 
-        // Hide all photos
-        els.navPhotos.forEach(p => p.classList.remove('is-visible'));
+        // Hide all photos and clear their animations
+        els.navPhotos.forEach(p => {
+            p.classList.remove('is-visible');
+        });
 
         // Show target photo
         const targetPhoto = document.querySelector(`.nav-photo[data-photo="${index}"]`);
         if (targetPhoto) {
+            // Remove animation
+            targetPhoto.style.animation = 'none';
+            
+            // Force reflow - this is the critical part
+            targetPhoto.offsetHeight;
+            
+            // Re-apply animation - starts from beginning
+            targetPhoto.style.animation = '';
             targetPhoto.classList.add('is-visible');
         }
 
