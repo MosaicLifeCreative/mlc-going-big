@@ -87,15 +87,26 @@ if (!defined('ABSPATH')) exit;
 
             <div class="nav-overlay__right">
                 <!-- Photo panels -->
-                <div class="nav-photo nav-photo--default is-default" id="navPhotoDefault" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
-                <div class="nav-photo" data-photo="0" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
+                <div class="nav-photo nav-photo--default is-default" id="navPhotoDefault" style="background-image: url('/wp-content/uploads/2026/02/flagstaff-hike.jpg');"></div>
+                <div class="nav-photo" data-photo="0" style="background-image: url('/wp-content/uploads/2026/02/flagstaff-hike.jpg');"></div>
                 <div class="nav-photo" data-photo="1" style="background-image: url('/wp-content/uploads/2026/02/tuscon-at-sunset.jpg');"></div>
-                <div class="nav-photo" data-photo="2" style="background-image: url('/wp-content/uploads/2026/02/flagstaff-hike.jpg');"></div>
-                <div class="nav-photo" data-photo="3" style="background-image: url('/wp-content/uploads/2026/02/tuscon-at-sunset.jpg');"></div>
+                <div class="nav-photo" data-photo="2" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-sunset.jpg');"></div>
+                <div class="nav-photo" data-photo="3" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
                 <div class="nav-caption" id="navCaption">
                     <div class="nav-caption__title" id="navCaptionTitle">Photo 01</div>
                     <div class="nav-caption__credit">MLC</div>
                 </div>
+                <!-- Slideshow navigation buttons -->
+                <button id="navPrev" class="nav-control nav-control--prev" aria-label="Previous photo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <button id="navNext" class="nav-control nav-control--next" aria-label="Next photo">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
             </div>
         </div>
 
