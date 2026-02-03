@@ -23,10 +23,10 @@
 
         // Nav photos - captions to be added later
         navPhotos: [
-            { caption: "Photo 01", credit: "MLC" },
-            { caption: "Photo 02", credit: "MLC" },
-            { caption: "Photo 03", credit: "MLC" },
-            { caption: "Photo 04", credit: "MLC" }
+            { caption: "Trail at Buffalo Park, Flagstaff", credit: "TREY KAUFFMAN" },
+            { caption: "Rincon Mountains, Tucson", credit: "TREY KAUFFMAN" },
+            { caption: "San Francisco Peaks, Flagstaff", credit: "TREY KAUFFMAN" },
+            { caption: "Sunset at Buffalo Park, Flagstaff", credit: "TREY KAUFFMAN" }
         ],
 
         slideshowDuration: 6000, // 7 seconds per photo
@@ -106,6 +106,7 @@
         navPhotoDefault: $('#navPhotoDefault'),
         navCaption: $('#navCaption'),
         navCaptionTitle: $('#navCaptionTitle'),
+        navCaptionCredit: $('.nav-caption__credit'),
         navPrev: $('#navPrev'),
         navNext: $('#navNext'),
         phaseText: $('#phaseText'),
@@ -167,6 +168,10 @@
         if (els.navCaption && els.navCaptionTitle) {
             els.navCaption.classList.add('is-visible');
             els.navCaptionTitle.textContent = CONFIG.navPhotos[index].caption;
+            
+            if (els.navCaptionCredit) {
+                els.navCaptionCredit.textContent = CONFIG.navPhotos[index].credit;
+            }
         }
 
         state.slideshowIndex = index;
