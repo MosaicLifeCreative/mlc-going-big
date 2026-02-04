@@ -498,6 +498,14 @@
                 }, 800);
             } else {
                 state.huntStatus = 'wrong';
+                
+                // Show custom message if provided, otherwise default
+                if (data.data && data.data.message) {
+                    els.huntError.textContent = data.data.message;
+                } else {
+                    els.huntError.textContent = 'Not quite. Try again.';
+                }
+                
                 els.huntError.classList.add('is-visible');
                 els.huntCard.classList.add('shake');
 

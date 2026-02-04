@@ -47,7 +47,7 @@ function mlc_enqueue_landing_assets() {
             'mlc-landing-css',
             get_stylesheet_directory_uri() . '/assets/css/landing.css',
             array(),
-            '1.2.0',
+            '1.2.1',
             'all'
         );
         
@@ -56,7 +56,7 @@ function mlc_enqueue_landing_assets() {
             'mlc-landing-js',
             get_stylesheet_directory_uri() . '/assets/js/landing.js',
             array(),
-            '1.2.1',
+            '1.2.2',
             true // Load in footer
         );
     }
@@ -65,7 +65,7 @@ add_action('wp_enqueue_scripts', 'mlc_enqueue_landing_assets');
 
 /**
  * AJAX Handler for Hunt Sequence Validation
- * Keeps the target sequence server-side only
+ * Validates BOTH sequence AND time window server-side
  */
 function mlc_validate_hunt_sequence() {
     // Verify nonce for security
@@ -77,13 +77,41 @@ function mlc_validate_hunt_sequence() {
     // Target sequence (server-side only - never exposed to client)
     $target = '4815162342';
     
-    // Validate
-    $is_correct = ($guess === $target);
+    // First check: Is the sequence correct?
+    if ($guess !== $target) {
+        wp_send_json_success(array(
+            'correct' => false,
+            'redirect' => ''
+        ));
+        return;
+    }
     
-    // Return JSON response
+    // Second check: Are we in the time window?
+    // Set timezone (Ohio = Eastern Time)
+    $timezone = new DateTimeZone('America/New_York');
+    $now = new DateTime('now', $timezone);
+    
+    // Create target time for today at 3:16:23 PM
+    $target_time = new DateTime('now', $timezone);
+    $target_time->setTime(15, 16, 23); // 3:16:23 PM
+    
+    // Calculate difference in seconds
+    $diff = $now->getTimestamp() - $target_time->getTimestamp();
+    
+    // Must be within 42-second window (0 to 42 seconds after target)
+    if ($diff < 0 || $diff > 42) {
+        wp_send_json_success(array(
+            'correct' => false,
+            'message' => 'Not the right time.',
+            'redirect' => ''
+        ));
+        return;
+    }
+    
+    // Both checks passed - grant access
     wp_send_json_success(array(
-        'correct' => $is_correct,
-        'redirect' => $is_correct ? 'https://4815162342.quest' : ''
+        'correct' => true,
+        'redirect' => 'https://4815162342.quest'
     ));
 }
 add_action('wp_ajax_mlc_validate_hunt', 'mlc_validate_hunt_sequence');
