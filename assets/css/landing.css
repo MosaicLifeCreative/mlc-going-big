@@ -956,4 +956,25 @@ html, body {
         bottom: 16px;
         right: 16px;
     }
+
+    /* Button fixes for mobile */
+    .choice-buttons {
+        flex-direction: column;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+    
+    /* Reverse visual order - primary on top */
+    .btn--primary {
+        order: -1;
+    }
+    
+    .btn--secondary {
+        order: 1;
+    }
 }

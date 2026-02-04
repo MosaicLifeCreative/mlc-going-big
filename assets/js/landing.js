@@ -3,6 +3,8 @@
 
     // ─── CONFIGURATION ──────────────────────────────────────────
     const CONFIG = {
+        huntDebugMode: false, // Set to true to always enable hunt button (for testing)
+
         // Static fallback phases (when AI is off or fails)
         staticPhases: [
             { text: "Hello.", duration: 2400, size: "clamp(48px, 10vw, 96px)", tracking: -2, highlight: false, isHeading: true },
@@ -16,10 +18,6 @@
         targetMin: 16,
         targetSec: 23,
         windowDuration: 42, // seconds
-
-        // Hunt sequence
-        targetSequence: "4815162342",
-        questDomain: "4815162342.quest",
 
         // Nav photos - captions to be added later
         navPhotos: [
@@ -115,7 +113,6 @@
         btnPrimary: $('#btnPrimary'),
         btnSecondary: $('#btnSecondary'),
         loadingText: $('#loadingText'),
-        scrollHint: $('#scrollHint'),
         countdown: $('#countdown'),
         huntEnterBtn: $('#huntEnterBtn'),
         huntModal: $('#huntModal'),
@@ -314,7 +311,6 @@
                 await sleep(2200);
                 state.showChoice = true;
                 els.choiceButtons.classList.add('is-visible');
-                els.scrollHint.style.display = 'none';
                 break;
             }
 
@@ -352,6 +348,14 @@
         target.setHours(CONFIG.targetHour, CONFIG.targetMin, CONFIG.targetSec, 0);
 
         let diff = (target - now) / 1000;
+
+        // DEBUG MODE - always show hunt button if enabled
+        if (CONFIG.huntDebugMode) {
+            els.countdown.textContent = '00:00:00';
+            els.countdown.classList.add('is-active');
+            els.huntEnterBtn.classList.add('is-active');
+            return;
+        }
 
         // Check if we're in the 42-second window
         if (diff <= 0 && diff > -CONFIG.windowDuration) {
@@ -399,14 +403,28 @@
     }
 
     function validateHunt() {
-        const input = els.huntInput.value;
+    const input = els.huntInput.value;
 
-        if (input === CONFIG.targetSequence) {
+    // Send to server for validation
+    fetch(mlcHunt.ajaxurl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+            action: 'mlc_validate_hunt',
+            nonce: mlcHunt.nonce,
+            sequence: input
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.data.correct) {
             state.huntStatus = 'success';
             
             // Redirect to quest site
             setTimeout(() => {
-                window.location.href = 'https://' + CONFIG.questDomain;
+                window.open(data.data.redirect, '_blank');
             }, 800);
         } else {
             state.huntStatus = 'wrong';
@@ -422,7 +440,14 @@
                 els.huntError.classList.remove('is-visible');
             }, 1500);
         }
-    }
+    })
+    .catch(error => {
+        console.error('Hunt validation error:', error);
+        // Show error to user
+        els.huntError.textContent = 'Connection error. Try again.';
+        els.huntError.classList.add('is-visible');
+    });
+}
 
     els.huntEnterBtn.addEventListener('click', openHuntModal);
     els.huntClose.addEventListener('click', closeHuntModal);

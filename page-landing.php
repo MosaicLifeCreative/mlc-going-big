@@ -125,8 +125,6 @@ if (!defined('ABSPATH')) exit;
             </div>
 
             <div class="loading-text" id="loadingText" style="display: none;">Opening...</div>
-
-            <div class="scroll-hint" id="scrollHint">or just scroll</div>
         </div>
 
         <!-- Footer with Countdown -->

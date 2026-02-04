@@ -47,7 +47,7 @@ function mlc_enqueue_landing_assets() {
             'mlc-landing-css',
             get_stylesheet_directory_uri() . '/assets/css/landing.css',
             array(),
-            '1.1.9',
+            '1.2.0',
             'all'
         );
         
@@ -56,10 +56,53 @@ function mlc_enqueue_landing_assets() {
             'mlc-landing-js',
             get_stylesheet_directory_uri() . '/assets/js/landing.js',
             array(),
-            '1.1.4',
+            '1.2.0',
             true // Load in footer
         );
     }
 }
 add_action('wp_enqueue_scripts', 'mlc_enqueue_landing_assets');
+
+/**
+ * AJAX Handler for Hunt Sequence Validation
+ * Keeps the target sequence server-side only
+ */
+function mlc_validate_hunt_sequence() {
+    // Verify nonce for security
+    check_ajax_referer('mlc_hunt_nonce', 'nonce');
+    
+    // Get the submitted guess
+    $guess = isset($_POST['sequence']) ? sanitize_text_field($_POST['sequence']) : '';
+    
+    // Target sequence (server-side only - never exposed to client)
+    $target = '4815162342';
+    
+    // Validate
+    $is_correct = ($guess === $target);
+    
+    // Return JSON response
+    wp_send_json_success(array(
+        'correct' => $is_correct,
+        'redirect' => $is_correct ? 'https://4815162342.quest' : ''
+    ));
+}
+add_action('wp_ajax_mlc_validate_hunt', 'mlc_validate_hunt_sequence');
+add_action('wp_ajax_nopriv_mlc_validate_hunt', 'mlc_validate_hunt_sequence');
+
+/**
+ * Add nonce for hunt validation
+ */
+function mlc_add_hunt_nonce() {
+    if (is_page_template('page-landing.php')) {
+        ?>
+        <script type="text/javascript">
+            var mlcHunt = {
+                ajaxurl: '<?php echo admin_url('admin-ajax.php'); ?>',
+                nonce: '<?php echo wp_create_nonce('mlc_hunt_nonce'); ?>'
+            };
+        </script>
+        <?php
+    }
+}
+add_action('wp_head', 'mlc_add_hunt_nonce');
 ?>
