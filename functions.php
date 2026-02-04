@@ -56,7 +56,7 @@ function mlc_enqueue_landing_assets() {
             'mlc-landing-js',
             get_stylesheet_directory_uri() . '/assets/js/landing.js',
             array(),
-            '1.2.0',
+            '1.2.1',
             true // Load in footer
         );
     }

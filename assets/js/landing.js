@@ -19,7 +19,7 @@
         targetSec: 23,
         windowDuration: 42, // seconds
 
-        // Nav photos - captions to be added later
+        // Nav photos
         navPhotos: [
             { caption: "Trail at Buffalo Park, Flagstaff", credit: "TREY KAUFFMAN" },
             { caption: "Rincon Mountains, Tucson", credit: "TREY KAUFFMAN" },
@@ -27,7 +27,7 @@
             { caption: "Sunset at Buffalo Park, Flagstaff", credit: "TREY KAUFFMAN" }
         ],
 
-        slideshowDuration: 6000, // 7 seconds per photo
+        slideshowDuration: 6000, // 6 seconds per photo
 
         // Chatbot flows
         chatFlows: {
@@ -88,7 +88,13 @@
         chatTyping: false,
         slideshowIndex: 0,
         slideshowInterval: null,
-        slideshowPaused: false
+        slideshowPaused: false,
+        
+        // Wheatley idle tracking
+        idleTime: 0,
+        wheatleyActive: false,
+        wheatleyMessageCount: 0,
+        lastActivityTime: Date.now()
     };
 
     // ─── DOM ELEMENTS ───────────────────────────────────────────
@@ -133,6 +139,46 @@
 
     function sleep(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    // ─── WHEATLEY IDLE DETECTION ────────────────────────────────
+    function resetIdleTimer() {
+        state.lastActivityTime = Date.now();
+        state.idleTime = 0;
+    }
+
+    function checkIdleTime() {
+        const now = Date.now();
+        const idleSeconds = Math.floor((now - state.lastActivityTime) / 1000);
+        state.idleTime = idleSeconds;
+        
+        // Trigger thresholds: 30s, 180s (3m), 600s (10m), 1200s (20m), 1800s (30m)
+        const thresholds = [30, 180, 600, 1200, 1800];
+        
+        // Check if we've hit a threshold we haven't triggered yet
+        for (let i = 0; i < thresholds.length; i++) {
+            if (idleSeconds >= thresholds[i] && state.wheatleyMessageCount === i) {
+                triggerWheatley(i + 1);
+                state.wheatleyMessageCount++;
+                break;
+            }
+        }
+        
+        // After 30m, trigger every 10 minutes
+        if (idleSeconds >= 1800 && idleSeconds % 600 === 0) {
+            const extraMessages = Math.floor((idleSeconds - 1800) / 600);
+            if (state.wheatleyMessageCount === 5 + extraMessages) {
+                triggerWheatley(6 + extraMessages);
+                state.wheatleyMessageCount++;
+            }
+        }
+    }
+
+    function triggerWheatley(messageNumber) {
+        // For now, just console.log - we'll add API call later
+        console.log(`🤖 Wheatley Message #${messageNumber} triggered at ${state.idleTime}s idle`);
+        
+        // TODO: Call API here in next session
     }
 
     // ─── NAV PHOTO SLIDESHOW ────────────────────────────────────
@@ -343,12 +389,6 @@
 
     // ─── COUNTDOWN TIMER ────────────────────────────────────────
     function updateCountdown() {
-        const now = new Date();
-        const target = new Date();
-        target.setHours(CONFIG.targetHour, CONFIG.targetMin, CONFIG.targetSec, 0);
-
-        let diff = (target - now) / 1000;
-
         // DEBUG MODE - always show hunt button if enabled
         if (CONFIG.huntDebugMode) {
             els.countdown.textContent = '00:00:00';
@@ -356,6 +396,12 @@
             els.huntEnterBtn.classList.add('is-active');
             return;
         }
+
+        const now = new Date();
+        const target = new Date();
+        target.setHours(CONFIG.targetHour, CONFIG.targetMin, CONFIG.targetSec, 0);
+
+        let diff = (target - now) / 1000;
 
         // Check if we're in the 42-second window
         if (diff <= 0 && diff > -CONFIG.windowDuration) {
@@ -403,51 +449,51 @@
     }
 
     function validateHunt() {
-    const input = els.huntInput.value;
+        const input = els.huntInput.value;
 
-    // Send to server for validation
-    fetch(mlcHunt.ajaxurl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-            action: 'mlc_validate_hunt',
-            nonce: mlcHunt.nonce,
-            sequence: input
+        // Send to server for validation
+        fetch(mlcHunt.ajaxurl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'mlc_validate_hunt',
+                nonce: mlcHunt.nonce,
+                sequence: input
+            })
         })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success && data.data.correct) {
-            state.huntStatus = 'success';
-            
-            // Redirect to quest site
-            setTimeout(() => {
-                window.open(data.data.redirect, '_blank');
-            }, 800);
-        } else {
-            state.huntStatus = 'wrong';
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data.correct) {
+                state.huntStatus = 'success';
+                
+                // Open quest site in new tab
+                setTimeout(() => {
+                    window.open(data.data.redirect, '_blank');
+                    closeHuntModal();
+                }, 800);
+            } else {
+                state.huntStatus = 'wrong';
+                els.huntError.classList.add('is-visible');
+                els.huntCard.classList.add('shake');
+
+                setTimeout(() => {
+                    els.huntCard.classList.remove('shake');
+                }, 500);
+
+                setTimeout(() => {
+                    state.huntStatus = 'idle';
+                    els.huntError.classList.remove('is-visible');
+                }, 1500);
+            }
+        })
+        .catch(error => {
+            console.error('Hunt validation error:', error);
+            els.huntError.textContent = 'Connection error. Try again.';
             els.huntError.classList.add('is-visible');
-            els.huntCard.classList.add('shake');
-
-            setTimeout(() => {
-                els.huntCard.classList.remove('shake');
-            }, 500);
-
-            setTimeout(() => {
-                state.huntStatus = 'idle';
-                els.huntError.classList.remove('is-visible');
-            }, 1500);
-        }
-    })
-    .catch(error => {
-        console.error('Hunt validation error:', error);
-        // Show error to user
-        els.huntError.textContent = 'Connection error. Try again.';
-        els.huntError.classList.add('is-visible');
-    });
-}
+        });
+    }
 
     els.huntEnterBtn.addEventListener('click', openHuntModal);
     els.huntClose.addEventListener('click', closeHuntModal);
@@ -618,6 +664,15 @@
         // Start countdown timer
         updateCountdown();
         setInterval(updateCountdown, 1000);
+
+        // Start idle checking (every second)
+        setInterval(checkIdleTime, 1000);
+
+        // Reset idle timer on any activity
+        document.addEventListener('mousemove', resetIdleTimer);
+        document.addEventListener('keydown', resetIdleTimer);
+        document.addEventListener('scroll', resetIdleTimer);
+        document.addEventListener('click', resetIdleTimer);
 
         // Start text sequence
         setTimeout(() => {
