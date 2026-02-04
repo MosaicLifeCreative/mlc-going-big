@@ -934,6 +934,21 @@ html, body {
     line-height: 1.6;
 }
 
+/* ─── WHEATLEY CURSOR ────────────────────────────────────── */
+.wheatley-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 0.9em;
+    background: var(--primary);
+    margin-left: 4px;
+    animation: blink 0.9s step-start infinite;
+    vertical-align: text-bottom;
+}
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
 /* ─── MOBILE ADJUSTMENTS ─────────────────────────────────── */
 @media (max-width: 768px) {
     .nav-overlay__left {

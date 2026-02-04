@@ -3,7 +3,7 @@
 
     // ─── CONFIGURATION ──────────────────────────────────────────
     const CONFIG = {
-        huntDebugMode: false, // Set to true to always enable hunt button (for testing)
+        huntDebugMode: false,
 
         // Static fallback phases (when AI is off or fails)
         staticPhases: [
@@ -13,11 +13,20 @@
             { text: "So how do you want yours to feel?", duration: null, size: "clamp(24px, 4vw, 42px)", tracking: -0.5, highlight: false, isHeading: false }
         ],
 
-        // Countdown target: 3:16:23 PM (Lost numbers: 3, 16, 23)
+        // Wheatley test messages (hardcoded for now, API later)
+        wheatleyMessages: [
+            "Right, so... it's been 30 seconds. I'm an AI. I'm literally counting.",
+            "Three minutes. You're committed now. I respect that. Or you forgot this tab was open. I respect that too, honestly.",
+            "Ten minutes. I cost fractions of a penny per message. This conversation has cost... about 1.5 cents. Worth it?",
+            "Twenty minutes. Are you real? I'm genuinely asking. Because I'm not, and this feels weird.",
+            "Half an hour. Nobody stays this long. You've earned something. Here: 4 8 15 16 23 42. Does that mean anything to you?"
+        ],
+
+        // Countdown target time
         targetHour: 15,
         targetMin: 16,
         targetSec: 23,
-        windowDuration: 42, // seconds
+        windowDuration: 42,
 
         // Nav photos
         navPhotos: [
@@ -27,7 +36,7 @@
             { caption: "Sunset at Buffalo Park, Flagstaff", credit: "TREY KAUFFMAN" }
         ],
 
-        slideshowDuration: 6000, // 6 seconds per photo
+        slideshowDuration: 6000,
 
         // Chatbot flows
         chatFlows: {
@@ -152,6 +161,9 @@
         const idleSeconds = Math.floor((now - state.lastActivityTime) / 1000);
         state.idleTime = idleSeconds;
         
+        // Don't trigger if Wheatley is already active
+        if (state.wheatleyActive) return;
+        
         // Trigger thresholds: 30s, 180s (3m), 600s (10m), 1200s (20m), 1800s (30m)
         const thresholds = [30, 180, 600, 1200, 1800];
         
@@ -175,39 +187,63 @@
     }
 
     function triggerWheatley(messageNumber) {
-        // For now, just console.log - we'll add API call later
         console.log(`🤖 Wheatley Message #${messageNumber} triggered at ${state.idleTime}s idle`);
         
-        // TODO: Call API here in next session
+        state.wheatleyActive = true;
+        
+        // Get message (use last message if we've run out)
+        const messageIndex = Math.min(messageNumber - 1, CONFIG.wheatleyMessages.length - 1);
+        const message = CONFIG.wheatleyMessages[messageIndex];
+        
+        // Display with typewriter effect
+        displayWheatley(message);
+    }
+
+    async function displayWheatley(text) {
+        // Hide current phase content
+        hidePhase();
+        await sleep(300);
+        
+        // Clear headline and prepare for typewriter
+        els.phaseHeadline.textContent = '';
+        els.phaseHeadline.style.fontSize = 'clamp(24px, 4vw, 42px)';
+        els.phaseHeadline.style.letterSpacing = '-0.5px';
+        els.phaseHeadline.style.fontWeight = 'var(--weight-body)';
+        els.phaseHeadline.classList.remove('is-highlight');
+        
+        // Show phase container
+        showPhase();
+        
+        // Typewriter effect
+        for (let i = 0; i < text.length; i++) {
+            els.phaseHeadline.textContent += text[i];
+            await sleep(30); // 30ms per character
+        }
+        
+        // Add blinking cursor after text
+        const cursor = document.createElement('span');
+        cursor.className = 'wheatley-cursor';
+        els.phaseHeadline.appendChild(cursor);
     }
 
     // ─── NAV PHOTO SLIDESHOW ────────────────────────────────────
     function showSlide(index) {
-        // Hide default photo
         if (els.navPhotoDefault) {
             els.navPhotoDefault.classList.remove('is-visible');
         }
 
-        // Hide all photos and clear their animations
         els.navPhotos.forEach(p => {
             p.classList.remove('is-visible');
         });
 
-        // Show target photo
         const targetPhoto = document.querySelector(`.nav-photo[data-photo="${index}"]`);
         if (targetPhoto) {
-            // Remove animation
             targetPhoto.style.animation = 'none';
-            
-            // Force reflow - this is the critical part
             targetPhoto.offsetHeight;
-            
-            // Re-apply animation - starts from beginning
             targetPhoto.style.animation = '';
             targetPhoto.classList.add('is-visible');
         }
 
-        // Update caption
         if (els.navCaption && els.navCaptionTitle) {
             els.navCaption.classList.add('is-visible');
             els.navCaptionTitle.textContent = CONFIG.navPhotos[index].caption;
@@ -237,10 +273,8 @@
     function startSlideshow() {
         if (state.slideshowInterval) return;
         
-        // Show first slide immediately
         showSlide(0);
         
-        // Start auto-advance
         state.slideshowInterval = setInterval(() => {
             if (!state.slideshowPaused) {
                 nextSlide();
@@ -254,7 +288,6 @@
             state.slideshowInterval = null;
         }
         
-        // Reset all photos
         els.navPhotos.forEach(p => p.classList.remove('is-visible'));
         if (els.navPhotoDefault) {
             els.navPhotoDefault.classList.add('is-visible');
@@ -268,7 +301,6 @@
     }
 
     function resetSlideshowTimer() {
-        // Restart the interval when user manually navigates
         if (state.slideshowInterval) {
             clearInterval(state.slideshowInterval);
             state.slideshowInterval = setInterval(() => {
@@ -292,7 +324,6 @@
         stopSlideshow();
     }
 
-    // Hamburger magnetic effect
     els.hamburger.addEventListener('mousemove', function(e) {
         const rect = this.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
@@ -309,7 +340,6 @@
     els.hamburger.addEventListener('click', openNav);
     els.navClose.addEventListener('click', closeNav);
 
-    // Slideshow controls
     if (els.navPrev) {
         els.navPrev.addEventListener('click', prevSlide);
     }
@@ -353,7 +383,6 @@
             const current = state.phases[i];
 
             if (current.duration === null) {
-                // Last phase - show buttons after delay
                 await sleep(2200);
                 state.showChoice = true;
                 els.choiceButtons.classList.add('is-visible');
@@ -389,7 +418,6 @@
 
     // ─── COUNTDOWN TIMER ────────────────────────────────────────
     function updateCountdown() {
-        // DEBUG MODE - always show hunt button if enabled
         if (CONFIG.huntDebugMode) {
             els.countdown.textContent = '00:00:00';
             els.countdown.classList.add('is-active');
@@ -403,7 +431,6 @@
 
         let diff = (target - now) / 1000;
 
-        // Check if we're in the 42-second window
         if (diff <= 0 && diff > -CONFIG.windowDuration) {
             els.countdown.textContent = '00:00:00';
             els.countdown.classList.add('is-active');
@@ -411,13 +438,11 @@
             return;
         }
 
-        // Window expired - reset to next day
         if (diff <= -CONFIG.windowDuration) {
             target.setDate(target.getDate() + 1);
             diff = (target - now) / 1000;
             els.huntEnterBtn.classList.remove('is-active');
 
-            // Only clear hunt state if modal isn't open
             if (!state.huntModalOpen) {
                 els.huntInput.value = '';
                 state.huntStatus = 'idle';
@@ -451,7 +476,6 @@
     function validateHunt() {
         const input = els.huntInput.value;
 
-        // Send to server for validation
         fetch(mlcHunt.ajaxurl, {
             method: 'POST',
             headers: {
@@ -468,7 +492,6 @@
             if (data.success && data.data.correct) {
                 state.huntStatus = 'success';
                 
-                // Open quest site in new tab
                 setTimeout(() => {
                     window.open(data.data.redirect, '_blank');
                     closeHuntModal();
@@ -661,26 +684,21 @@
 
     // ─── INITIALIZE ─────────────────────────────────────────────
     function init() {
-        // Start countdown timer
         updateCountdown();
         setInterval(updateCountdown, 1000);
 
-        // Start idle checking (every second)
         setInterval(checkIdleTime, 1000);
 
-        // Reset idle timer on any activity
         document.addEventListener('mousemove', resetIdleTimer);
         document.addEventListener('keydown', resetIdleTimer);
         document.addEventListener('scroll', resetIdleTimer);
         document.addEventListener('click', resetIdleTimer);
 
-        // Start text sequence
         setTimeout(() => {
             runSequence();
         }, 500);
     }
 
-    // Run on DOM ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);
     } else {
