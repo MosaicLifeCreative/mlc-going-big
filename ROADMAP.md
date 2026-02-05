@@ -1,39 +1,76 @@
 # Mosaic Life Creative - Landing Page Roadmap
 
 ## ✅ Completed
-- [x] Landing page foundation (text sequence, choice buttons)
+
+### Landing Page Foundation
+- [x] Text sequence with four phases
+- [x] Choice buttons (Like everyone else's / Like nothing else)
+- [x] Hamburger nav with photo slideshow
 - [x] Hunt modal with server-side validation
 - [x] Countdown timer (3:16:23 PM, 42-second window)
-- [x] Hamburger nav with photo slideshow
-- [x] Wheatley idle detection + typewriter effect + blinking cursor
 - [x] Security: Server-side time validation (both sequence AND time window)
-- [x] Services page mockup/vision
-- [x] CSS v1.2.1, JS v1.2.3 deployed
 - [x] Obfuscated config (removed obvious hunt comments)
 
-## 🚧 In Progress (Next Session)
-- [ ] Wheatley API integration (Anthropic) - ~40 minutes
-  - [ ] Set up Anthropic Console account (prep before session)
-  - [ ] Generate API key + add billing (prep before session)
-  - [ ] Build PHP endpoint `/wp-json/mlc/v1/wheatley` (20 min)
-  - [ ] Wire up JS fetch call with context passing (10 min)
-  - [ ] Test real AI responses (5 min)
-  - [ ] Refine personality prompts (5 min)
+### Wheatley AI System (v1.4.2) - Feb 4, 2026
+- [x] Anthropic API integration with Claude Haiku 4.5
+- [x] Context-aware personality (visitor type, exact time, device, activity)
+- [x] Time-based triggers (30s, 3m, 10m, 20m, 30m, +10m intervals)
+- [x] 90-minute finale message with automatic shutoff
+- [x] API failure fallback with self-aware error messaging
+- [x] Clean UI: CTA text hidden when Wheatley appears, buttons remain
+- [x] Cost control: ~$0.0015 per message, max 11 messages per visitor (~$0.015/engaged visitor)
+
+### Design & Planning
+- [x] Services page mockup/vision
+- [x] Snake 451 game prototype (Fahrenheit 451 reference for hunt)
+- [x] CSS v1.2.1, JS v1.4.2 deployed
 
 ## 📋 Next Up (Priority Order)
-1. [ ] Chatling widget setup (other pages - same Wheatley personality)
-2. [ ] Services page build (from mockup)
-3. [ ] How We Work page (timeline/stepper design)
-4. [ ] Examples page (card grid, not portfolio)
-5. [ ] Let's Talk page (Calendly + simple form)
-6. [ ] Quest site content (4815162342.quest)
-7. [ ] Advanced Wheatley features (hunt hints, session memory, tab visibility)
-8. [ ] Final polish + launch
+
+### 1. Chatling Integration (Priority 1)
+- [ ] Replace hardcoded chatbot with Chatling widget
+- [ ] "Like nothing else" button → Wheatley transition → Chatling opens
+- [ ] Unified Wheatley personality across homepage + chat widget
+- [ ] Chatling personality prompt configuration
+
+### 2. Quest Site Build (4815162342.quest)
+**Hunt Flow:**
+1. ✅ Countdown: 3:16:23 PM daily (42-second window)
+2. ✅ Sequence Input: 4815162342
+3. ✅ Combination Lock: 2237
+4. 🚧 Snake 451 Game:
+   - Target score: 451 (Fahrenheit 451 reference)
+   - Escalating point values per apple (easier progression)
+   - Door appears at 451 on random edge
+   - Must navigate to door without dying to win
+   - Fail states: exceed 451, hit wall, hit self
+5. ⏳ Final stage: TBD (Anorak AI guide?)
+
+### 3. Site Pages
+- [ ] Services page build (from mockup)
+- [ ] How We Work page (timeline/stepper design)
+- [ ] Examples page (card grid, not portfolio)
+- [ ] Let's Talk page (Calendly + simple form)
+- [ ] About page (personal story, values)
+- [ ] Contact page (form + info)
+
+### 4. Advanced Wheatley Features
+- [ ] Hunt meta-commentary based on countdown proximity
+- [ ] Session memory (sessionStorage tracking)
+- [ ] Tab visibility detection
+- [ ] Console easter eggs
+
+### 5. Final Polish + Launch
+- [ ] Performance optimization
+- [ ] SEO implementation
+- [ ] Cross-browser testing
+- [ ] Mobile QA
+- [ ] Analytics setup
+- [ ] Launch checklist execution
 
 ## 💡 Ideas / Nice-to-Have
-- Hunt meta-commentary from Wheatley during countdown
-- Session memory (Wheatley remembers if you return)
-- Tab visibility detection
-- Easter eggs in console
-- Custom plugin to add/edit photos to the desktop menu to use as a place to show off travels
-- Wheatley drops Lost numbers sequence after 30+ minutes idle (IMPLEMENTED in hardcoded messages)
+- Custom plugin to add/edit nav photos (show off travels)
+- Award submission preparation (Awwwards, CSS Design Awards, FWA)
+- Case study documentation for hunt system
+- Video walkthrough of interactive features
+- Behind-the-scenes blog post about building Wheatley

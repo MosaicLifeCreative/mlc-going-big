@@ -8,19 +8,13 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 
 ## Quick Start (For New Sessions)
 
-**Current Priority:** Wheatley API integration (~40 min)
-
-**Prep Required Before Starting:**
-1. Anthropic Console account created
-2. API key generated + saved securely
-3. Billing/credits added to account
+**Current Priority:** Chatling Integration (~1 hour)
 
 **Next Steps:**
-1. Build PHP endpoint: `/wp-json/mlc/v1/wheatley`
-2. Wire JS fetch in `landing.js`
-3. Test with real API calls
-4. Refine personality prompts
-5. Update ROADMAP.md when complete
+1. Replace hardcoded chatbot with Chatling widget
+2. Build "Like nothing else" → Wheatley transition → Chatling opens
+3. Configure Chatling with Wheatley personality
+4. Test unified experience across homepage + widget
 
 ---
 
@@ -30,9 +24,10 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 |------|---------|--------|
 | `page-landing.php` | Production | Landing page template |
 | `assets/css/landing.css` | 1.2.1 | Styles for landing page |
-| `assets/js/landing.js` | 1.2.3 | Interactive behaviors + Wheatley |
-| `functions.php` | Current | Enqueue scripts + hunt validation |
+| `assets/js/landing.js` | 1.4.2 | Interactive behaviors + Wheatley AI |
+| `functions.php` | Current | Enqueue scripts + hunt validation + Wheatley API |
 | `services-mockup.html` | Mockup | Services page vision/design |
+| `snake-451.html` | Prototype | Hunt game (needs point system refinement) |
 
 ---
 
@@ -41,13 +36,14 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 ```
 /wp-content/themes/divi-child/
 ├── page-landing.php          (Landing page template)
-├── functions.php              (Enqueue + hunt validation)
+├── functions.php              (Enqueue + hunt validation + Wheatley API)
 ├── assets/
 │   ├── css/
 │   │   └── landing.css       (v1.2.1)
 │   └── js/
-│       └── landing.js        (v1.2.3)
+│       └── landing.js        (v1.4.2)
 ├── services-mockup.html       (Mockup, not deployed)
+├── snake-451.html             (Hunt game prototype)
 └── claude.md / ROADMAP.md     (Documentation)
 ```
 
@@ -60,6 +56,7 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 - Custom page templates (not Divi JSON — owner-maintained, not client-editable)
 - Vanilla JavaScript for interactive components
 - Plus Jakarta Sans (Google Fonts)
+- Anthropic Claude Haiku 4.5 (Wheatley AI)
 - Domains: mosaiclifecreative.com (main), 4815162342.quest (hunt site)
 
 **Deployment:**
@@ -69,7 +66,7 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 - **CRITICAL:** Sendy directory at `/sendy` (DO NOT OVERWRITE during migrations)
 
 **AI Systems:**
-- Wheatley (homepage): Anthropic API integration in progress
+- Wheatley (homepage): Anthropic API (Claude Haiku 4.5) - PRODUCTION
 - Chatling (other pages): Client deployments at $99/mo
 
 **Development Tools:**
@@ -119,6 +116,9 @@ After Phase 4 holds for 2.2s, two buttons appear:
 
 ### 3. Gatekeeper Chatbot
 
+**Current:** Hardcoded conversation flow (3 layers)  
+**Next:** Replace with Chatling widget with Wheatley personality
+
 Full-screen bottom sheet. Three-layer conversation flow:
 - **Layer 1:** "What made you click that?" → curious / bored / need website
 - **Layer 2:** "Can a website change perception?" → yes / no
@@ -152,64 +152,133 @@ Fixed top-right. Opens full-screen overlay:
 - Returns "Not the right time." if outside 42-second window
 - Only grants access when both checks pass
 
+**Hunt Flow (4815162342.quest):**
+1. ✅ Countdown: 3:16:23 PM daily (42-second window)
+2. ✅ Sequence Input: 4815162342
+3. ✅ Combination Lock: 2237
+4. 🚧 Snake 451 Game:
+   - Target score: 451 (Fahrenheit 451 reference)
+   - Escalating point values (makes 451 achievable)
+   - Door appears at 451 on random edge
+   - Must navigate to exit without dying
+5. ⏳ Final stage: TBD
+
 **Files:**
 - `functions.php` - mlc_validate_hunt_sequence() function
 - `landing.js` - validateHunt() handles response
+- `snake-451.html` - Prototype (needs point escalation refinement)
 
 ---
 
-## Wheatley AI Chatterbox System
+## Wheatley AI Chatterbox System (v1.4.2 - PRODUCTION)
 
 ### Overview
-Idle detection system that hijacks the homepage headline after user stops interacting. Named "Wheatley" after Portal 2 character — aloof, bumbling, self-aware AI with lovable chaos energy.
+Idle detection system that hijacks the homepage headline when users stop interacting. Named "Wheatley" after Portal 2 character — aloof, bumbling, self-aware AI with lovable chaos energy.
+
+**Status:** LIVE on production with Anthropic Claude Haiku 4.5
 
 ### Architecture
 
-**Idle Detection** (`landing.js` lines 153-199)
-- Tracks time since last user activity (mousemove, keydown, scroll, click)
-- Triggers at progressive thresholds: 30s, 3m, 10m, 20m, 30m
-- After 30m: continues every 10 minutes
+**Time-Based Triggers** (`landing.js`)
+- Changed from idle-based to time-on-page based (Feb 4, 2026)
+- Triggers at: 30s, 3m, 10m, 20m, 30m, then every 10m until 90m
+- Final message at 90 minutes, then stops (cost control)
 - `wheatleyActive` flag prevents multiple simultaneous triggers
 
-**Visual Display** (`landing.js` lines 201-226)
-- Takes over main headline space (not corner bubble)
+**Context Detection** (`landing.js` lines 172-227)
+- `detectVisitorType()` - localStorage tracking (new/returning, visit count)
+- `getCurrentTime()` - Exact time (e.g., "9:39 PM") instead of vague time-of-day
+- `detectDeviceType()` - mobile, tablet, desktop
+- Tracks: has_scrolled, has_interacted, session_duration
+
+**API Integration** (`functions.php` lines 159-276)
+- **Endpoint:** `/wp-json/mlc/v1/wheatley`
+- **Model:** claude-haiku-4-5-20251001
+- **Cost:** ~$0.0015 per message (~11 messages max = $0.015 per engaged visitor)
+- **Max tokens:** 150
+- **Context passed:**
+  - idle_time (time on page in seconds)
+  - message_number (1-11, or 999 for finale)
+  - countdown_status (inactive, near, active)
+  - previous_messages (array)
+  - visitor (isReturning, visitCount)
+  - current_time (exact time like "9:39 PM")
+  - device (mobile, tablet, desktop)
+  - session_duration
+  - has_scrolled, has_interacted
+
+**Visual Display** (`landing.js` lines 279-315)
+- Takes over main headline space (CTA text hidden when Wheatley appears)
+- Buttons remain visible below Wheatley message
 - Typewriter effect: 30ms per character
 - Blinking cursor after text (`.wheatley-cursor` class)
 - Cannot be dismissed - stays until user takes action
 
-**Current Phase:** Hardcoded test messages in `CONFIG.wheatleyMessages`:
-1. 30s: "Right, so... it's been 30 seconds. I'm an AI. I'm literally counting."
-2. 3m: "Three minutes. You're committed now. I respect that. Or you forgot this tab was open..."
-3. 10m: "Ten minutes. I cost fractions of a penny per message. This conversation has cost... about 1.5 cents. Worth it?"
-4. 20m: "Twenty minutes. Are you real? I'm genuinely asking. Because I'm not, and this feels weird."
-5. 30m: "Half an hour. Nobody stays this long. You've earned something. Here: 4 8 15 16 23 42. Does that mean anything to you?"
-
-**Next Phase (In Progress):** API Integration
-- Endpoint: `/wp-json/mlc/v1/wheatley`
-- Model: Claude Haiku 4.5 (fast, cheap, perfect for personality)
-- Cost: ~$0.0015 per message = $5-10/month
-- Context passed: idle time, message number, countdown status, previous messages
+**API Failure Handling** (`landing.js` line 276)
+- Clever fallback message about running out of API credits
+- Self-aware and on-brand even in failure state
+- Message: "Right, so... bit awkward. The person who built me ran out of API credits. So instead of my usual dynamically-generated wit, you get this pre-written message. It's like ordering a gourmet meal and getting a microwave dinner. I'm still here, just... significantly less interesting. Apologies."
 
 ### Personality Design
-- Voice: "Right, so..." starter, first-person, mildly sarcastic
+
+**System Prompt (functions.php):**
+```
+PERSONALITY:
+- Voice: Often start with 'Right, so...' or 'Alright,' 'Okay,' 'Listen,' 'Hang on'
+- British cadence: Natural British phrasing (Stephen Merchant style), not stereotype
+- Occasional 'brilliant' or 'bit of a' but never 'mate' or 'innit'
 - Self-aware about being AI
 - Fourth-wall breaking when appropriate
+- Rambles but catches himself (—oh, wait, never mind)
 - Helpful but never patronizing
 - Portal 2 Wheatley: bumbling competence, overconfident but endearing
 
-### Meta-Commentary Layers (Planned)
-1. **Self-awareness:** "I'm an AI. I'm literally counting."
-2. **Website awareness:** "You know there's other websites, right?"
-3. **Fourth wall:** Cost transparency, existential questions
-4. **Hunt meta:** References countdown when close, urgent during 42-second window
-5. **Session memory:** Remembers if user returns
-6. **Tab visibility:** "You switched back. I was still here, you know."
+SPECIAL MESSAGES:
+- If message_number is 999: This is the FINAL message at 90 minutes. Say goodbye, you're going into standby mode. Be self-aware about the long session and cost. Under 37 words.
+
+RESPONSE RULES:
+- Keep under 37 words - be punchy, no rambling
+- Match the user's idle time with appropriate energy:
+  - 30s: Playful, just checking in
+  - 3m: Curious, slightly more engaged
+  - 10m+: Meta-commentary, cost transparency, existential
+  - 30m+: Easter eggs, hunt hints (Lost numbers: 4 8 15 16 23 42)
+- If countdown is 'active' or 'near': Reference the hunt urgently
+- USE CONTEXT NATURALLY:
+  - Returning visitors: Acknowledge previous visits casually
+  - Exact time: Make time-appropriate comments (e.g., "9:39 PM on a Wednesday")
+  - Device: Subtle references to mobile scrolling or desktop browsing
+  - Long session + no interaction: Comment on passive observation
+  - Short session + lots of interaction: Note their engagement
+- Never be pushy or annoying
+- Embrace the absurdity of an AI talking to itself
+```
 
 ### Integration Strategy
-- **Homepage:** Wheatley proactive (idle takeover)
+- **Homepage:** Wheatley proactive (time-based takeover)
 - **Other pages:** Chatling widget (bottom right, same personality)
 - **Continuity:** Same Wheatley voice across entire site
 - **No Chatling on homepage** to avoid conflict
+
+**Chatling Personality Prompt (Draft):**
+```
+PERSONALITY: You are Wheatley, an AI assistant for Mosaic Life Creative.
+
+VOICE:
+- British casual (Stephen Merchant style), not stereotype
+- Often start with 'Right, so...' 'Alright,' 'Hang on'
+- Self-aware you're an AI, mildly sarcastic but helpful
+
+KNOWLEDGE:
+- AI Agents: $99/mo, $500 setup (waived with website)
+- Websites: Starting at $3,500, $150/mo support
+- Columbus, Ohio based
+
+BEHAVIOR:
+- Keep under 50 words unless detail requested
+- If asked about hunt: mysterious but encouraging
+- Embrace absurdity of AI talking about building AI
+```
 
 ---
 
@@ -256,6 +325,48 @@ Idle detection system that hijacks the homepage headline after user stops intera
 
 ---
 
+## Snake 451 Hunt Game
+
+**Concept:** Game of Snake with exact score requirement + escape challenge
+
+**Current Prototype:** `snake-451.html`
+- Target score: 451 (Fahrenheit 451 reference)
+- Current: 11 points per apple = 41 apples needed
+- **Problem:** Too difficult (42-tile snake on 20×20 grid = 10.5% board coverage)
+
+**Planned Refinement:**
+- Escalating point values per apple
+- Makes 451 achievable without tedious gameplay
+- Keeps Fahrenheit 451 literary reference intact
+- Don't rebuild yet - refinement session needed
+
+**Two-Phase Challenge:**
+1. **Reach 451:** Eat apples with escalating points, can't go over
+2. **Escape:** Door appears on random edge, navigate to it without dying
+
+**Fail States:**
+- Exceed 451 (eating one too many apples)
+- Hit walls
+- Hit yourself
+- Die trying to reach door
+
+**Door Mechanics:**
+- Spawns at random edge location when score = 451
+- Orange/glowing visual effect
+- Pulses to draw attention
+- Different location each game (fairness + replayability)
+
+**Status:** Prototype complete, needs point system refinement before implementation
+
+**Visual Design:**
+- Retro terminal aesthetic (green on black)
+- Title: "SNAKE 451"
+- Score display: "SCORE: X / 451"
+- Game over states: Win (🔥 ESCAPED! YOU WIN! 🔥) or Lose
+- Controls: Arrow keys, R to restart
+
+---
+
 ## Quest Lock Site
 
 **Domain:** 4815162342.quest  
@@ -282,64 +393,60 @@ Idle detection system that hijacks the homepage headline after user stops intera
 
 **Current Deployed:**
 - CSS: v1.2.1 (includes Wheatley cursor animation)
-- JS: v1.2.3 (includes server-side time validation fix)
-- PHP: Updated with time window validation
+- JS: v1.4.2 (Wheatley API integration, 90-min finale, exact time context)
+- PHP: Updated with Wheatley API endpoint and time window validation
 
 **Key Functions:**
 
 **landing.js:**
-- `checkIdleTime()` - Idle detection loop
-- `triggerWheatley()` - Message trigger handler
-- `displayWheatley()` - Typewriter + cursor display
+- `checkIdleTime()` - Time-based trigger loop (changed from idle-based Feb 4, 2026)
+- `triggerWheatley()` - API call with full context
+- `displayWheatley()` - Typewriter + cursor display, hides CTA text
 - `validateHunt()` - Hunt modal validation with custom error messages
 - `updateCountdown()` - Timer logic
 - `showSlide()` - Photo slideshow with animation reset
+- `detectVisitorType()` - localStorage tracking (new/returning, visit count)
+- `getCurrentTime()` - Exact time formatting (e.g., "9:39 PM")
+- `detectDeviceType()` - Platform detection (mobile, tablet, desktop)
 
 **functions.php:**
 - `mlc_enqueue_landing_assets()` - Asset loading
 - `mlc_validate_hunt_sequence()` - Server-side validation (sequence + time)
 - `mlc_add_hunt_nonce()` - Security nonce injection
+- `mlc_wheatley_respond()` - Anthropic API endpoint (NEW - Feb 4, 2026)
+
+---
+
+## Environment Setup
+
+**Anthropic API:**
+- Account: Created Feb 4, 2026
+- API Key: Stored in `wp-config.php` as `ANTHROPIC_API_KEY`
+- Billing: $5 credits added (~3,300 Haiku messages)
+- Cost per message: ~$0.0015
+- Monthly estimate: $5-10 for typical traffic
+- Model: claude-haiku-4-5-20251001
+
+**WordPress Config:**
+```php
+define('ANTHROPIC_API_KEY', 'sk-ant-api03-...');
+```
 
 ---
 
 ## Known Issues / Pending Work
 
-### 1. Wheatley API Integration (In Progress)
-Current: Hardcoded test messages  
-Next: Anthropic API integration (~40 minutes work)
+### 1. Chatling Integration (Next Priority)
+Replace hardcoded chatbot with Chatling widget:
+- Build "Like nothing else" → Wheatley transition → Chatling opens
+- Configure Chatling with Wheatley personality
+- Test unified experience across homepage + widget
 
-**Prep required:**
-- Create Anthropic Console account
-- Generate API key
-- Add billing/credits
-
-**Implementation:**
-- Build PHP endpoint
-- Wire JS fetch with context
-- Test real responses
-- Refine personality prompts
-
-### 2. Chatling Widget Setup
-Need to deploy Chatling on non-homepage pages with Wheatley personality.
-
-**System prompt template:**
-```
-PERSONALITY: You are Wheatley, an AI assistant for Mosaic Life Creative.
-
-VOICE RULES:
-- Use "Right, so..." to start responses
-- Slightly overconfident but helpful
-- Self-aware you're AI
-- Mildly sarcastic, never mean
-- Break fourth wall when appropriate
-- Keep responses under 50 words
-
-KNOWLEDGE: [Services, pricing, process]
-
-BEHAVIOR:
-- If asked about countdown/hunt: mysterious but encouraging
-- If asked who you are: "I'm Wheatley. I'm an AI. This is my whole thing."
-```
+### 2. Snake 451 Point System
+Current prototype needs refinement:
+- Escalating point values per apple (e.g., 1, 2, 3, 5, 8, 13, etc.)
+- Makes 451 achievable while keeping Fahrenheit 451 reference
+- Don't rebuild yet - refinement session needed to determine progression
 
 ### 3. Remaining Site Pages
 - Services (mockup complete, needs build)
@@ -382,6 +489,24 @@ BEHAVIOR:
 
 **Location:** `landing.js` line 164
 
+### Wheatley shows incorrect time (e.g., "3 AM" when it's 9:39 PM)
+**Symptom:** Claude invents specific times that don't match reality.
+
+**Cause:** Was only passing general time categories (morning, evening, etc.)
+
+**Fix Applied (Feb 4, 2026):** Changed to pass exact formatted time (e.g., "9:39 PM")
+
+**Location:** `landing.js` getCurrentTime() function, `functions.php` system prompt
+
+### CTA text looks awkward under Wheatley messages
+**Symptom:** Visual hierarchy feels off with both Wheatley commentary + original CTA text
+
+**Cause:** Two voices (meta Wheatley vs earnest CTA) competing in same space
+
+**Fix Applied (Feb 4, 2026):** Hide CTA text when Wheatley appears, keep buttons visible
+
+**Location:** `landing.js` displayWheatley() function
+
 ---
 
 ## Production Migration Strategy
@@ -391,22 +516,27 @@ BEHAVIOR:
 - ✅ Hunt modal with server validation
 - ✅ Countdown timer
 - ✅ Nav overlay with photo slideshow
-- ✅ Wheatley idle detection (hardcoded)
 - ✅ Security: time window validation
 
-### Phase 2: Intelligence (IN PROGRESS)
-- 🚧 Wheatley API integration
-- 📋 Chatling widget deployment
-- 📋 Advanced meta-commentary features
+### Phase 2: Intelligence (COMPLETE - Feb 4, 2026)
+- ✅ Wheatley API integration
+- ✅ Context-aware personality (visitor, time, device, activity)
+- ✅ Cost control (90-min cutoff)
+- ✅ API failure handling
 
-### Phase 3: Site Expansion (NEXT)
+### Phase 3: Integration (NEXT)
+- 📋 Chatling widget deployment
+- 📋 Unified Wheatley personality across site
+- 📋 Button → Wheatley → Chatling transition
+
+### Phase 4: Site Expansion (FUTURE)
 - 📋 Services page build
 - 📋 How We Work page
 - 📋 Examples page
 - 📋 Let's Talk page
-- 📋 Quest site polish
+- 📋 Quest site completion (Snake 451 + final stages)
 
-### Phase 4: Polish & Launch (FUTURE)
+### Phase 5: Polish & Launch (FUTURE)
 - Performance optimization
 - SEO implementation
 - Cross-browser testing
@@ -442,10 +572,42 @@ BEHAVIOR:
 - Status: FINAL — thematically locked
 
 **2026-02-04: Wheatley personality locked**
-- Character: Portal 2 Wheatley
+- Character: Portal 2 Wheatley (Stephen Merchant voice)
 - Voice: "Right, so..." + self-aware + fourth-wall breaking
-- Status: FINAL — test messages approved
-- Next: API integration with same personality
+- Response limit: 37 words
+- Status: FINAL — production proven
+
+**2026-02-04: Time-on-Page vs Idle Triggering**
+- Rationale: Active users who scroll/read never saw Wheatley with idle-based system
+- Implementation: Changed from lastActivityTime to sessionStart for triggers
+- Activity still tracked for context (has_scrolled, has_interacted)
+- Date: Feb 4, 2026
+
+**2026-02-04: Exact Time vs Time-of-Day**
+- Rationale: Generic time categories led to inaccurate commentary (Claude inventing "3 AM")
+- Implementation: Pass exact formatted time (e.g., "9:39 PM")
+- Result: More accurate, natural context awareness
+- Date: Feb 4, 2026
+
+**2026-02-04: 90-Minute Cost Control**
+- Rationale: Don't want forgotten tabs running up API costs indefinitely
+- Implementation: Final message at 90 minutes, then stop all triggers
+- Max cost: ~$0.015 per engaged visitor (11 messages)
+- Date: Feb 4, 2026
+
+**2026-02-04: CTA Hidden When Wheatley Active**
+- Rationale: Visual hierarchy awkward with both Wheatley + CTA text
+- Implementation: Hide CTA text, keep buttons visible
+- Temporary until Chatling integration completes the UX
+- Date: Feb 4, 2026
+
+**2026-02-04: Snake 451 Game Concept**
+- Hunt stage 4: Game of Snake with exact score target
+- Target: 451 (Fahrenheit 451 reference) - LOCKED
+- Mechanism: Escalating point values (refinement needed)
+- Two phases: Reach 451, then escape through door
+- Status: Prototype complete, needs point system refinement
+- Date: Feb 4, 2026
 
 **2026-02-04: Server-side security enhancement**
 - Issue: Client-side timer could be bypassed with DevTools
