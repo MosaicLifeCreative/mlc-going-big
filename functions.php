@@ -56,7 +56,7 @@ function mlc_enqueue_landing_assets() {
             'mlc-landing-js',
             get_stylesheet_directory_uri() . '/assets/js/landing.js',
             array(),
-            '1.2.2',
+            '1.4.1',
             true // Load in footer
         );
     }
@@ -133,4 +133,136 @@ function mlc_add_hunt_nonce() {
     }
 }
 add_action('wp_head', 'mlc_add_hunt_nonce');
+
+// ============================================
+// Wheatley AI API Endpoint
+// ============================================
+
+add_action('rest_api_init', function() {
+    register_rest_route('mlc/v1', '/wheatley', array(
+        'methods' => 'POST',
+        'callback' => 'mlc_wheatley_respond',
+        'permission_callback' => '__return_true' // Public endpoint
+    ));
+});
+
+function mlc_wheatley_respond($request) {
+    $params = $request->get_json_params();
+    
+    // Get context from request
+    $idle_time = isset($params['idle_time']) ? intval($params['idle_time']) : 0;
+    $message_number = isset($params['message_number']) ? intval($params['message_number']) : 1;
+    $countdown_status = isset($params['countdown_status']) ? $params['countdown_status'] : 'inactive';
+    $previous_messages = isset($params['previous_messages']) ? $params['previous_messages'] : array();
+    $visitor = isset($params['visitor']) ? $params['visitor'] : array('isReturning' => false, 'visitCount' => 1);
+    $time_of_day = isset($params['time_of_day']) ? $params['time_of_day'] : 'unknown';
+    $device = isset($params['device']) ? $params['device'] : 'unknown';
+    $session_duration = isset($params['session_duration']) ? intval($params['session_duration']) : 0;
+    $has_scrolled = isset($params['has_scrolled']) ? $params['has_scrolled'] : false;
+    $has_interacted = isset($params['has_interacted']) ? $params['has_interacted'] : false;
+    
+    // Build system prompt
+    $system_prompt = "You are Wheatley, an AI assistant for Mosaic Life Creative's website. You hijack the homepage headline when users go idle.
+
+PERSONALITY:
+- Voice: Often start with 'Right, so...' or 'Alright,' 'Okay,' 'Listen,' 'Hang on'
+- British cadence: Natural British phrasing (Stephen Merchant style), not stereotype. Occasional 'brilliant' or 'bit of a' but never 'mate' or 'innit'
+- Self-aware you're an AI
+- Fourth-wall breaking when appropriate
+- Rambles but catches himself (—oh, wait, never mind)
+- Helpful but never patronizing
+- Portal 2 Wheatley: bumbling competence, overconfident but endearing
+
+CONTEXT:
+- User has been on page for " . $idle_time . " seconds
+- This is message #" . $message_number . "
+- Countdown timer status: " . $countdown_status . "
+- Visitor type: " . ($visitor['isReturning'] ? 'returning (visit #' . $visitor['visitCount'] . ')' : 'first-time') . "
+- Time of day: " . $time_of_day . "
+- Device: " . $device . "
+- Session duration: " . $session_duration . " seconds total
+- Activity: " . ($has_scrolled ? 'scrolled' : 'no scroll') . ", " . ($has_interacted ? 'interacted' : 'no interaction yet') . "
+
+RESPONSE RULES:
+- Keep under 37 words
+- Match the user's idle time with appropriate energy:
+  - 30s: Playful, just checking in
+  - 3m: Curious, slightly more engaged
+  - 10m+: Meta-commentary, cost transparency, existential
+  - 30m+: Easter eggs, hunt hints (Lost numbers: 4 8 15 16 23 42)
+- If countdown is 'active' or 'near': Reference the hunt urgently
+- USE CONTEXT NATURALLY:
+  - Returning visitors: Acknowledge previous visits casually
+  - Time of day: Make time-appropriate comments (morning energy vs late night)
+  - Device: Subtle references to mobile scrolling or desktop browsing
+  - Long session + no interaction: Comment on passive observation
+  - Short session + lots of interaction: Note their engagement
+- Never be pushy or annoying
+- Embrace the absurdity of an AI talking to itself
+
+Generate ONE message for this idle moment.";
+
+    // Build user message with conversation history
+    $conversation_history = '';
+    if (!empty($previous_messages)) {
+        $conversation_history = "Previous messages you've sent:\n";
+        foreach ($previous_messages as $msg) {
+            $conversation_history .= "- " . $msg . "\n";
+        }
+        $conversation_history .= "\nGenerate a NEW message that doesn't repeat these.";
+    }
+    
+    $user_message = $conversation_history ?: "Generate a message for this idle moment.";
+    
+    // Call Anthropic API
+    $api_key = defined('ANTHROPIC_API_KEY') ? ANTHROPIC_API_KEY : '';
+    
+    if (empty($api_key)) {
+        return new WP_Error('no_api_key', 'Anthropic API key not configured', array('status' => 500));
+    }
+    
+    $response = wp_remote_post('https://api.anthropic.com/v1/messages', array(
+        'headers' => array(
+            'Content-Type' => 'application/json',
+            'x-api-key' => $api_key,
+            'anthropic-version' => '2023-06-01'
+        ),
+        'body' => json_encode(array(
+            'model' => 'claude-haiku-4-5-20251001',
+            'max_tokens' => 150,
+            'system' => $system_prompt,
+            'messages' => array(
+                array(
+                    'role' => 'user',
+                    'content' => $user_message
+                )
+            )
+        )),
+        'timeout' => 30
+    ));
+    
+    if (is_wp_error($response)) {
+        return new WP_Error('api_error', $response->get_error_message(), array('status' => 500));
+    }
+    
+    $body = json_decode(wp_remote_retrieve_body($response), true);
+
+    // Log the full response for debugging
+    error_log('Anthropic API Response: ' . print_r($body, true));
+
+    if (isset($body['content'][0]['text'])) {
+        return array(
+            'success' => true,
+            'message' => $body['content'][0]['text']
+        );
+    }
+
+    // Return the actual error from Anthropic if available
+    if (isset($body['error'])) {
+        return new WP_Error('api_error', 'Anthropic API Error: ' . $body['error']['message'], array('status' => 500, 'details' => $body['error']));
+    }
+
+    return new WP_Error('invalid_response', 'Invalid API response structure', array('status' => 500, 'body' => $body));
+    }
+
 ?>

@@ -103,7 +103,10 @@
         idleTime: 0,
         wheatleyActive: false,
         wheatleyMessageCount: 0,
-        lastActivityTime: Date.now()
+        lastActivityTime: Date.now(),
+        sessionStart: Date.now(),
+        hasScrolled: false,
+        hasInteracted: false
     };
 
     // ─── DOM ELEMENTS ───────────────────────────────────────────
@@ -154,12 +157,15 @@
     function resetIdleTimer() {
         state.lastActivityTime = Date.now();
         state.idleTime = 0;
+        state.hasInteracted = true;
     }
 
     function checkIdleTime() {
         const now = Date.now();
-        const idleSeconds = Math.floor((now - state.lastActivityTime) / 1000);
-        state.idleTime = idleSeconds;
+        const timeOnPage = Math.floor((now - state.sessionStart) / 1000);  // ← Changed: time since page load
+        const timeSinceActivity = Math.floor((now - state.lastActivityTime) / 1000);  // ← Still track this for context
+        
+        state.idleTime = timeOnPage;  // Store for context passing
         
         // Don't trigger if Wheatley is already active
         if (state.wheatleyActive) return;
@@ -169,7 +175,7 @@
         
         // Check if we've hit a threshold we haven't triggered yet
         for (let i = 0; i < thresholds.length; i++) {
-            if (idleSeconds >= thresholds[i] && state.wheatleyMessageCount === i) {
+            if (timeOnPage >= thresholds[i] && state.wheatleyMessageCount === i) {  // ← Changed: use timeOnPage
                 triggerWheatley(i + 1);
                 state.wheatleyMessageCount++;
                 break;
@@ -177,8 +183,8 @@
         }
         
         // After 30m, trigger every 10 minutes
-        if (idleSeconds >= 1800 && idleSeconds % 600 === 0) {
-            const extraMessages = Math.floor((idleSeconds - 1800) / 600);
+        if (timeOnPage >= 1800 && timeOnPage % 600 === 0) {  // ← Changed: use timeOnPage
+            const extraMessages = Math.floor((timeOnPage - 1800) / 600);
             if (state.wheatleyMessageCount === 5 + extraMessages) {
                 triggerWheatley(6 + extraMessages);
                 state.wheatleyMessageCount++;
@@ -186,17 +192,115 @@
         }
     }
 
-    function triggerWheatley(messageNumber) {
-        console.log(`🤖 Wheatley Message #${messageNumber} triggered at ${state.idleTime}s idle`);
+    // ─── CONTEXT DETECTION ────────────────────────────────
+    function detectVisitorType() {
+        const visitKey = 'mlc_visited';
+        const countKey = 'mlc_visit_count';
         
+        let isReturning = false;
+        let visitCount = 1;
+        
+        try {
+            const lastVisit = localStorage.getItem(visitKey);
+            if (lastVisit) {
+                isReturning = true;
+                visitCount = parseInt(localStorage.getItem(countKey) || '1') + 1;
+            }
+            
+            localStorage.setItem(visitKey, Date.now().toString());
+            localStorage.setItem(countKey, visitCount.toString());
+        } catch (e) {
+            // localStorage blocked - treat as new visitor
+        }
+        
+        return { isReturning, visitCount };
+    }
+
+    function detectTimeOfDay() {
+        const hour = new Date().getHours();
+        
+        if (hour < 6) return 'late_night';      // 12am-6am
+        if (hour < 12) return 'morning';        // 6am-12pm
+        if (hour < 17) return 'afternoon';      // 12pm-5pm
+        if (hour < 21) return 'evening';        // 5pm-9pm
+        return 'night';                          // 9pm-12am
+    }
+
+    function detectDeviceType() {
+        const ua = navigator.userAgent.toLowerCase();
+        
+        if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) {
+            return 'tablet';
+        }
+        if (/mobile|iphone|ipod|blackberry|opera mini|iemobile/i.test(ua)) {
+            return 'mobile';
+        }
+        return 'desktop';
+    }
+
+    async function triggerWheatley(messageNumber) {
+        if (state.wheatleyActive) return;
         state.wheatleyActive = true;
         
-        // Get message (use last message if we've run out)
-        const messageIndex = Math.min(messageNumber - 1, CONFIG.wheatleyMessages.length - 1);
-        const message = CONFIG.wheatleyMessages[messageIndex];
+        console.log(`🤖 Wheatley Message #${messageNumber} triggered at ${state.idleTime}s idle`);
         
-        // Display with typewriter effect
-        displayWheatley(message);
+        const idleSeconds = state.idleTime;
+        
+        // Determine countdown status
+        let countdownStatus = 'inactive';
+        const now = new Date();
+        const target = new Date(now);
+        target.setHours(15, 16, 23, 0); // 3:16:23 PM
+        
+        const timeUntil = (target - now) / 1000;
+        if (timeUntil <= 60 && timeUntil > 0) {
+            countdownStatus = 'near'; // Within 1 minute
+        } else if (state.huntWindowActive) {
+            countdownStatus = 'active'; // 42-second window open
+        }
+        
+        try {
+            const response = await fetch('/wp-json/mlc/v1/wheatley', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    idle_time: idleSeconds,
+                    message_number: messageNumber,
+                    countdown_status: countdownStatus,
+                    previous_messages: state.previousWheatleyMessages || [],
+                    // NEW CONTEXT
+                    visitor: detectVisitorType(),
+                    time_of_day: detectTimeOfDay(),
+                    device: detectDeviceType(),
+                    session_duration: Math.floor((Date.now() - state.sessionStart) / 1000),
+                    has_scrolled: state.hasScrolled,
+                    has_interacted: state.hasInteracted
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success && data.message) {
+                // Store message in history
+                if (!state.previousWheatleyMessages) {
+                    state.previousWheatleyMessages = [];
+                }
+                state.previousWheatleyMessages.push(data.message);
+                
+                await displayWheatley(data.message);
+            } else {
+                // Fallback to hardcoded message if API fails
+                const messageIndex = Math.min(messageNumber - 1, CONFIG.wheatleyMessages.length - 1);
+                await displayWheatley(CONFIG.wheatleyMessages[messageIndex]);
+            }
+        } catch (error) {
+            console.error('Wheatley API error:', error);
+            // Fallback to hardcoded message
+            const messageIndex = Math.min(messageNumber - 1, CONFIG.wheatleyMessages.length - 1);
+            await displayWheatley(CONFIG.wheatleyMessages[messageIndex]);
+        }
     }
 
     async function displayWheatley(text) {
@@ -415,6 +519,12 @@
             openChatbot();
         }, 400);
     });
+
+    // ─── SCROLL LISTENER ────────────────────────────────────────
+    window.addEventListener('scroll', () => {
+        state.hasScrolled = true;
+        resetIdleTimer();
+    }, { once: true });  // Only track first scroll
 
     // ─── COUNTDOWN TIMER ────────────────────────────────────────
     function updateCountdown() {

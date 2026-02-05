@@ -6,6 +6,24 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 
 ---
 
+## Quick Start (For New Sessions)
+
+**Current Priority:** Wheatley API integration (~40 min)
+
+**Prep Required Before Starting:**
+1. Anthropic Console account created
+2. API key generated + saved securely
+3. Billing/credits added to account
+
+**Next Steps:**
+1. Build PHP endpoint: `/wp-json/mlc/v1/wheatley`
+2. Wire JS fetch in `landing.js`
+3. Test with real API calls
+4. Refine personality prompts
+5. Update ROADMAP.md when complete
+
+---
+
 ## Current Production Files
 
 | File | Version | Status |
@@ -18,6 +36,23 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 
 ---
 
+## File Structure
+
+```
+/wp-content/themes/divi-child/
+├── page-landing.php          (Landing page template)
+├── functions.php              (Enqueue + hunt validation)
+├── assets/
+│   ├── css/
+│   │   └── landing.css       (v1.2.1)
+│   └── js/
+│       └── landing.js        (v1.2.3)
+├── services-mockup.html       (Mockup, not deployed)
+└── claude.md / ROADMAP.md     (Documentation)
+```
+
+---
+
 ## Tech Stack
 
 **Production (Current):**
@@ -26,6 +61,12 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 - Vanilla JavaScript for interactive components
 - Plus Jakarta Sans (Google Fonts)
 - Domains: mosaiclifecreative.com (main), 4815162342.quest (hunt site)
+
+**Deployment:**
+- Host: SiteGround
+- SFTP configured in VS Code
+- Git tracking (local, push manually)
+- **CRITICAL:** Sendy directory at `/sendy` (DO NOT OVERWRITE during migrations)
 
 **AI Systems:**
 - Wheatley (homepage): Anthropic API integration in progress
