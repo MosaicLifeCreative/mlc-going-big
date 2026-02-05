@@ -10,7 +10,7 @@
             { text: "Hello.", duration: 2400, size: "clamp(48px, 10vw, 96px)", tracking: -2, highlight: false, isHeading: true },
             { text: "We build websites that make people stop scrolling.", duration: 3400, size: "clamp(26px, 4.5vw, 48px)", tracking: -0.5, highlight: false, isHeading: false },
             { text: "Built Different.", duration: 3000, size: "clamp(40px, 8vw, 80px)", tracking: -1.5, highlight: true, isHeading: true },
-            { text: "So how do you want yours to feel?", duration: null, size: "clamp(24px, 4vw, 42px)", tracking: -0.5, highlight: false, isHeading: false }
+            { text: "So how do you want your website to feel?", duration: null, size: "clamp(24px, 4vw, 42px)", tracking: -0.5, highlight: false, isHeading: false }
         ],
 
         // Wheatley test messages (hardcoded for now, API later)
@@ -182,13 +182,19 @@
             }
         }
         
-        // After 30m, trigger every 10 minutes
-        if (timeOnPage >= 1800 && timeOnPage % 600 === 0) {  // ← Changed: use timeOnPage
+        // After 30m, trigger every 10 minutes UNTIL 90 minutes
+        if (timeOnPage >= 1800 && timeOnPage < 5400 && timeOnPage % 600 === 0) {
             const extraMessages = Math.floor((timeOnPage - 1800) / 600);
             if (state.wheatleyMessageCount === 5 + extraMessages) {
                 triggerWheatley(6 + extraMessages);
                 state.wheatleyMessageCount++;
             }
+        }
+
+        // Final message at 90 minutes (5400 seconds)
+        if (timeOnPage >= 5400 && state.wheatleyMessageCount < 999) {
+            triggerWheatley(999);  // Special finale message number
+            state.wheatleyMessageCount = 999;  // Prevent any future triggers
         }
     }
 
@@ -216,14 +222,17 @@
         return { isReturning, visitCount };
     }
 
-    function detectTimeOfDay() {
-        const hour = new Date().getHours();
+    function getCurrentTime() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
         
-        if (hour < 6) return 'late_night';      // 12am-6am
-        if (hour < 12) return 'morning';        // 6am-12pm
-        if (hour < 17) return 'afternoon';      // 12pm-5pm
-        if (hour < 21) return 'evening';        // 5pm-9pm
-        return 'night';                          // 9pm-12am
+        // Format as "9:39 PM" style
+        const period = hours >= 12 ? 'PM' : 'AM';
+        const displayHours = hours % 12 || 12;
+        const displayMinutes = String(minutes).padStart(2, '0');
+        
+        return `${displayHours}:${displayMinutes} ${period}`;
     }
 
     function detectDeviceType() {
@@ -272,7 +281,7 @@
                     previous_messages: state.previousWheatleyMessages || [],
                     // NEW CONTEXT
                     visitor: detectVisitorType(),
-                    time_of_day: detectTimeOfDay(),
+                    current_time: getCurrentTime(),
                     device: detectDeviceType(),
                     session_duration: Math.floor((Date.now() - state.sessionStart) / 1000),
                     has_scrolled: state.hasScrolled,
@@ -297,37 +306,54 @@
             }
         } catch (error) {
             console.error('Wheatley API error:', error);
-            // Fallback to hardcoded message
-            const messageIndex = Math.min(messageNumber - 1, CONFIG.wheatleyMessages.length - 1);
-            await displayWheatley(CONFIG.wheatleyMessages[messageIndex]);
+            // Use clever API failure message instead of generic fallback
+            const apiFallback = "Right, so... bit awkward. The person who built me ran out of API credits. So instead of my usual dynamically-generated wit, you get this pre-written message. It's like ordering a gourmet meal and getting a microwave dinner. I'm still here, just... significantly less interesting. Apologies.";
+            await displayWheatley(apiFallback);
         }
     }
 
     async function displayWheatley(text) {
-        // Hide current phase content
-        hidePhase();
-        await sleep(300);
+        // Make sure we're showing Phase 4 (with buttons)
+        if (state.currentPhase !== 4) {
+            state.currentPhase = 4;
+            showPhase();
+            await sleep(300);
+        }
         
-        // Clear headline and prepare for typewriter
-        els.phaseHeadline.textContent = '';
-        els.phaseHeadline.style.fontSize = 'clamp(24px, 4vw, 42px)';
-        els.phaseHeadline.style.letterSpacing = '-0.5px';
-        els.phaseHeadline.style.fontWeight = 'var(--weight-body)';
-        els.phaseHeadline.classList.remove('is-highlight');
+        // Hide CTA text when Wheatley appears
+        els.phaseHeadline.style.display = 'none';
         
-        // Show phase container
-        showPhase();
+        // Create Wheatley's message container above CTA
+        let wheatleyContainer = document.getElementById('wheatley-message');
+        if (!wheatleyContainer) {
+            wheatleyContainer = document.createElement('div');
+            wheatleyContainer.id = 'wheatley-message';
+            wheatleyContainer.style.fontSize = 'clamp(24px, 4vw, 42px)';
+            wheatleyContainer.style.letterSpacing = '-0.5px';
+            wheatleyContainer.style.fontWeight = 'var(--weight-body)';
+            wheatleyContainer.style.marginBottom = '1rem';
+            wheatleyContainer.style.minHeight = '180px';
+            wheatleyContainer.style.lineHeight = '1.3';
+            wheatleyContainer.style.display = 'block';
+            els.phaseHeadline.parentNode.insertBefore(wheatleyContainer, els.phaseHeadline);
+        }
+        
+        // Clear previous Wheatley message
+        wheatleyContainer.textContent = '';
         
         // Typewriter effect
         for (let i = 0; i < text.length; i++) {
-            els.phaseHeadline.textContent += text[i];
-            await sleep(30); // 30ms per character
+            wheatleyContainer.textContent += text[i];
+            await sleep(30);
         }
         
-        // Add blinking cursor after text
+        // Add blinking cursor
         const cursor = document.createElement('span');
         cursor.className = 'wheatley-cursor';
-        els.phaseHeadline.appendChild(cursor);
+        wheatleyContainer.appendChild(cursor);
+        
+        // Reset so next message can trigger
+        state.wheatleyActive = false;
     }
 
     // ─── NAV PHOTO SLIDESHOW ────────────────────────────────────

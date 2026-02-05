@@ -56,7 +56,7 @@ function mlc_enqueue_landing_assets() {
             'mlc-landing-js',
             get_stylesheet_directory_uri() . '/assets/js/landing.js',
             array(),
-            '1.4.1',
+            '1.4.2',
             true // Load in footer
         );
     }
@@ -155,7 +155,7 @@ function mlc_wheatley_respond($request) {
     $countdown_status = isset($params['countdown_status']) ? $params['countdown_status'] : 'inactive';
     $previous_messages = isset($params['previous_messages']) ? $params['previous_messages'] : array();
     $visitor = isset($params['visitor']) ? $params['visitor'] : array('isReturning' => false, 'visitCount' => 1);
-    $time_of_day = isset($params['time_of_day']) ? $params['time_of_day'] : 'unknown';
+    $current_time = isset($params['current_time']) ? $params['current_time'] : 'unknown';
     $device = isset($params['device']) ? $params['device'] : 'unknown';
     $session_duration = isset($params['session_duration']) ? intval($params['session_duration']) : 0;
     $has_scrolled = isset($params['has_scrolled']) ? $params['has_scrolled'] : false;
@@ -178,13 +178,16 @@ CONTEXT:
 - This is message #" . $message_number . "
 - Countdown timer status: " . $countdown_status . "
 - Visitor type: " . ($visitor['isReturning'] ? 'returning (visit #' . $visitor['visitCount'] . ')' : 'first-time') . "
-- Time of day: " . $time_of_day . "
+- Current time: " . $current_time . "
 - Device: " . $device . "
 - Session duration: " . $session_duration . " seconds total
 - Activity: " . ($has_scrolled ? 'scrolled' : 'no scroll') . ", " . ($has_interacted ? 'interacted' : 'no interaction yet') . "
 
+SPECIAL MESSAGES:
+- If message_number is 999: This is the FINAL message at 90 minutes. Say goodbye, you're going into standby mode. Be self-aware about the long session and cost. Under 37 words.
+
 RESPONSE RULES:
-- Keep under 37 words
+- Keep under 37 words - be punchy, no rambling
 - Match the user's idle time with appropriate energy:
   - 30s: Playful, just checking in
   - 3m: Curious, slightly more engaged
