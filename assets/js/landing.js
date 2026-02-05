@@ -38,7 +38,7 @@
 
         slideshowDuration: 6000,
 
-        // Chatbot flows
+        // Chatbot flows (KEEP until Chatling integration complete)
         chatFlows: {
             opener: { from: "bot", text: "Interesting choice. Tell me something — what made you click that?" },
             answers: {
@@ -82,6 +82,28 @@
         }
     };
 
+    // ─── UTILITY: URL PERSONALIZATION DECODER ──────────────────
+    // NEW: Decode URL parameters for personalized Wheatley messages
+    function getPersonalizationFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        const encoded = params.get('u');
+        
+        if (!encoded) return { name: null, isBirthday: false };
+        
+        try {
+            const decoded = atob(encoded); // Base64 decode
+            const parts = decoded.split(',');
+            
+            return {
+                name: parts[0] || null,
+                isBirthday: parts[1] === 'birthday'
+            };
+        } catch (e) {
+            console.error('Failed to decode personalization:', e);
+            return { name: null, isBirthday: false };
+        }
+    }
+
     // ─── STATE ──────────────────────────────────────────────────
     const state = {
         phase: 0,
@@ -106,8 +128,17 @@
         lastActivityTime: Date.now(),
         sessionStart: Date.now(),
         hasScrolled: false,
-        hasInteracted: false
+        hasInteracted: false,
+        
+        // NEW: Personalization from URL
+        userName: null,
+        isBirthday: false
     };
+
+    // NEW: Get personalization on page load
+    const personalization = getPersonalizationFromURL();
+    state.userName = personalization.name;
+    state.isBirthday = personalization.isBirthday;
 
     // ─── DOM ELEMENTS ───────────────────────────────────────────
     const $ = (sel) => document.querySelector(sel);
@@ -162,27 +193,23 @@
 
     function checkIdleTime() {
         const now = Date.now();
-        const timeOnPage = Math.floor((now - state.sessionStart) / 1000);  // ← Changed: time since page load
-        const timeSinceActivity = Math.floor((now - state.lastActivityTime) / 1000);  // ← Still track this for context
+        const timeOnPage = Math.floor((now - state.sessionStart) / 1000);
+        const timeSinceActivity = Math.floor((now - state.lastActivityTime) / 1000);
         
-        state.idleTime = timeOnPage;  // Store for context passing
+        state.idleTime = timeOnPage;
         
-        // Don't trigger if Wheatley is already active
         if (state.wheatleyActive) return;
         
-        // Trigger thresholds: 30s, 180s (3m), 600s (10m), 1200s (20m), 1800s (30m)
         const thresholds = [30, 180, 600, 1200, 1800];
         
-        // Check if we've hit a threshold we haven't triggered yet
         for (let i = 0; i < thresholds.length; i++) {
-            if (timeOnPage >= thresholds[i] && state.wheatleyMessageCount === i) {  // ← Changed: use timeOnPage
+            if (timeOnPage >= thresholds[i] && state.wheatleyMessageCount === i) {
                 triggerWheatley(i + 1);
                 state.wheatleyMessageCount++;
                 break;
             }
         }
         
-        // After 30m, trigger every 10 minutes UNTIL 90 minutes
         if (timeOnPage >= 1800 && timeOnPage < 5400 && timeOnPage % 600 === 0) {
             const extraMessages = Math.floor((timeOnPage - 1800) / 600);
             if (state.wheatleyMessageCount === 5 + extraMessages) {
@@ -191,10 +218,9 @@
             }
         }
 
-        // Final message at 90 minutes (5400 seconds)
         if (timeOnPage >= 5400 && state.wheatleyMessageCount < 999) {
-            triggerWheatley(999);  // Special finale message number
-            state.wheatleyMessageCount = 999;  // Prevent any future triggers
+            triggerWheatley(999);
+            state.wheatleyMessageCount = 999;
         }
     }
 
@@ -227,7 +253,6 @@
         const hours = now.getHours();
         const minutes = now.getMinutes();
         
-        // Format as "9:39 PM" style
         const period = hours >= 12 ? 'PM' : 'AM';
         const displayHours = hours % 12 || 12;
         const displayMinutes = String(minutes).padStart(2, '0');
@@ -255,17 +280,16 @@
         
         const idleSeconds = state.idleTime;
         
-        // Determine countdown status
         let countdownStatus = 'inactive';
         const now = new Date();
         const target = new Date(now);
-        target.setHours(15, 16, 23, 0); // 3:16:23 PM
+        target.setHours(15, 16, 23, 0);
         
         const timeUntil = (target - now) / 1000;
         if (timeUntil <= 60 && timeUntil > 0) {
-            countdownStatus = 'near'; // Within 1 minute
+            countdownStatus = 'near';
         } else if (state.huntWindowActive) {
-            countdownStatus = 'active'; // 42-second window open
+            countdownStatus = 'active';
         }
         
         try {
@@ -279,20 +303,21 @@
                     message_number: messageNumber,
                     countdown_status: countdownStatus,
                     previous_messages: state.previousWheatleyMessages || [],
-                    // NEW CONTEXT
                     visitor: detectVisitorType(),
                     current_time: getCurrentTime(),
                     device: detectDeviceType(),
                     session_duration: Math.floor((Date.now() - state.sessionStart) / 1000),
                     has_scrolled: state.hasScrolled,
-                    has_interacted: state.hasInteracted
+                    has_interacted: state.hasInteracted,
+                    // NEW: Personalization context
+                    user_name: state.userName || null,
+                    is_birthday: state.isBirthday || false
                 })
             });
             
             const data = await response.json();
             
             if (data.success && data.message) {
-                // Store message in history
                 if (!state.previousWheatleyMessages) {
                     state.previousWheatleyMessages = [];
                 }
@@ -300,30 +325,25 @@
                 
                 await displayWheatley(data.message);
             } else {
-                // Fallback to hardcoded message if API fails
                 const messageIndex = Math.min(messageNumber - 1, CONFIG.wheatleyMessages.length - 1);
                 await displayWheatley(CONFIG.wheatleyMessages[messageIndex]);
             }
         } catch (error) {
             console.error('Wheatley API error:', error);
-            // Use clever API failure message instead of generic fallback
             const apiFallback = "Right, so... bit awkward. The person who built me ran out of API credits. So instead of my usual dynamically-generated wit, you get this pre-written message. It's like ordering a gourmet meal and getting a microwave dinner. I'm still here, just... significantly less interesting. Apologies.";
             await displayWheatley(apiFallback);
         }
     }
 
     async function displayWheatley(text) {
-        // Make sure we're showing Phase 4 (with buttons)
         if (state.currentPhase !== 4) {
             state.currentPhase = 4;
             showPhase();
             await sleep(300);
         }
         
-        // Hide CTA text when Wheatley appears
         els.phaseHeadline.style.display = 'none';
         
-        // Create Wheatley's message container above CTA
         let wheatleyContainer = document.getElementById('wheatley-message');
         if (!wheatleyContainer) {
             wheatleyContainer = document.createElement('div');
@@ -338,21 +358,17 @@
             els.phaseHeadline.parentNode.insertBefore(wheatleyContainer, els.phaseHeadline);
         }
         
-        // Clear previous Wheatley message
         wheatleyContainer.textContent = '';
         
-        // Typewriter effect
         for (let i = 0; i < text.length; i++) {
             wheatleyContainer.textContent += text[i];
             await sleep(30);
         }
         
-        // Add blinking cursor
         const cursor = document.createElement('span');
         cursor.className = 'wheatley-cursor';
         wheatleyContainer.appendChild(cursor);
         
-        // Reset so next message can trigger
         state.wheatleyActive = false;
     }
 
@@ -550,7 +566,7 @@
     window.addEventListener('scroll', () => {
         state.hasScrolled = true;
         resetIdleTimer();
-    }, { once: true });  // Only track first scroll
+    }, { once: true });
 
     // ─── COUNTDOWN TIMER ────────────────────────────────────────
     function updateCountdown() {
@@ -635,7 +651,6 @@
             } else {
                 state.huntStatus = 'wrong';
                 
-                // Show custom message if provided, otherwise default
                 if (data.data && data.data.message) {
                     els.huntError.textContent = data.data.message;
                 } else {
