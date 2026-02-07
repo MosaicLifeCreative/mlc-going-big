@@ -33,7 +33,8 @@
             { caption: "Trail at Buffalo Park, Flagstaff", credit: "TREY KAUFFMAN" },
             { caption: "Rincon Mountains, Tucson", credit: "TREY KAUFFMAN" },
             { caption: "San Francisco Peaks, Flagstaff", credit: "TREY KAUFFMAN" },
-            { caption: "Sunset at Buffalo Park, Flagstaff", credit: "TREY KAUFFMAN" }
+            { caption: "Sunset at Buffalo Park, Flagstaff", credit: "TREY KAUFFMAN" },
+            { caption: "Dharma Intiative, South Pacific", credit: "HUGO REYES" }
         ],
 
         slideshowDuration: 6000,

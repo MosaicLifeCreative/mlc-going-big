@@ -18,7 +18,7 @@
 - [x] 90-minute finale message with automatic shutoff
 - [x] API failure fallback with self-aware error messaging
 - [x] Clean UI: CTA text hidden when Wheatley appears, buttons remain
-- [x] URL personalization system (name + birthday flag encoding)
+- [x] URL personalization system (name + context encoding)
 - [x] Cost control: ~$0.0015 per message, max 11 messages per visitor (~$0.015/engaged visitor)
 
 ### Design & Planning
@@ -40,24 +40,66 @@
 - [ ] Unified Wheatley personality across homepage + chat widget
 - [ ] Chatling personality prompt configuration with Aperture Science backstory
 
-### 3. Wheatley Enhancements
+### 3. Share Feature (Phase 1 - Afternoon Session)
+- [ ] **Bottom-left "Personalize & Share" button**
+  - Fixed position, subtle styling, doesn't compete with main UI
+  - Opens modal on click
+- [ ] **Share Modal UI**
+  - Name field (required)
+  - Context field (optional, 50 char limit with counter)
+  - Placeholder ideas: "Birthday, Convincing my boss, Designing your logo, Got dumped, Anniversary"
+  - Real-time preview of Wheatley's greeting
+  - Generate + Copy button with success feedback
+  - Mobile-responsive (full-screen on mobile)
+- [ ] **URL Encoding**
+  - Format: `name|context` → Base64 → `?u=encoded`
+  - Example: `Jordan|designing the logo` → `?u=Sm9yZGFufGRlc2lnbmluZyB0aGUgbG9nbw==`
+- [ ] **Context-Aware Wheatley Messages**
+  - Update system prompt to parse context and personalize first message
+  - Examples: "convincing boss" → sales pitch, "got dumped" → sympathetic distraction
+- [ ] **Basic Analytics Logging**
+  - Log generated links (timestamp, name_hash, context, encoded_url)
+  - Track if generated URLs are actually visited (conversion)
+  - Privacy-first: hash names, store contexts for analytics
+
+### 4. Share Feature (Phase 2 - Future)
+- [ ] Analytics dashboard (most popular contexts, conversion rates, generation volume)
+- [ ] Gallery page: "How Others Are Sharing This"
+- [ ] Use case: customer URLs when sharing from my accounts, like LinkedIn
+- [ ] Manual curation interface for admin
+- [ ] Profanity filter for auto-display
+- [ ] Optional: Short code backend for cleaner URLs + enhanced tracking
+
+### 5. Photo Slideshow Enhancements
+- [ ] **Expand photo library to 50-100 photos**
+  - Mix personal travel photos with hunt clues
+  - Hunt clue examples: Dharma Initiative logo, Aperture Science, Ready Player One references, Fahrenheit 451 book cover, cryptic coordinates
+  - Personal photos: Travel, Arizona landscapes, adventures (replaces social media)
+- [ ] **Randomize slideshow order**
+  - Ensures hunt clues appear unpredictably
+  - Fresh experience each visit
+  - Better distribution across large photo set
+- [ ] **Mobile slideshow access**
+  - Current: Photos only visible in desktop nav overlay
+  - Solution: Add "Gallery" button/icon for mobile users
+  - Full-screen swipeable slideshow on mobile
+  - Ensures hunt clues accessible to all devices
+
+### 6. Quest Site Deployment (Tonight)
+- [ ] Deploy 4815162342.quest with current assets
+- [ ] Link together: Countdown → Sequence → Combination Lock → Snake 451
+- [ ] Create simple landing page connecting the flow
+- [ ] Test end-to-end on live domain
+- [ ] Iterate on design/mechanics as new ideas emerge
+
+### 7. Wheatley Enhancements
 - [ ] **Real math calculations:** Use actual session metrics in 10m-20m messages
   - Example: "600 seconds, 4 scrolls, 0 clicks. 600 ÷ 4 = 150 seconds per scroll. That's either thorough reading or excellent procrastination."
   - Pull from state: session_duration, scroll count, interaction count
   - Present in Wheatley's conversational voice (not clinical)
   - Keep under 37 words
-- [ ] **Name parameter personalization:** URL like `?u=U2FyYWg=` (Base64 encoded name)
-  - JavaScript reads URLSearchParams on page load
-  - Decode Base64, store in state, pass to API
-  - Wheatley's first message: "Right, so—Sarah, is it? Someone sent you here specifically. Interesting."
-  - Don't store in localStorage (privacy)
-- [ ] **Share button with URL obfuscation:**
-  - UI: Input name → generates `?u=Base64` link
-  - "Copy Link" button
-  - Clean shareable URLs without obvious parameters
-  - Option to upgrade to short code backend later for analytics
 
-### 4. Aperture Science Integration
+### 8. Aperture Science Integration
 - [ ] **Console easter eggs:** Personality Core v2.7.4 logs on page load
 ```javascript
   console.log("Aperture Science Personality Core v2.7.4");
@@ -79,7 +121,7 @@
   - Play at appropriate puzzle moments
   - Option to upgrade to real-time TTS with personalization later
 
-### 5. Quest Site Build (4815162342.quest)
+### 9. Quest Site Build (4815162342.quest)
 **Hunt Flow:**
 1. ✅ Countdown: 3:16:23 PM daily (42-second window)
 2. ✅ Sequence Input: 4815162342
@@ -89,11 +131,15 @@
    - Escalating point values per apple (easier progression)
    - Door appears at 451 on random edge
    - Must navigate to door without dying to win
+   - If they make it through the door, pop up a modal with a Fahrenheit 451 quiz question and a timer countdown down from 30
+    - The user must get the question right within the timeframe
+        - If they get it right, they move on
+        - If they get it wrong or run out of time, the game of snake starts over
    - Fail states: exceed 451, hit wall, hit self
 5. ⏳ GLaDOS Testing Chamber (optional)
 6. ⏳ Final stage: TBD (Anorak AI guide?)
 
-### 6. Site Pages
+### 10. Site Pages
 - [ ] Services page build (from mockup)
 - [ ] How We Work page (timeline/stepper design)
 - [ ] Examples page (card grid, not portfolio)
@@ -101,13 +147,13 @@
 - [ ] About page (personal story, values)
 - [ ] Contact page (form + info)
 
-### 7. Advanced Wheatley Features (Future)
+### 11. Advanced Wheatley Features (Future)
 - [ ] Hunt meta-commentary based on countdown proximity
 - [ ] Session memory (sessionStorage tracking across visits)
 - [ ] Tab visibility detection ("You switched back. I was still here.")
 - [ ] More console easter eggs (hidden commands, keystroke combos)
 
-### 8. Final Polish + Launch
+### 12. Final Polish + Launch
 - [ ] Performance optimization
 - [ ] SEO implementation
 - [ ] Cross-browser testing
@@ -116,12 +162,13 @@
 - [ ] Launch checklist execution
 
 ## 💡 Ideas / Nice-to-Have
-- Custom plugin to add/edit nav photos (show off travels)
+- Custom plugin to add/edit nav photos (show off travels + hunt clues)
 - Award submission preparation (Awwwards, CSS Design Awards, FWA)
 - Case study documentation for hunt system
 - Video walkthrough of interactive features
 - Behind-the-scenes blog post about building Wheatley
-- Personalized URL generator tool for client demos and hunt invitations
-- Share link analytics (track who's sharing, conversion rates)
+- Share link analytics dashboard with conversion tracking
+- Gallery page: "How Others Are Sharing This" (curated contexts)
 - Upgrade URL obfuscation to true short codes with backend
 - Real-time GLaDOS TTS with personalization (vs pre-generated audio)
+- Mobile gallery/slideshow access for hunt clue discovery
