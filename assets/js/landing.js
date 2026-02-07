@@ -28,17 +28,6 @@
         targetSec: 23,
         windowDuration: 42,
 
-        // Nav photos
-        navPhotos: [
-            { caption: "Trail at Buffalo Park, Flagstaff", credit: "TREY KAUFFMAN" },
-            { caption: "Rincon Mountains, Tucson", credit: "TREY KAUFFMAN" },
-            { caption: "San Francisco Peaks, Flagstaff", credit: "TREY KAUFFMAN" },
-            { caption: "Sunset at Buffalo Park, Flagstaff", credit: "TREY KAUFFMAN" },
-            { caption: "Dharma Intiative, South Pacific", credit: "HUGO REYES" }
-        ],
-
-        slideshowDuration: 6000,
-
         // Chatbot flows (KEEP until Chatling integration complete)
         chatFlows: {
             opener: { from: "bot", text: "Interesting choice. Tell me something — what made you click that?" },
@@ -84,7 +73,6 @@
     };
 
     // ─── UTILITY: URL PERSONALIZATION DECODER ──────────────────
-    // NEW: Decode URL parameters for personalized Wheatley messages
     function getPersonalizationFromURL() {
         const params = new URLSearchParams(window.location.search);
         const encoded = params.get('u');
@@ -92,7 +80,7 @@
         if (!encoded) return { name: null, isBirthday: false };
         
         try {
-            const decoded = atob(encoded); // Base64 decode
+            const decoded = atob(encoded);
             const parts = decoded.split(',');
             
             return {
@@ -115,12 +103,8 @@
         clicked: null,
         huntModalOpen: false,
         huntStatus: 'idle',
-        navOpen: false,
         chatStage: 'open',
         chatTyping: false,
-        slideshowIndex: 0,
-        slideshowInterval: null,
-        slideshowPaused: false,
         
         // Wheatley idle tracking
         idleTime: 0,
@@ -131,32 +115,20 @@
         hasScrolled: false,
         hasInteracted: false,
         
-        // NEW: Personalization from URL
+        // Personalization from URL
         userName: null,
         isBirthday: false
     };
 
-    // NEW: Get personalization on page load
+    // Get personalization on page load
     const personalization = getPersonalizationFromURL();
     state.userName = personalization.name;
     state.isBirthday = personalization.isBirthday;
 
     // ─── DOM ELEMENTS ───────────────────────────────────────────
     const $ = (sel) => document.querySelector(sel);
-    const $$ = (sel) => document.querySelectorAll(sel);
 
     const els = {
-        hamburger: $('#hamburgerBtn'),
-        navOverlay: $('#navOverlay'),
-        navClose: $('#navClose'),
-        navItems: $$('.nav-item'),
-        navPhotos: $$('.nav-photo[data-photo]'),
-        navPhotoDefault: $('#navPhotoDefault'),
-        navCaption: $('#navCaption'),
-        navCaptionTitle: $('#navCaptionTitle'),
-        navCaptionCredit: $('.nav-caption__credit'),
-        navPrev: $('#navPrev'),
-        navNext: $('#navNext'),
         phaseText: $('#phaseText'),
         phaseHeadline: $('#phaseHeadline'),
         choiceButtons: $('#choiceButtons'),
@@ -195,7 +167,6 @@
     function checkIdleTime() {
         const now = Date.now();
         const timeOnPage = Math.floor((now - state.sessionStart) / 1000);
-        const timeSinceActivity = Math.floor((now - state.lastActivityTime) / 1000);
         
         state.idleTime = timeOnPage;
         
@@ -310,7 +281,6 @@
                     session_duration: Math.floor((Date.now() - state.sessionStart) / 1000),
                     has_scrolled: state.hasScrolled,
                     has_interacted: state.hasInteracted,
-                    // NEW: Personalization context
                     user_name: state.userName || null,
                     is_birthday: state.isBirthday || false
                 })
@@ -371,127 +341,6 @@
         wheatleyContainer.appendChild(cursor);
         
         state.wheatleyActive = false;
-    }
-
-    // ─── NAV PHOTO SLIDESHOW ────────────────────────────────────
-    function showSlide(index) {
-        if (els.navPhotoDefault) {
-            els.navPhotoDefault.classList.remove('is-visible');
-        }
-
-        els.navPhotos.forEach(p => {
-            p.classList.remove('is-visible');
-        });
-
-        const targetPhoto = document.querySelector(`.nav-photo[data-photo="${index}"]`);
-        if (targetPhoto) {
-            targetPhoto.style.animation = 'none';
-            targetPhoto.offsetHeight;
-            targetPhoto.style.animation = '';
-            targetPhoto.classList.add('is-visible');
-        }
-
-        if (els.navCaption && els.navCaptionTitle) {
-            els.navCaption.classList.add('is-visible');
-            els.navCaptionTitle.textContent = CONFIG.navPhotos[index].caption;
-            
-            if (els.navCaptionCredit) {
-                els.navCaptionCredit.textContent = CONFIG.navPhotos[index].credit;
-            }
-        }
-
-        state.slideshowIndex = index;
-    }
-
-    function nextSlide() {
-        const nextIndex = (state.slideshowIndex + 1) % CONFIG.navPhotos.length;
-        showSlide(nextIndex);
-        resetSlideshowTimer();
-    }
-
-    function prevSlide() {
-        const prevIndex = state.slideshowIndex === 0 
-            ? CONFIG.navPhotos.length - 1 
-            : state.slideshowIndex - 1;
-        showSlide(prevIndex);
-        resetSlideshowTimer();
-    }
-
-    function startSlideshow() {
-        if (state.slideshowInterval) return;
-        
-        showSlide(0);
-        
-        state.slideshowInterval = setInterval(() => {
-            if (!state.slideshowPaused) {
-                nextSlide();
-            }
-        }, CONFIG.slideshowDuration);
-    }
-
-    function stopSlideshow() {
-        if (state.slideshowInterval) {
-            clearInterval(state.slideshowInterval);
-            state.slideshowInterval = null;
-        }
-        
-        els.navPhotos.forEach(p => p.classList.remove('is-visible'));
-        if (els.navPhotoDefault) {
-            els.navPhotoDefault.classList.add('is-visible');
-        }
-        if (els.navCaption) {
-            els.navCaption.classList.remove('is-visible');
-        }
-        
-        state.slideshowIndex = 0;
-        state.slideshowPaused = false;
-    }
-
-    function resetSlideshowTimer() {
-        if (state.slideshowInterval) {
-            clearInterval(state.slideshowInterval);
-            state.slideshowInterval = setInterval(() => {
-                if (!state.slideshowPaused) {
-                    nextSlide();
-                }
-            }, CONFIG.slideshowDuration);
-        }
-    }
-
-    // ─── HAMBURGER NAV ──────────────────────────────────────────
-    function openNav() {
-        state.navOpen = true;
-        els.navOverlay.classList.add('is-open');
-        startSlideshow();
-    }
-
-    function closeNav() {
-        state.navOpen = false;
-        els.navOverlay.classList.remove('is-open');
-        stopSlideshow();
-    }
-
-    els.hamburger.addEventListener('mousemove', function(e) {
-        const rect = this.getBoundingClientRect();
-        const cx = rect.left + rect.width / 2;
-        const cy = rect.top + rect.height / 2;
-        const dx = (e.clientX - cx) / rect.width * 6;
-        const dy = (e.clientY - cy) / rect.height * 6;
-        this.style.transform = `translate(${dx}px, ${dy}px) scale(1.08)`;
-    });
-
-    els.hamburger.addEventListener('mouseleave', function() {
-        this.style.transform = 'translate(0, 0) scale(1)';
-    });
-
-    els.hamburger.addEventListener('click', openNav);
-    els.navClose.addEventListener('click', closeNav);
-
-    if (els.navPrev) {
-        els.navPrev.addEventListener('click', prevSlide);
-    }
-    if (els.navNext) {
-        els.navNext.addEventListener('click', nextSlide);
     }
 
     // ─── TEXT SEQUENCE ──────────────────────────────────────────
@@ -844,6 +693,12 @@
 
     // ─── INITIALIZE ─────────────────────────────────────────────
     function init() {
+        // Check if we're on the landing page
+        if (!els.phaseText) {
+            console.log('Landing page elements not found, skipping landing-specific init');
+            return;
+        }
+
         updateCountdown();
         setInterval(updateCountdown, 1000);
 
