@@ -24,92 +24,13 @@ if (!defined('ABSPATH')) exit;
     <?php wp_head(); ?>
 </head>
 <body <?php body_class('mlc-landing-page'); ?>>
+<?php wp_body_open(); // This triggers nav injection from functions.php ?>
 
     <div class="mlc-landing">
-        <!-- Gradient Orbs -->
-        <div class="gradient-orb gradient-orb--1"></div>
-        <div class="gradient-orb gradient-orb--2"></div>
-        <div class="gradient-orb gradient-orb--3"></div>
-        <div class="gradient-orb gradient-orb--4"></div>
+        <!-- Render shared gradient background -->
+        <?php mlc_render_gradient_blobs(); ?>
 
-        <!-- Hamburger Navigation Button -->
-        <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation">
-            <div class="hamburger__inner">
-                <div class="hamburger__line hamburger__line--1"></div>
-                <div class="hamburger__line hamburger__line--2"></div>
-                <div class="hamburger__line hamburger__line--3"></div>
-            </div>
-        </button>
-
-        <!-- Navigation Overlay -->
-        <div class="nav-overlay" id="navOverlay">
-            <button class="nav-overlay__close" id="navClose" aria-label="Close navigation">&times;</button>
-
-            <div class="nav-overlay__left">
-                <div class="nav-overlay__brand">Mosaic Life Creative</div>
-                <nav>
-                    <ul class="nav-list" id="navList">
-                        <li class="nav-item" data-index="0">
-                            <span class="nav-item__number">01</span>
-                            <a href="#" class="nav-item__label">Home</a>
-                        </li>
-                        <li class="nav-item" data-index="1">
-                            <span class="nav-item__number">02</span>
-                            <a href="#" class="nav-item__label">Website Design</a>
-                        </li>
-                        <li class="nav-item" data-index="2">
-                            <span class="nav-item__number">03</span>
-                            <a href="#" class="nav-item__label">Hosting</a>
-                        </li>
-                        <li class="nav-item" data-index="3">
-                            <span class="nav-item__number">04</span>
-                            <a href="#" class="nav-item__label">Maintenance</a>
-                        </li>
-                        <li class="nav-item" data-index="4">
-                            <span class="nav-item__number">05</span>
-                            <a href="#" class="nav-item__label">Email Marketing</a>
-                        </li>
-                        <li class="nav-item" data-index="5">
-                            <span class="nav-item__number">06</span>
-                            <a href="#" class="nav-item__label">AI Chat Agents</a>
-                        </li>
-                        <li class="nav-item" data-index="6">
-                            <span class="nav-item__number">07</span>
-                            <a href="#" class="nav-item__label">About</a>
-                        </li>
-                        <li class="nav-item" data-index="7">
-                            <span class="nav-item__number">08</span>
-                            <a href="#" class="nav-item__label">Contact</a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-
-            <div class="nav-overlay__right">
-                <!-- Photo panels -->
-                <div class="nav-photo nav-photo--default is-default" id="navPhotoDefault" style="background-image: url('/wp-content/uploads/2026/02/flagstaff-hike.jpg');"></div>
-                <div class="nav-photo" data-photo="0" style="background-image: url('/wp-content/uploads/2026/02/flagstaff-hike.jpg');"></div>
-                <div class="nav-photo" data-photo="1" style="background-image: url('/wp-content/uploads/2026/02/tuscon-at-sunset.jpg');"></div>
-                <div class="nav-photo" data-photo="2" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-sunset.jpg');"></div>
-                <div class="nav-photo" data-photo="3" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
-                <div class="nav-photo" data-photo="4" style="background-image: url('/wp-content/uploads/2026/02/dharma-initiative.jpg');"></div>
-                <div class="nav-caption" id="navCaption">
-                    <div class="nav-caption__title" id="navCaptionTitle">Photo 01</div>
-                    <div class="nav-caption__credit">MLC</div>
-                </div>
-                <!-- Slideshow navigation buttons -->
-                <button id="navPrev" class="nav-control nav-control--prev" aria-label="Previous photo">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="15 18 9 12 15 6"></polyline>
-                    </svg>
-                </button>
-                <button id="navNext" class="nav-control nav-control--next" aria-label="Next photo">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
-            </div>
-        </div>
+        <!-- Nav is now injected globally via functions.php -->
 
         <!-- Main Content -->
         <div class="main-content">

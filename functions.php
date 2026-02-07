@@ -294,6 +294,21 @@ Generate ONE message for this idle moment.";
 }
 
 // ============================================
+// Reusable Component: Gradient Background Blobs
+// ============================================
+
+function mlc_render_gradient_blobs() {
+    ?>
+    <!-- Gradient Background Blobs -->
+    <div class="gradient-bg">
+        <div class="gradient-orb gradient-orb--1"></div>
+        <div class="gradient-orb gradient-orb--2"></div>
+        <div class="gradient-orb gradient-orb--3"></div>
+    </div>
+    <?php
+}
+
+// ============================================
 // Inject Nav HTML Site-Wide
 // ============================================
 
@@ -322,26 +337,30 @@ function mlc_inject_nav_html() {
                     </li>
                     <li class="nav-item" data-index="1">
                         <span class="nav-item__number">02</span>
-                        <a href="#" class="nav-item__label">Services</a>
+                        <a href="/website-design" class="nav-item__label">Website Design</a>
                     </li>
                     <li class="nav-item" data-index="2">
                         <span class="nav-item__number">03</span>
-                        <a href="#" class="nav-item__label">How We Work</a>
+                        <a href="#" class="nav-item__label">Hosting</a>
                     </li>
                     <li class="nav-item" data-index="3">
                         <span class="nav-item__number">04</span>
-                        <a href="#" class="nav-item__label">Examples</a>
+                        <a href="#" class="nav-item__label">Maintenance</a>
                     </li>
                     <li class="nav-item" data-index="4">
                         <span class="nav-item__number">05</span>
-                        <a href="#" class="nav-item__label">Let's Talk</a>
+                        <a href="#" class="nav-item__label">Email Marketing</a>
                     </li>
                     <li class="nav-item" data-index="5">
                         <span class="nav-item__number">06</span>
-                        <a href="#" class="nav-item__label">About</a>
+                        <a href="#" class="nav-item__label">AI Chat Agents</a>
                     </li>
                     <li class="nav-item" data-index="6">
                         <span class="nav-item__number">07</span>
+                        <a href="#" class="nav-item__label">About</a>
+                    </li>
+                    <li class="nav-item" data-index="7">
+                        <span class="nav-item__number">08</span>
                         <a href="#" class="nav-item__label">Contact</a>
                     </li>
                 </ul>
@@ -356,6 +375,9 @@ function mlc_inject_nav_html() {
             <div class="nav-photo" data-photo="2" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-sunset.jpg');"></div>
             <div class="nav-photo" data-photo="3" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
             <div class="nav-photo" data-photo="4" style="background-image: url('/wp-content/uploads/2026/02/dharma-initiative.jpg');"></div>
+            <div class="nav-photo" data-photo="5" style="background-image: url('/wp-content/uploads/2026/02/flagstaff-hike.jpg');"></div>
+            <div class="nav-photo" data-photo="6" style="background-image: url('/wp-content/uploads/2026/02/tuscon-at-sunset.jpg');"></div>
+            <div class="nav-photo" data-photo="7" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-sunset.jpg');"></div>
             <div class="nav-caption" id="navCaption">
                 <div class="nav-caption__title" id="navCaptionTitle">Photo 01</div>
                 <div class="nav-caption__credit">MLC</div>
