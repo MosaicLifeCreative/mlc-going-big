@@ -21,24 +21,34 @@
 - [x] URL personalization system (name + context encoding)
 - [x] Cost control: ~$0.0015 per message, max 11 messages per visitor (~$0.015/engaged visitor)
 
+### Shared Component Architecture (v1.6.0) - Feb 7, 2026
+- [x] Global nav injection via `mlc_inject_nav_html()` (wp_body_open hook)
+- [x] Reusable gradient background via `mlc_render_gradient_blobs()`
+- [x] Standalone page template pattern established (no Divi header/footer)
+- [x] Global CSS unified (nav + landing styles in single file v1.2.2)
+- [x] Asset enqueue strategy (global.js site-wide, landing.js page-specific)
+- [x] 8-item nav menu with proper URLs
+- [x] Fixed gradient class naming consistency (gradient-orb throughout)
+- [x] Service page styles added to landing.css (glassmorphism cards, responsive)
+
 ### Design & Planning
 - [x] Services page mockup/vision
 - [x] Snake 451 game prototype (Fahrenheit 451 reference for hunt)
-- [x] CSS v1.2.1, JS v1.4.3 deployed
+- [x] Website Design page template created (placeholder content, structure complete)
 
 ## 📋 Next Up (Priority Order)
 
-### 1. Priority Fixes
-- [ ] **Early button click handler:** If user clicks "Like nothing else" before 30s (before Wheatley appears), trigger special Wheatley welcome message, THEN open Chatling
-  - Check `state.wheatleyMessageCount === 0` in button handler
-  - Special message: "Brilliant choice. Right, let me just—there we go. Chat window, bottom right. That's me in there. Properly interactive now."
-  - After typewriter completes → open Chatling
-
-### 2. Chatling Integration - READY FOR AFTERNOON SESSION
+### 1. Chatling Integration - READY FOR AFTERNOON SESSION
 - [ ] Replace hardcoded chatbot with Chatling widget
 - [ ] "Like nothing else" button → Wheatley transition → Chatling opens (coordinated with early button fix)
 - [ ] Unified Wheatley personality across homepage + chat widget
 - [ ] Chatling personality prompt configuration with Aperture Science backstory
+
+### 2. Priority Fixes
+- [ ] **Early button click handler:** If user clicks "Like nothing else" before 30s (before Wheatley appears), trigger special Wheatley welcome message, THEN open Chatling
+  - Check `state.wheatleyMessageCount === 0` in button handler
+  - Special message: "Brilliant choice. Right, let me just—there we go. Chat window, bottom right. That's me in there. Properly interactive now."
+  - After typewriter completes → open Chatling
 
 ### 3. Share Feature (Phase 1 - Afternoon Session)
 - [ ] **Bottom-left "Personalize & Share" button**
@@ -140,12 +150,17 @@
 6. ⏳ Final stage: TBD (Anorak AI guide?)
 
 ### 10. Site Pages
-- [ ] Services page build (from mockup)
-- [ ] How We Work page (timeline/stepper design)
-- [ ] Examples page (card grid, not portfolio)
-- [ ] Let's Talk page (Calendly + simple form)
-- [ ] About page (personal story, values)
-- [ ] Contact page (form + info)
+- [ ] **Website Design page** (placeholder content deployed, needs full build)
+  - Hero section complete
+  - Content blocks need expansion
+  - Add actual service details, portfolio examples, process breakdown
+  - CTA integration
+- [ ] **Services overview page** (from mockup - two-column AI Agents + Websites)
+- [ ] **How We Work page** (timeline/stepper design)
+- [ ] **Examples page** (card grid, not portfolio)
+- [ ] **Let's Talk page** (Calendly + simple form)
+- [ ] **About page** (personal story, values)
+- [ ] **Contact page** (form + info)
 
 ### 11. Advanced Wheatley Features (Future)
 - [ ] Hunt meta-commentary based on countdown proximity
@@ -172,3 +187,31 @@
 - Upgrade URL obfuscation to true short codes with backend
 - Real-time GLaDOS TTS with personalization (vs pre-generated audio)
 - Mobile gallery/slideshow access for hunt clue discovery
+
+## 🏗️ Technical Foundation (Current State)
+
+### Architecture Pattern
+All new page templates follow this structure:
+1. Standalone HTML (no Divi header/footer)
+2. Call `<?php wp_body_open(); ?>` to inject nav
+3. Call `<?php mlc_render_gradient_blobs(); ?>` for background
+4. Single CSS file (landing.css) for all styles
+5. Conditional JS loading (global.js everywhere, landing.js only on landing page)
+
+### File Versions
+- **landing.css:** v1.2.2 (nav + landing + service pages)
+- **landing.js:** v1.5.0 (Wheatley AI, hunt, nav interactions)
+- **global.js:** v1.0.0 (nav functionality only)
+- **functions.php:** v1.6.0 (asset enqueue, hunt validation, Wheatley API, shared components)
+
+### Shared Components
+- `mlc_render_gradient_blobs()` - Animated gradient background (3 orbs)
+- `mlc_inject_nav_html()` - Full nav overlay with 8-item menu + photo slideshow
+
+### Next Template Pattern
+When creating new service pages (Hosting, Maintenance, etc.):
+1. Copy `page-website-design.php` as starting point
+2. Update template name/description
+3. Modify content sections as needed
+4. Nav and gradients work automatically
+5. Service page styles already in landing.css
