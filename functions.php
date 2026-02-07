@@ -1,6 +1,7 @@
 <?php
 /**
  * Divi Child Theme Functions
+ * Version: 1.7.6 - Added Share Feature
  * 
  * Enqueues parent and child theme styles and custom scripts.
  */
@@ -40,12 +41,12 @@ add_action( 'after_setup_theme', 'divi_child_setup' );
  * Loads on every page - currently just nav functionality
  */
 function mlc_enqueue_global_assets() {
-    // Global CSS (unified - nav + landing styles)
+    // Global CSS (unified - nav + landing styles + share feature)
     wp_enqueue_style(
         'mlc-global-css',
         get_stylesheet_directory_uri() . '/assets/css/landing.css',
         array(),
-        '1.2.4',
+        '1.3.1',
         'all'
     );
     
@@ -71,7 +72,7 @@ function mlc_enqueue_landing_assets() {
             'mlc-landing-js',
             get_stylesheet_directory_uri() . '/assets/js/landing.js',
             array('mlc-global-js'), // Dependency on global
-            '1.6.1',
+            '1.7.0',
             true
         );
     }

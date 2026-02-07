@@ -8,13 +8,13 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 
 ## Quick Start (For New Sessions)
 
-**Current Priority:** Chatling Integration (~1 hour)
+**Current Status:** Share Feature Phase 1 complete, Wheatley AI live, ready for Phase 2 enhancements
 
-**Next Steps:**
-1. Replace hardcoded chatbot with Chatling widget
-2. Build "Like nothing else" → Wheatley transition → Chatling opens
-3. Configure Chatling with Wheatley personality
-4. Test unified experience across homepage + widget
+**Next Priorities:**
+1. Context-aware Wheatley messages based on share URL parameters
+2. Analytics logging for share feature
+3. Photo slideshow expansion (50-100 photos with hunt clues)
+4. Quest site deployment (4815162342.quest)
 
 ---
 
@@ -22,10 +22,10 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 
 | File | Version | Status |
 |------|---------|--------|
-| `page-landing.php` | Production | Landing page template |
-| `assets/css/landing.css` | 1.2.1 | Styles for landing page |
-| `assets/js/landing.js` | 1.4.2 | Interactive behaviors + Wheatley AI |
-| `functions.php` | Current | Enqueue scripts + hunt validation + Wheatley API |
+| `page-landing.php` | v2 | Landing page template with share feature |
+| `assets/css/landing.css` | 1.3.1 | All styles (nav + landing + services + share) |
+| `assets/js/landing.js` | 1.7.0 | Interactive behaviors + Wheatley + share |
+| `functions.php` | 1.7.6 | Enqueue scripts + hunt validation + Wheatley API |
 | `services-mockup.html` | Mockup | Services page vision/design |
 | `snake-451.html` | Prototype | Hunt game (needs point system refinement) |
 
@@ -35,13 +35,13 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 
 ```
 /wp-content/themes/divi-child/
-├── page-landing.php          (Landing page template)
-├── functions.php              (Enqueue + hunt validation + Wheatley API)
+├── page-landing.php          (Landing page template with share feature)
+├── functions.php              (v1.7.6 - Enqueue + hunt + Wheatley + cache busting)
 ├── assets/
 │   ├── css/
-│   │   └── landing.css       (v1.2.1)
+│   │   └── landing.css       (v1.3.1 - includes share modal styles)
 │   └── js/
-│       └── landing.js        (v1.4.2)
+│       └── landing.js        (v1.7.0 - includes share functionality)
 ├── services-mockup.html       (Mockup, not deployed)
 ├── snake-451.html             (Hunt game prototype)
 └── claude.md / ROADMAP.md     (Documentation)
@@ -138,7 +138,29 @@ Fixed top-right. Opens full-screen overlay:
 
 **Nav items:** Home, Services, How We Work, Examples, Let's Talk, About, Contact
 
-### 5. Scavenger Hunt System
+### 5. Share Feature (v1.3.1)
+
+**Button:** Fixed position, glassmorphism styling
+- Desktop: bottom-left corner (20px, 20px)
+- Mobile: centered above countdown (50%, bottom: 60px)
+
+**Modal:** Full-screen on mobile, centered card on desktop
+- Name field (required)
+- Context field (optional, 50 char limit with counter)
+- Preview section showing sample Wheatley greeting
+- Generate & Copy button with success feedback
+- URL encoding: `name|context` → Base64 → `?u=encoded`
+
+**Example URLs:**
+- `?u=Sm9yZGFufGRlc2lnbmluZyB0aGUgbG9nbw==` (Jordan|designing the logo)
+- `?u=U2FyYWh8Z290IGR1bXBlZA==` (Sarah|got dumped)
+
+**Phase 2 (Pending):**
+- Context-aware Wheatley first messages
+- Analytics logging (timestamp, name_hash, context)
+- Conversion tracking (link generation vs actual visits)
+
+### 6. Scavenger Hunt System
 
 **Countdown timer** — fixed bottom-right corner. Targets 3:16:23 PM daily (Lost numbers: 3, 16, 23). Displays as `HH:MM:SS` in monospace.
 
@@ -392,9 +414,9 @@ BEHAVIOR:
 ## File Versions & Status
 
 **Current Deployed:**
-- CSS: v1.2.1 (includes Wheatley cursor animation)
-- JS: v1.4.2 (Wheatley API integration, 90-min finale, exact time context)
-- PHP: Updated with Wheatley API endpoint and time window validation
+- CSS: v1.3.1 (includes share feature styles)
+- JS: v1.7.0 (includes share functionality)
+- PHP: v1.7.6 (updated cache busting for v1.3.1 CSS)
 
 **Key Functions:**
 
@@ -408,12 +430,15 @@ BEHAVIOR:
 - `detectVisitorType()` - localStorage tracking (new/returning, visit count)
 - `getCurrentTime()` - Exact time formatting (e.g., "9:39 PM")
 - `detectDeviceType()` - Platform detection (mobile, tablet, desktop)
+- `initShareFeature()` - Share modal setup, URL encoding, clipboard (NEW - Feb 7, 2026)
 
 **functions.php:**
-- `mlc_enqueue_landing_assets()` - Asset loading
+- `mlc_enqueue_landing_assets()` - Asset loading with version cache busting
 - `mlc_validate_hunt_sequence()` - Server-side validation (sequence + time)
 - `mlc_add_hunt_nonce()` - Security nonce injection
-- `mlc_wheatley_respond()` - Anthropic API endpoint (NEW - Feb 4, 2026)
+- `mlc_wheatley_respond()` - Anthropic API endpoint
+- `mlc_inject_nav_html()` - Global nav injection via wp_body_open
+- `mlc_render_gradient_blobs()` - Reusable gradient background
 
 ---
 
@@ -436,25 +461,32 @@ define('ANTHROPIC_API_KEY', 'sk-ant-api03-...');
 
 ## Known Issues / Pending Work
 
-### 1. Chatling Integration (Next Priority)
-Replace hardcoded chatbot with Chatling widget:
-- Build "Like nothing else" → Wheatley transition → Chatling opens
-- Configure Chatling with Wheatley personality
-- Test unified experience across homepage + widget
+### 1. Share Feature Phase 2
+Context-aware Wheatley messages:
+- Parse URL parameter `?u=base64encoded`
+- Decode to get name + context
+- Personalize first Wheatley message based on context
+- Examples: "convincing boss" → sales pitch, "got dumped" → sympathetic distraction
 
-### 2. Snake 451 Point System
+### 2. Share Analytics
+Track generated links and usage:
+- Log: timestamp, name_hash, context, encoded_url
+- Track: link generation vs actual visits (conversion)
+- Privacy-first: hash names before storing
+
+### 3. Snake 451 Point System
 Current prototype needs refinement:
 - Escalating point values per apple (e.g., 1, 2, 3, 5, 8, 13, etc.)
 - Makes 451 achievable while keeping Fahrenheit 451 reference
 - Don't rebuild yet - refinement session needed to determine progression
 
-### 3. Remaining Site Pages
+### 4. Remaining Site Pages
 - Services (mockup complete, needs build)
 - How We Work (timeline/stepper design)
 - Examples (card grid, not portfolio)
 - Let's Talk (Calendly + simple form)
 
-### 4. Advanced Wheatley Features
+### 5. Advanced Wheatley Features
 - Hunt meta-commentary based on countdown proximity
 - Session memory (sessionStorage tracking)
 - Tab visibility detection
@@ -507,6 +539,15 @@ Current prototype needs refinement:
 
 **Location:** `landing.js` displayWheatley() function
 
+### Share Modal Input Padding Not Applied
+**Symptom:** Inspector showed 2px padding despite CSS specifying 18px-24px
+
+**Cause:** Other stylesheets overriding modal input styles with higher specificity
+
+**Fix Applied (Feb 7, 2026):** Added `!important` to all `.share-modal__input` properties
+
+**Location:** `landing.css` v1.3.0+
+
 ---
 
 ## Production Migration Strategy
@@ -524,19 +565,25 @@ Current prototype needs refinement:
 - ✅ Cost control (90-min cutoff)
 - ✅ API failure handling
 
-### Phase 3: Integration (NEXT)
-- 📋 Chatling widget deployment
-- 📋 Unified Wheatley personality across site
-- 📋 Button → Wheatley → Chatling transition
+### Phase 3: Sharing (COMPLETE - Feb 7, 2026)
+- ✅ Share button and modal UI
+- ✅ URL encoding system
+- ✅ Preview functionality
+- ✅ Clipboard integration
 
-### Phase 4: Site Expansion (FUTURE)
+### Phase 4: Integration (NEXT)
+- 📋 Context-aware Wheatley messages from share URLs
+- 📋 Analytics logging for share feature
+- 📋 Chatling HUNT knowledge base
+
+### Phase 5: Site Expansion (FUTURE)
 - 📋 Services page build
 - 📋 How We Work page
 - 📋 Examples page
 - 📋 Let's Talk page
 - 📋 Quest site completion (Snake 451 + final stages)
 
-### Phase 5: Polish & Launch (FUTURE)
+### Phase 6: Polish & Launch (FUTURE)
 - Performance optimization
 - SEO implementation
 - Cross-browser testing
@@ -618,6 +665,20 @@ Current prototype needs refinement:
 - Layout: Two-column split (AI Agents / Websites)
 - Style: Clean cards, gradient accents, transparent pricing
 - Status: Mockup complete, ready for build
+
+**2026-02-07: Share Feature URL Encoding**
+- Format: `name|context` → Base64 → `?u=encoded`
+- Example: `Jordan|designing the logo` → `?u=Sm9yZGFufGRlc2lnbmluZyB0aGUgbG9nbw==`
+- Rationale: Simple, readable in dev tools, no backend required for Phase 1
+- Status: IMPLEMENTED in v1.3.0
+- Date: Feb 7, 2026
+
+**2026-02-07: Share Button Positioning**
+- Desktop: Bottom-left (20px, 20px) - doesn't interfere with main UI
+- Mobile: Centered above countdown (50%, bottom: 60px) - proper stacking
+- Rationale: Desktop users have space, mobile needs vertical stacking
+- Status: FINALIZED in v1.3.1
+- Date: Feb 7, 2026
 
 ---
 

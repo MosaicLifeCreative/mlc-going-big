@@ -30,10 +30,22 @@
         targetHour: 15,
         targetMin: 16,
         targetSec: 23,
-        windowDuration: 42
+        windowDuration: 42,
+        
+        // Share feature
+        contextMaxLength: 50,
+        contextExamples: [
+            "Birthday",
+            "Convincing my boss",
+            "Designing your logo",
+            "Got dumped",
+            "Anniversary",
+            "Just curious",
+            "Needs a website"
+        ]
     };
 
-    // ─── UTILITY: URL PERSONALIZATION DECODER ──────────────────
+    // ─── UTILITY: URL PERSONALIZATION ──────────────────────────
     function getPersonalizationFromURL() {
         const params = new URLSearchParams(window.location.search);
         const encoded = params.get('u');
@@ -52,6 +64,13 @@
             console.error('Failed to decode personalization:', e);
             return { name: null, context: null };
         }
+    }
+    
+    function generatePersonalizedURL(name, context) {
+        const parts = context ? `${name}|${context}` : name;
+        const encoded = btoa(parts);
+        const baseUrl = window.location.origin + window.location.pathname;
+        return `${baseUrl}?u=${encoded}`;
     }
 
     // ─── STATE ──────────────────────────────────────────────────
@@ -79,7 +98,10 @@
         
         // Personalization from URL
         userName: null,
-        userContext: null
+        userContext: null,
+        
+        // Share modal
+        shareModalOpen: false
     };
 
     // Get personalization on page load
@@ -104,7 +126,19 @@
         huntClose: $('#huntClose'),
         huntInput: $('#huntInput'),
         huntError: $('#huntError'),
-        huntSubmit: $('#huntSubmit')
+        huntSubmit: $('#huntSubmit'),
+        
+        // Share elements
+        shareBtn: $('#shareBtn'),
+        shareModal: $('#shareModal'),
+        shareClose: $('#shareClose'),
+        shareName: $('#shareName'),
+        shareContext: $('#shareContext'),
+        shareCharCount: $('#shareCharCount'),
+        sharePreviewText: $('#sharePreviewText'),
+        shareGenerate: $('#shareGenerate'),
+        shareSuccess: $('#shareSuccess'),
+        shareSuccessText: $('#shareSuccessText')
     };
 
     // ─── UTILITY FUNCTIONS ──────────────────────────────────────
@@ -413,6 +447,146 @@
         state.chatlingHandoff = true;
     }
 
+    // ─── SHARE MODAL ────────────────────────────────────────────
+    function openShareModal() {
+        state.shareModalOpen = true;
+        els.shareModal.classList.add('is-open');
+        els.shareName.focus();
+        updateSharePreview();
+    }
+
+    function closeShareModal() {
+        state.shareModalOpen = false;
+        els.shareModal.classList.remove('is-open');
+        els.shareName.value = '';
+        els.shareContext.value = '';
+        updateCharCount();
+        els.shareSuccess.classList.remove('is-visible');
+    }
+
+    function updateCharCount() {
+        const length = els.shareContext.value.length;
+        const remaining = CONFIG.contextMaxLength - length;
+        
+        els.shareCharCount.textContent = `${length} / ${CONFIG.contextMaxLength}`;
+        
+        els.shareCharCount.classList.remove('is-warning', 'is-limit');
+        
+        if (length >= CONFIG.contextMaxLength) {
+            els.shareCharCount.classList.add('is-limit');
+        } else if (length >= CONFIG.contextMaxLength - 10) {
+            els.shareCharCount.classList.add('is-warning');
+        }
+    }
+
+    function updateSharePreview() {
+        const name = els.shareName.value.trim();
+        const context = els.shareContext.value.trim();
+        
+        if (!name) {
+            els.sharePreviewText.innerHTML = 'Enter a name to see the preview...';
+            els.shareGenerate.disabled = true;
+            return;
+        }
+        
+        els.shareGenerate.disabled = false;
+        
+        // Generate example Wheatley greeting based on context
+        let preview = '';
+        
+        if (context) {
+            // Context-aware preview
+            const contextLower = context.toLowerCase();
+            
+            if (contextLower.includes('birthday')) {
+                preview = `Right, <span class="share-modal__preview-name">${name}</span>! Birthday, is it? Brilliant. Well, happy birthday! Someone's gone and sent you here as a gift, apparently. Better than a card, I reckon.`;
+            } else if (contextLower.includes('boss') || contextLower.includes('work') || contextLower.includes('convince')) {
+                preview = `Alright, <span class="share-modal__preview-name">${name}</span>. So you're here to convince someone about something. ${context}. Right. Let me help make that case, then.`;
+            } else if (contextLower.includes('dump') || contextLower.includes('breakup')) {
+                preview = `Right, <span class="share-modal__preview-name">${name}</span>. ${context}. That's... listen, I'm not great with the emotional stuff, but I can at least distract you with some interesting web design. That help?`;
+            } else if (contextLower.includes('logo') || contextLower.includes('design')) {
+                preview = `<span class="share-modal__preview-name">${name}</span>! ${context}. Excellent. Well, you're in the right place for that. Let's make something brilliant, shall we?`;
+            } else if (contextLower.includes('anniversary')) {
+                preview = `<span class="share-modal__preview-name">${name}</span>! ${context}. How romantic. Someone's sent you here as part of that, apparently. Bit unconventional, but I like it.`;
+            } else if (contextLower.includes('website') || contextLower.includes('need')) {
+                preview = `Right, <span class="share-modal__preview-name">${name}</span>. ${context}. Perfect timing. That's literally what we do. Let's talk about what you need.`;
+            } else {
+                // Generic context-aware
+                preview = `<span class="share-modal__preview-name">${name}</span>! Right, so... ${context}. Interesting. Well, you're here now. Let me show you what we do.`;
+            }
+        } else {
+            // No context - just name
+            preview = `Right, <span class="share-modal__preview-name">${name}</span>! Someone's sent you here. Brilliant. Let me show you what we do.`;
+        }
+        
+        els.sharePreviewText.innerHTML = preview;
+    }
+
+    async function generateShareLink() {
+        const name = els.shareName.value.trim();
+        const context = els.shareContext.value.trim();
+        
+        if (!name) {
+            els.shareName.focus();
+            return;
+        }
+        
+        const url = generatePersonalizedURL(name, context);
+        
+        // Copy to clipboard
+        try {
+            await navigator.clipboard.writeText(url);
+            
+            // Show success message
+            els.shareSuccessText.textContent = 'Link copied to clipboard!';
+            els.shareSuccess.classList.add('is-visible');
+            
+            // Log analytics (simple version - could be expanded)
+            logShareGeneration(name, context, url);
+            
+            // Hide success after 3 seconds
+            setTimeout(() => {
+                els.shareSuccess.classList.remove('is-visible');
+            }, 3000);
+            
+        } catch (err) {
+            // Fallback for older browsers
+            console.error('Clipboard API failed:', err);
+            
+            // Create temporary input for fallback copy
+            const tempInput = document.createElement('input');
+            tempInput.value = url;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+            
+            els.shareSuccessText.textContent = 'Link copied!';
+            els.shareSuccess.classList.add('is-visible');
+            
+            setTimeout(() => {
+                els.shareSuccess.classList.remove('is-visible');
+            }, 3000);
+        }
+    }
+
+    function logShareGeneration(name, context, url) {
+        // Simple analytics logging
+        // Future: send to server endpoint for tracking
+        const timestamp = new Date().toISOString();
+        
+        console.log('Share link generated:', {
+            timestamp,
+            name_length: name.length,
+            has_context: !!context,
+            context_length: context ? context.length : 0,
+            url_length: url.length
+        });
+        
+        // Could add fetch to server endpoint here for Phase 2
+        // fetch('/wp-json/mlc/v1/share-analytics', { ... })
+    }
+
     // ─── TEXT SEQUENCE ──────────────────────────────────────────
     function updatePhaseDisplay() {
         const current = state.phases[state.displayedPhase];
@@ -610,6 +784,9 @@
         });
     }
 
+    // ─── EVENT LISTENERS ────────────────────────────────────────
+    
+    // Hunt
     els.huntEnterBtn.addEventListener('click', openHuntModal);
     els.huntClose.addEventListener('click', closeHuntModal);
     els.huntSubmit.addEventListener('click', validateHunt);
@@ -624,6 +801,47 @@
         if (e.key === 'Enter') validateHunt();
         if (e.key === 'Escape') closeHuntModal();
     });
+    
+    // Share
+    if (els.shareBtn) {
+        els.shareBtn.addEventListener('click', openShareModal);
+    }
+    
+    if (els.shareClose) {
+        els.shareClose.addEventListener('click', closeShareModal);
+    }
+    
+    if (els.shareName) {
+        els.shareName.addEventListener('input', updateSharePreview);
+    }
+    
+    if (els.shareContext) {
+        els.shareContext.addEventListener('input', function() {
+            // Enforce max length
+            if (this.value.length > CONFIG.contextMaxLength) {
+                this.value = this.value.slice(0, CONFIG.contextMaxLength);
+            }
+            updateCharCount();
+            updateSharePreview();
+        });
+    }
+    
+    if (els.shareGenerate) {
+        els.shareGenerate.addEventListener('click', generateShareLink);
+    }
+    
+    // Share modal keyboard shortcuts
+    if (els.shareModal) {
+        document.addEventListener('keydown', function(e) {
+            if (state.shareModalOpen && e.key === 'Escape') {
+                closeShareModal();
+            }
+            if (state.shareModalOpen && e.key === 'Enter' && e.metaKey) {
+                // Cmd+Enter to generate
+                generateShareLink();
+            }
+        });
+    }
 
     // ─── INITIALIZE ─────────────────────────────────────────────
     function init() {
@@ -642,6 +860,11 @@
         document.addEventListener('keydown', resetIdleTimer);
         document.addEventListener('scroll', resetIdleTimer);
         document.addEventListener('click', resetIdleTimer);
+        
+        // Initialize share char count
+        if (els.shareCharCount) {
+            updateCharCount();
+        }
 
         setTimeout(() => {
             runSequence();

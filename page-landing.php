@@ -56,6 +56,9 @@ if (!defined('ABSPATH')) exit;
                 <div class="countdown" id="countdown">00:00:00</div>
             </div>
         </div>
+        
+        <!-- Share Button (Bottom Left) -->
+        <button class="share-btn" id="shareBtn">Personalize & Share</button>
     </div>
 
     <!-- Hunt Modal -->
@@ -81,6 +84,82 @@ if (!defined('ABSPATH')) exit;
             <div class="hunt-modal__error" id="huntError">
                 Not quite. Try again.
             </div>
+        </div>
+    </div>
+    
+    <!-- Share Modal -->
+    <div class="share-modal" id="shareModal">
+        <div class="share-modal__card">
+            <button class="share-modal__close" id="shareClose">&times;</button>
+
+            <div class="share-modal__title">Personalize & Share</div>
+            <div class="share-modal__subtitle">
+                Create a custom link that greets someone by name. Wheatley will adjust his first message based on the context you provide.
+            </div>
+
+            <form class="share-modal__form" onsubmit="return false;">
+                <!-- Name Field -->
+                <div class="share-modal__field">
+                    <label class="share-modal__label" for="shareName">
+                        Their Name <span class="share-modal__label-required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="shareName" 
+                        class="share-modal__input"
+                        placeholder="Jordan"
+                        required
+                        autocomplete="off"
+                    />
+                </div>
+
+                <!-- Context Field -->
+                <div class="share-modal__field">
+                    <label class="share-modal__label" for="shareContext">
+                        Context <span style="color: #666; font-weight: 400; text-transform: none;">(Optional)</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="shareContext" 
+                        class="share-modal__input"
+                        placeholder="Birthday, Convincing my boss, Designing your logo..."
+                        maxlength="50"
+                        autocomplete="off"
+                    />
+                    <div class="share-modal__char-count" id="shareCharCount">0 / 50</div>
+                    <div class="share-modal__hint">
+                        A hint about why you're sending them here. Wheatley will adjust his greeting accordingly.
+                    </div>
+                </div>
+
+                <!-- Preview -->
+                <div class="share-modal__field">
+                    <div class="share-modal__preview">
+                        <div class="share-modal__preview-label">Preview</div>
+                        <div class="share-modal__preview-text" id="sharePreviewText">
+                            Enter a name to see the preview...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="share-modal__actions">
+                    <button 
+                        type="button" 
+                        class="share-modal__button share-modal__button--primary" 
+                        id="shareGenerate"
+                        disabled
+                    >
+                        Generate & Copy Link
+                    </button>
+                </div>
+
+                <!-- Success Message -->
+                <div class="share-modal__success" id="shareSuccess">
+                    <span class="share-modal__success-icon">✓</span>
+                    <span id="shareSuccessText">Link copied to clipboard!</span>
+                </div>
+            </form>
         </div>
     </div>
 

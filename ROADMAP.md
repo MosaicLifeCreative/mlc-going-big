@@ -44,6 +44,19 @@
 - [x] Footer: Meta self-reference with link to AI agents page
 - [x] Hover message for user-initiated interaction
 
+### Share Feature (Phase 1) (v1.3.1) - Feb 7, 2026
+- [x] Bottom-positioned "Personalize & Share" button (desktop: bottom-left, mobile: centered)
+- [x] Share modal UI with name field (required) and context field (optional, 50 char limit)
+- [x] Real-time character counter for context field
+- [x] URL encoding system (Base64: `name|context` → `?u=encoded`)
+- [x] Preview section showing sample Wheatley greeting
+- [x] Generate & Copy button with clipboard functionality
+- [x] Success feedback on copy
+- [x] Mobile-responsive modal (full-screen on mobile)
+- [x] Glassmorphism styling consistent with site design
+- [x] Input styling fixed (24px padding with !important overrides)
+- [x] Button positioning responsive (bottom-left desktop, centered mobile above countdown)
+
 ### Design & Planning
 - [x] Services page mockup/vision
 - [x] Snake 451 game prototype (Fahrenheit 451 reference for hunt)
@@ -72,37 +85,22 @@
   - Different behavior on quest pages vs service pages
   - Quest page hints and guidance from Wheatley
 
-### 3. Share Feature (Phase 1)
-- [ ] **Bottom-left "Personalize & Share" button**
-  - Fixed position, subtle styling, doesn't compete with main UI
-  - Opens modal on click
-- [ ] **Share Modal UI**
-  - Name field (required)
-  - Context field (optional, 50 char limit with counter)
-  - Placeholder ideas: "Birthday, Convincing my boss, Designing your logo, Got dumped, Anniversary"
-  - Real-time preview of Wheatley's greeting
-  - Generate + Copy button with success feedback
-  - Mobile-responsive (full-screen on mobile)
-- [ ] **URL Encoding**
-  - Format: `name|context` → Base64 → `?u=encoded`
-  - Example: `Jordan|designing the logo` → `?u=Sm9yZGFufGRlc2lnbmluZyB0aGUgbG9nbw==`
+### 3. Share Feature (Phase 2 - Future)
 - [ ] **Context-Aware Wheatley Messages**
-  - Update system prompt to parse context and personalize first message
+  - Update system prompt to parse URL parameter and personalize first message
   - Examples: "convincing boss" → sales pitch, "got dumped" → sympathetic distraction
 - [ ] **Basic Analytics Logging**
   - Log generated links (timestamp, name_hash, context, encoded_url)
   - Track if generated URLs are actually visited (conversion)
   - Privacy-first: hash names, store contexts for analytics
+- [ ] **Analytics dashboard** (most popular contexts, conversion rates, generation volume)
+- [ ] **Gallery page:** "How Others Are Sharing This"
+- [ ] **Use case:** customer URLs when sharing from my accounts, like LinkedIn
+- [ ] **Manual curation interface** for admin
+- [ ] **Profanity filter** for auto-display
+- [ ] **Optional:** Short code backend for cleaner URLs + enhanced tracking
 
-### 4. Share Feature (Phase 2 - Future)
-- [ ] Analytics dashboard (most popular contexts, conversion rates, generation volume)
-- [ ] Gallery page: "How Others Are Sharing This"
-- [ ] Use case: customer URLs when sharing from my accounts, like LinkedIn
-- [ ] Manual curation interface for admin
-- [ ] Profanity filter for auto-display
-- [ ] Optional: Short code backend for cleaner URLs + enhanced tracking
-
-### 5. Photo Slideshow Enhancements
+### 4. Photo Slideshow Enhancements
 - [ ] **Expand photo library to 50-100 photos**
   - Mix personal travel photos with hunt clues
   - Hunt clue examples: Dharma Initiative logo, Aperture Science, Ready Player One references, Fahrenheit 451 book cover, cryptic coordinates
@@ -117,14 +115,14 @@
   - Full-screen swipeable slideshow on mobile
   - Ensures hunt clues accessible to all devices
 
-### 6. Quest Site Deployment (Tonight)
+### 5. Quest Site Deployment (Tonight)
 - [ ] Deploy 4815162342.quest with current assets
 - [ ] Link together: Countdown → Sequence → Combination Lock → Snake 451
 - [ ] Create simple landing page connecting the flow
 - [ ] Test end-to-end on live domain
 - [ ] Iterate on design/mechanics as new ideas emerge
 
-### 7. Aperture Science Integration
+### 6. Aperture Science Integration
 - [ ] **Console easter eggs:** Personality Core v2.7.4 logs on page load
 ```javascript
   console.log("Aperture Science Personality Core v2.7.4");
@@ -140,7 +138,7 @@
   - Play at appropriate puzzle moments
   - Option to upgrade to real-time TTS with personalization later
 
-### 8. Quest Site Build (4815162342.quest)
+### 7. Quest Site Build (4815162342.quest)
 **Hunt Flow:**
 1. ✅ Countdown: 3:16:23 PM daily (42-second window)
 2. ✅ Sequence Input: 4815162342
@@ -158,7 +156,7 @@
 5. ⏳ GLaDOS Testing Chamber (optional)
 6. ⏳ Final stage: TBD (Anorak AI guide?)
 
-### 9. Site Pages
+### 8. Site Pages
 - [ ] **Website Design page** (placeholder content deployed, needs full build)
   - Hero section complete
   - Content blocks need expansion
@@ -171,13 +169,13 @@
 - [ ] **About page** (personal story, values)
 - [ ] **Contact page** (form + info)
 
-### 10. Advanced Wheatley Features (Future)
+### 9. Advanced Wheatley Features (Future)
 - [ ] Hunt meta-commentary based on countdown proximity
 - [ ] Session memory (sessionStorage tracking across visits)
 - [ ] Tab visibility detection ("You switched back. I was still here.")
 - [ ] More console easter eggs (hidden commands, keystroke combos)
 
-### 11. Final Polish + Launch
+### 10. Final Polish + Launch
 - [ ] Performance optimization
 - [ ] SEO implementation
 - [ ] Cross-browser testing
@@ -208,10 +206,10 @@ All new page templates follow this structure:
 5. Conditional JS loading (global.js everywhere, landing.js only on landing page)
 
 ### File Versions
-- **landing.css:** v1.2.4 (nav + landing + service pages, Chatling z-index)
-- **landing.js:** v1.6.1 (Wheatley AI, on-demand Chatling injection, hunt, nav interactions)
+- **landing.css:** v1.3.1 (nav + landing + service pages + share feature)
+- **landing.js:** v1.7.0 (Wheatley AI, Chatling injection, hunt, nav, share feature)
 - **global.js:** v1.0.0 (nav functionality only)
-- **functions.php:** v1.6.1 (asset enqueue, hunt validation, Wheatley API, shared components, Chatling exclusion for landing)
+- **functions.php:** v1.7.6 (asset enqueue, hunt validation, Wheatley API, shared components, Chatling exclusion)
 
 ### Shared Components
 - `mlc_render_gradient_blobs()` - Animated gradient background (3 orbs)
