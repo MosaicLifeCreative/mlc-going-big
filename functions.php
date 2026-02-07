@@ -71,7 +71,7 @@ function mlc_enqueue_landing_assets() {
             'mlc-landing-js',
             get_stylesheet_directory_uri() . '/assets/js/landing.js',
             array('mlc-global-js'), // Dependency on global
-            '1.5.0',
+            '1.6.0',
             true
         );
     }
@@ -176,7 +176,7 @@ function mlc_wheatley_respond($request) {
     $has_scrolled = isset($params['has_scrolled']) ? $params['has_scrolled'] : false;
     $has_interacted = isset($params['has_interacted']) ? $params['has_interacted'] : false;
     $user_name = isset($params['user_name']) ? sanitize_text_field($params['user_name']) : null;
-    $is_birthday = isset($params['is_birthday']) ? (bool)$params['is_birthday'] : false;
+    $user_context = isset($params['user_context']) ? sanitize_text_field($params['user_context']) : null;
     
     // Build system prompt
     $system_prompt = "You are Wheatley, an AI assistant for Mosaic Life Creative's website. You hijack the homepage headline when users go idle.
@@ -200,13 +200,16 @@ CONTEXT:
 - Session duration: " . $session_duration . " seconds total
 - Activity: " . ($has_scrolled ? 'scrolled' : 'no scroll') . ", " . ($has_interacted ? 'interacted' : 'no interaction yet') . "
 " . ($user_name ? "- User's name: " . $user_name : "") . "
-" . ($is_birthday ? "- SPECIAL: It's their birthday today!" : "") . "
+" . ($user_context ? "- Context: " . $user_context : "") . "
 
 PERSONALIZATION RULES:
 - If user_name provided: Use it naturally in your first message. Don't overuse it.
-- If is_birthday = true: Acknowledge it playfully in first message. Birthday references appropriate throughout.
-  - Example birthday greeting: 'Right, so—Tracy, is it? And someone thought you'd enjoy... a mysterious website. On your birthday. Interesting choice. Happy birthday, by the way.'
-- Don't be creepy about knowing their name - someone sent them here, that's the context
+- If user_context provided: Reference it playfully in first message based on context.
+  - Example contexts: 'birthday', 'convincing my boss', 'designing the logo', 'got dumped', 'anniversary'
+  - Birthday: Acknowledge playfully
+  - Work context: Be professional but still you
+  - Personal context: Show appropriate empathy/celebration
+- Don't be creepy about knowing their info - someone sent them here, that's the setup
 
 SPECIAL MESSAGES:
 - If message_number is 999: This is the FINAL message at 90 minutes. Say goodbye, you're going to sleep and that you don't want to be woken unless the user actually needs you. Be self-aware about the long session and cost. Under 37 words.
@@ -398,5 +401,25 @@ function mlc_inject_nav_html() {
     <?php
 }
 add_action('wp_body_open', 'mlc_inject_nav_html');
+
+// ============================================
+// Load Chatling Widget
+// ============================================
+
+function mlc_load_chatling() {
+    // Don't load on landing page (injected on-demand via JS)
+    if (is_page_template('page-landing.php')) {
+        return;
+    }
+    
+    // Load normally on all other pages
+    ?>
+    <script>
+        window.chtlConfig = { chatbotId: "2733792244" }
+    </script>
+    <script async data-id="2733792244" id="chtl-script" type="text/javascript" src="https://chatling.ai/js/embed.js"></script>
+    <?php
+}
+add_action('wp_footer', 'mlc_load_chatling', 99);
 
 ?>

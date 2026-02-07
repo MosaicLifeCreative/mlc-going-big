@@ -84,20 +84,6 @@ if (!defined('ABSPATH')) exit;
         </div>
     </div>
 
-    <!-- Chatbot -->
-    <div class="chatbot" id="chatbot">
-        <div class="chatbot__header">
-            <div class="chatbot__avatar">🤖</div>
-            <div>
-                <div class="chatbot__name">Mosaic</div>
-                <div class="chatbot__status">Online</div>
-            </div>
-            <button class="chatbot__close" id="chatbotClose">&times;</button>
-        </div>
-
-        <div class="chatbot__messages" id="chatMessages"></div>
-    </div>
-
     <?php wp_footer(); ?>
 
 </body>

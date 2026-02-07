@@ -13,63 +13,11 @@
             { text: "So how do you want your website to feel?", duration: null, size: "clamp(24px, 4vw, 42px)", tracking: -0.5, highlight: false, isHeading: false }
         ],
 
-        // Wheatley test messages (hardcoded for now, API later)
-        wheatleyMessages: [
-            "Right, so... it's been 30 seconds. I'm an AI. I'm literally counting.",
-            "Three minutes. You're committed now. I respect that. Or you forgot this tab was open. I respect that too, honestly.",
-            "Ten minutes. I cost fractions of a penny per message. This conversation has cost... about 1.5 cents. Worth it?",
-            "Twenty minutes. Are you real? I'm genuinely asking. Because I'm not, and this feels weird.",
-            "Half an hour. Nobody stays this long. You've earned something. Here: 4 8 15 16 23 42. Does that mean anything to you?"
-        ],
-
         // Countdown target time
         targetHour: 15,
         targetMin: 16,
         targetSec: 23,
-        windowDuration: 42,
-
-        // Chatbot flows (KEEP until Chatling integration complete)
-        chatFlows: {
-            opener: { from: "bot", text: "Interesting choice. Tell me something — what made you click that?" },
-            answers: {
-                curious: [
-                    { from: "bot", text: "Hmm. That's honest. I like honest." },
-                    { from: "bot", text: "Most people just click things. You actually stopped and thought about it." },
-                    { from: "bot", text: "Let me ask you this — do you believe a website can actually change how people perceive a business?" }
-                ],
-                boredom: [
-                    { from: "bot", text: "Fair enough. Nothing wrong with that." },
-                    { from: "bot", text: "But you did click 'Interesting.' So something pulled you." },
-                    { from: "bot", text: "What if I told you there's more to this page than meets the eye?" }
-                ],
-                needing: [
-                    { from: "bot", text: "Good. Then you're in the right place." },
-                    { from: "bot", text: "But before we talk business — I want to know something." },
-                    { from: "bot", text: "What does your current website make you feel when you look at it?" }
-                ]
-            },
-            deeper: {
-                yes: [
-                    { from: "bot", text: "Then you already understand more than most." },
-                    { from: "bot", text: "Most people think a website is just a page with information on it." },
-                    { from: "bot", text: "It's not. It's the first conversation your business has with a stranger." },
-                    { from: "bot", text: "And right now, yours is boring." },
-                    { from: "bot", text: "Want to see what it could be instead?" }
-                ],
-                no: [
-                    { from: "bot", text: "Most people don't think so either." },
-                    { from: "bot", text: "They're wrong." },
-                    { from: "bot", text: "A website is the first conversation your business ever has with a stranger." },
-                    { from: "bot", text: "And that conversation either pulls them in... or loses them in 3 seconds." },
-                    { from: "bot", text: "Want to see the difference?" }
-                ]
-            },
-            reward: [
-                { from: "bot", text: "Smart." },
-                { from: "bot", text: "Alright. You've earned it." },
-                { from: "bot", text: "🎯 Welcome to the interesting side." }
-            ]
-        }
+        windowDuration: 42
     };
 
     // ─── UTILITY: URL PERSONALIZATION DECODER ──────────────────
@@ -77,19 +25,19 @@
         const params = new URLSearchParams(window.location.search);
         const encoded = params.get('u');
         
-        if (!encoded) return { name: null, isBirthday: false };
+        if (!encoded) return { name: null, context: null };
         
         try {
             const decoded = atob(encoded);
-            const parts = decoded.split(',');
+            const parts = decoded.split('|');
             
             return {
                 name: parts[0] || null,
-                isBirthday: parts[1] === 'birthday'
+                context: parts[1] || null
             };
         } catch (e) {
             console.error('Failed to decode personalization:', e);
-            return { name: null, isBirthday: false };
+            return { name: null, context: null };
         }
     }
 
@@ -103,8 +51,6 @@
         clicked: null,
         huntModalOpen: false,
         huntStatus: 'idle',
-        chatStage: 'open',
-        chatTyping: false,
         
         // Wheatley idle tracking
         idleTime: 0,
@@ -115,15 +61,18 @@
         hasScrolled: false,
         hasInteracted: false,
         
+        // Chatling handoff
+        chatlingHandoff: false,
+        
         // Personalization from URL
         userName: null,
-        isBirthday: false
+        userContext: null
     };
 
     // Get personalization on page load
     const personalization = getPersonalizationFromURL();
     state.userName = personalization.name;
-    state.isBirthday = personalization.isBirthday;
+    state.userContext = personalization.context;
 
     // ─── DOM ELEMENTS ───────────────────────────────────────────
     const $ = (sel) => document.querySelector(sel);
@@ -142,10 +91,7 @@
         huntClose: $('#huntClose'),
         huntInput: $('#huntInput'),
         huntError: $('#huntError'),
-        huntSubmit: $('#huntSubmit'),
-        chatbot: $('#chatbot'),
-        chatbotClose: $('#chatbotClose'),
-        chatMessages: $('#chatMessages')
+        huntSubmit: $('#huntSubmit')
     };
 
     // ─── UTILITY FUNCTIONS ──────────────────────────────────────
@@ -170,7 +116,8 @@
         
         state.idleTime = timeOnPage;
         
-        if (state.wheatleyActive) return;
+        // Stop all idle checks if Chatling has taken over
+        if (state.wheatleyActive || state.chatlingHandoff) return;
         
         const thresholds = [30, 180, 600, 1200, 1800];
         
@@ -282,7 +229,7 @@
                     has_scrolled: state.hasScrolled,
                     has_interacted: state.hasInteracted,
                     user_name: state.userName || null,
-                    is_birthday: state.isBirthday || false
+                    user_context: state.userContext || null
                 })
             });
             
@@ -294,26 +241,51 @@
                 }
                 state.previousWheatleyMessages.push(data.message);
                 
+                // Debug: Log the actual message text
+                console.log('Wheatley message received:', data.message);
+                
                 await displayWheatley(data.message);
             } else {
-                const messageIndex = Math.min(messageNumber - 1, CONFIG.wheatleyMessages.length - 1);
-                await displayWheatley(CONFIG.wheatleyMessages[messageIndex]);
+                const fallback = "Right, so... bit awkward. The person who built me ran out of API credits. So instead of my usual dynamically-generated wit, you get this pre-written message.";
+                await displayWheatley(fallback);
             }
         } catch (error) {
             console.error('Wheatley API error:', error);
-            const apiFallback = "Right, so... bit awkward. The person who built me ran out of API credits. So instead of my usual dynamically-generated wit, you get this pre-written message. It's like ordering a gourmet meal and getting a microwave dinner. I'm still here, just... significantly less interesting. Apologies.";
+            const apiFallback = "Right, so... bit awkward. The person who built me ran out of API credits.";
             await displayWheatley(apiFallback);
         }
     }
 
     async function displayWheatley(text) {
+        // Debug: Ensure text is actually a string
+        console.log('displayWheatley called with:', text, 'Type:', typeof text);
+        
         if (state.currentPhase !== 4) {
             state.currentPhase = 4;
             showPhase();
             await sleep(300);
         }
         
+        // AGGRESSIVELY hide phase headline and all cursors
         els.phaseHeadline.style.display = 'none';
+        
+        // Hide any existing cursor elements to prevent double cursors
+        const existingCursors = document.querySelectorAll('.cursor-blink, .phase-text .cursor-blink, #phaseHeadline .cursor-blink');
+        existingCursors.forEach(cursor => {
+            cursor.style.display = 'none';
+            cursor.style.visibility = 'hidden';
+            cursor.style.opacity = '0';
+            cursor.remove(); // Nuclear option: just delete it
+        });
+        
+        // Also hide the entire phase text container if needed
+        const phaseTextContainer = document.querySelector('.phase-text');
+        if (phaseTextContainer) {
+            const cursorInContainer = phaseTextContainer.querySelector('.cursor-blink');
+            if (cursorInContainer) {
+                cursorInContainer.remove();
+            }
+        }
         
         let wheatleyContainer = document.getElementById('wheatley-message');
         if (!wheatleyContainer) {
@@ -329,18 +301,67 @@
             els.phaseHeadline.parentNode.insertBefore(wheatleyContainer, els.phaseHeadline);
         }
         
-        wheatleyContainer.textContent = '';
+        // Clear container
+        wheatleyContainer.innerHTML = '';
         
-        for (let i = 0; i < text.length; i++) {
-            wheatleyContainer.textContent += text[i];
+        // Convert text to string if it isn't already
+        const messageText = String(text);
+        
+        // Create text node for typewriter effect (safer than textContent +=)
+        const textNode = document.createTextNode('');
+        wheatleyContainer.appendChild(textNode);
+        
+        // Typewriter effect using textNode.nodeValue
+        for (let i = 0; i < messageText.length; i++) {
+            textNode.nodeValue += messageText[i];
             await sleep(30);
         }
         
+        // Add cursor
         const cursor = document.createElement('span');
         cursor.className = 'wheatley-cursor';
         wheatleyContainer.appendChild(cursor);
         
         state.wheatleyActive = false;
+    }
+
+    // ─── CHATLING WIDGET CONTROL ───────────────────────────────
+    function openChatling() {
+        console.log('Loading Chatling script...');
+        
+        // Inject Chatling script immediately
+        if (!document.getElementById('chtl-script')) {
+            // Add config
+            window.chtlConfig = { chatbotId: "2733792244" };
+            
+            // Add script
+            const script = document.createElement('script');
+            script.id = 'chtl-script';
+            script.async = true;
+            script.src = 'https://chatling.ai/js/embed.js';
+            script.setAttribute('data-id', '2733792244');
+            
+            // Open when script loads (desktop only)
+            const isMobile = window.innerWidth <= 768;
+            script.onload = () => {
+                console.log('Chatling script loaded');
+                if (!isMobile) {
+                    // Small delay to let Chatling initialize
+                    setTimeout(() => {
+                        if (window.Chatling && typeof window.Chatling.open === 'function') {
+                            console.log('Opening Chatling');
+                            window.Chatling.open();
+                        }
+                    }, 200);
+                }
+            };
+            
+            document.body.appendChild(script);
+            console.log('Chatling script injected - loading during typewriter');
+        }
+        
+        // Set handoff flag to stop all future Wheatley triggers
+        state.chatlingHandoff = true;
     }
 
     // ─── TEXT SEQUENCE ──────────────────────────────────────────
@@ -402,14 +423,25 @@
         }, 600);
     });
 
-    els.btnPrimary.addEventListener('click', function() {
+    els.btnPrimary.addEventListener('click', async function() {
         state.clicked = 'bold';
         els.choiceButtons.style.display = 'none';
-        els.loadingText.textContent = 'Opening...';
-        els.loadingText.style.display = 'block';
-        setTimeout(() => {
-            openChatbot();
-        }, 400);
+        
+        // Start loading Chatling IMMEDIATELY (loads while typewriter runs)
+        openChatling();
+        
+        // Check if this is an early click (before Wheatley's first appearance)
+        if (state.wheatleyMessageCount === 0) {
+            // Special early welcome message
+            const earlyMessage = "Brilliant choice. Right, let me just—there we go. Chat window, bottom right. That's me in there. Properly interactive now.";
+            await displayWheatley(earlyMessage);
+        } else {
+            // Normal transition message (Wheatley already appeared)
+            const transitionMessage = "Right, so... opening the proper chat interface now. Same me, just with actual conversation abilities. Bottom right corner.";
+            await displayWheatley(transitionMessage);
+        }
+        
+        // Chatling should be loaded and visible by now (script injected above, loaded during typewriter)
     });
 
     // ─── SCROLL LISTENER ────────────────────────────────────────
@@ -437,6 +469,7 @@
             els.countdown.textContent = '00:00:00';
             els.countdown.classList.add('is-active');
             els.huntEnterBtn.classList.add('is-active');
+            state.huntWindowActive = true;
             return;
         }
 
@@ -444,6 +477,7 @@
             target.setDate(target.getDate() + 1);
             diff = (target - now) / 1000;
             els.huntEnterBtn.classList.remove('is-active');
+            state.huntWindowActive = false;
 
             if (!state.huntModalOpen) {
                 els.huntInput.value = '';
@@ -541,155 +575,6 @@
         if (e.key === 'Enter') validateHunt();
         if (e.key === 'Escape') closeHuntModal();
     });
-
-    // ─── CHATBOT ────────────────────────────────────────────────
-    function openChatbot() {
-        els.chatbot.classList.add('is-open');
-        state.chatStage = 'open';
-        initChatbot();
-    }
-
-    function closeChatbot() {
-        els.chatbot.classList.remove('is-open');
-        els.chatMessages.innerHTML = '';
-    }
-
-    function addMessage(from, text) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `chat-message chat-message--${from}`;
-
-        const bubble = document.createElement('div');
-        bubble.className = 'chat-message__bubble';
-        bubble.textContent = text;
-
-        msgDiv.appendChild(bubble);
-        els.chatMessages.appendChild(msgDiv);
-        els.chatMessages.scrollTop = els.chatMessages.scrollHeight;
-    }
-
-    function showTyping() {
-        state.chatTyping = true;
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'chat-message chat-message--bot';
-        typingDiv.id = 'typingIndicator';
-
-        const bubble = document.createElement('div');
-        bubble.className = 'chat-message__bubble';
-        bubble.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
-
-        typingDiv.appendChild(bubble);
-        els.chatMessages.appendChild(typingDiv);
-        els.chatMessages.scrollTop = els.chatMessages.scrollHeight;
-    }
-
-    function hideTyping() {
-        state.chatTyping = false;
-        const indicator = document.getElementById('typingIndicator');
-        if (indicator) indicator.remove();
-    }
-
-    function showOptions(options) {
-        const optionsDiv = document.createElement('div');
-        optionsDiv.className = 'chat-options';
-        optionsDiv.id = 'chatOptions';
-
-        options.forEach(opt => {
-            const btn = document.createElement('button');
-            btn.className = 'chat-option';
-            btn.textContent = opt.label;
-            btn.addEventListener('click', () => handleOption(opt.value));
-            optionsDiv.appendChild(btn);
-        });
-
-        els.chatMessages.appendChild(optionsDiv);
-        els.chatMessages.scrollTop = els.chatMessages.scrollHeight;
-    }
-
-    function hideOptions() {
-        const opts = document.getElementById('chatOptions');
-        if (opts) opts.remove();
-    }
-
-    async function addMessagesSequence(messages, delay = 600) {
-        for (let i = 0; i < messages.length; i++) {
-            await sleep(delay + Math.random() * 400);
-            showTyping();
-            await sleep(800 + Math.random() * 400);
-            hideTyping();
-            addMessage(messages[i].from, messages[i].text);
-        }
-    }
-
-    async function initChatbot() {
-        showTyping();
-        await sleep(1000);
-        hideTyping();
-        addMessage('bot', CONFIG.chatFlows.opener.text);
-
-        await sleep(1200);
-        showOptions([
-            { label: "I was just curious", value: "curious" },
-            { label: "I'm bored", value: "boredom" },
-            { label: "I actually need a website", value: "needing" }
-        ]);
-    }
-
-    async function handleOption(value) {
-        hideOptions();
-
-        if (state.chatStage === 'open') {
-            const labels = {
-                curious: "I was just curious",
-                boredom: "I'm bored",
-                needing: "I actually need a website"
-            };
-            addMessage('user', labels[value]);
-
-            const flow = CONFIG.chatFlows.answers[value];
-            await addMessagesSequence(flow, 400);
-
-            await sleep(800);
-            showOptions([
-                { label: "Yeah, I think it can.", value: "yes" },
-                { label: "Honestly? No.", value: "no" }
-            ]);
-            state.chatStage = 'deeper';
-
-        } else if (state.chatStage === 'deeper') {
-            addMessage('user', value === 'yes' ? "Yeah, I think it can." : "Honestly? No.");
-
-            const flow = CONFIG.chatFlows.deeper[value];
-            await addMessagesSequence(flow, 400);
-
-            await sleep(600);
-            showOptions([
-                { label: "Show me.", value: "reward" }
-            ]);
-            state.chatStage = 'reward';
-
-        } else if (state.chatStage === 'reward') {
-            addMessage('user', "Show me.");
-
-            await addMessagesSequence(CONFIG.chatFlows.reward, 400);
-
-            await sleep(400);
-            showDoneCard();
-            state.chatStage = 'done';
-        }
-    }
-
-    function showDoneCard() {
-        const card = document.createElement('div');
-        card.className = 'chat-done-card';
-        card.innerHTML = `
-            <div class="chat-done-card__title">This is where it gets real.</div>
-            <div class="chat-done-card__desc">In production, this is where the bot branches — adventure, services, or deeper into the mystery. This is just the proof of concept.</div>
-        `;
-        els.chatMessages.appendChild(card);
-        els.chatMessages.scrollTop = els.chatMessages.scrollHeight;
-    }
-
-    els.chatbotClose.addEventListener('click', closeChatbot);
 
     // ─── INITIALIZE ─────────────────────────────────────────────
     function init() {
