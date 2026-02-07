@@ -805,6 +805,7 @@ body:has(#wheatley-message) .cursor-blink {
 /* ─── CHATLING WIDGET ────────────────────────────────────── */
 /* Chatling is loaded on-demand via JavaScript injection */
 /* No CSS hiding needed - script doesn't exist until button is clicked */
+/* Fade-in handled via inline styles in JavaScript */
 
 /* Force Chatling below our menu/modals */
 #chtl-container,

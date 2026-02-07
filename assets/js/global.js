@@ -1,3 +1,8 @@
+// ════════════════════════════════════════════════════════════
+// GLOBAL SCRIPTS - ALL PAGES
+// Version: 1.1.0 | Last Updated: Feb 7, 2026
+// ════════════════════════════════════════════════════════════
+
 (function() {
     'use strict';
 
@@ -169,10 +174,43 @@
         }
     }
 
-    // ─── INITIALIZE ─────────────────────────────────────────────
+    // ─── INITIALIZE NAV ─────────────────────────────────────────
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initNav);
     } else {
         initNav();
+    }
+    
+    // ─── CHATLING FADE-IN OBSERVER (ALL PAGES) ─────────────────
+    // Watch for Chatling elements being added to DOM and fade them in
+    const chatlingObserver = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.id && node.id.includes('chtl')) {
+                    console.log('Chatling element detected:', node.id);
+                    // Apply fade-in immediately
+                    node.style.opacity = '0';
+                    node.style.transition = 'opacity 0.5s ease-in';
+                    setTimeout(() => {
+                        node.style.opacity = '1';
+                    }, 50);
+                }
+            });
+        });
+    });
+    
+    // Start observing when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            chatlingObserver.observe(document.body, {
+                childList: true,
+                subtree: true
+            });
+        });
+    } else {
+        chatlingObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
     }
 })();

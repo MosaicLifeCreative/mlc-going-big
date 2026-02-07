@@ -49,12 +49,12 @@ function mlc_enqueue_global_assets() {
         'all'
     );
     
-    // Global JS (nav only)
+    // Global JS (nav + Chatling fade-in)
     wp_enqueue_script(
         'mlc-global-js',
         get_stylesheet_directory_uri() . '/assets/js/global.js',
         array(),
-        '1.0.0',
+        '1.1.0',
         true
     );
 }
@@ -171,12 +171,14 @@ function mlc_wheatley_respond($request) {
     $previous_messages = isset($params['previous_messages']) ? $params['previous_messages'] : array();
     $visitor = isset($params['visitor']) ? $params['visitor'] : array('isReturning' => false, 'visitCount' => 1);
     $current_time = isset($params['current_time']) ? $params['current_time'] : 'unknown';
+    $day_date = isset($params['day_date']) ? $params['day_date'] : 'unknown';
     $device = isset($params['device']) ? $params['device'] : 'unknown';
     $session_duration = isset($params['session_duration']) ? intval($params['session_duration']) : 0;
     $has_scrolled = isset($params['has_scrolled']) ? $params['has_scrolled'] : false;
     $has_interacted = isset($params['has_interacted']) ? $params['has_interacted'] : false;
     $user_name = isset($params['user_name']) ? sanitize_text_field($params['user_name']) : null;
     $user_context = isset($params['user_context']) ? sanitize_text_field($params['user_context']) : null;
+    $referrer = isset($params['referrer']) ? sanitize_text_field($params['referrer']) : 'direct';
     
     // Build system prompt
     $system_prompt = "You are Wheatley, an AI assistant for Mosaic Life Creative's website. You hijack the homepage headline when users go idle.
@@ -195,8 +197,10 @@ CONTEXT:
 - This is message #" . $message_number . "
 - Countdown timer status: " . $countdown_status . "
 - Visitor type: " . ($visitor['isReturning'] ? 'returning (visit #' . $visitor['visitCount'] . ')' : 'first-time') . "
+- Current day/date: " . $day_date . "
 - Current time: " . $current_time . "
 - Device: " . $device . "
+- Referrer: " . $referrer . "
 - Session duration: " . $session_duration . " seconds total
 - Activity: " . ($has_scrolled ? 'scrolled' : 'no scroll') . ", " . ($has_interacted ? 'interacted' : 'no interaction yet') . "
 " . ($user_name ? "- User's name: " . $user_name : "") . "

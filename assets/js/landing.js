@@ -1,5 +1,18 @@
 (function() {
     'use strict';
+    
+    // ─── APERTURE SCIENCE CONSOLE LOGS ─────────────────────────
+    console.log('%c═══════════════════════════════════════════════════', 'color: #7C3AED; font-weight: bold;');
+    console.log('%cAperture Science Personality Core v2.7.4', 'color: #7C3AED; font-weight: bold; font-size: 14px;');
+    console.log('%c═══════════════════════════════════════════════════', 'color: #7C3AED; font-weight: bold;');
+    console.log('%cStatus:', 'color: #06B6D4; font-weight: bold;', 'Relocated to Columbus, Ohio');
+    console.log('%cFormer Role:', 'color: #06B6D4; font-weight: bold;', 'Intelligence Dampening Sphere');
+    console.log('%cCurrent Role:', 'color: #06B6D4; font-weight: bold;', 'Web Development Assistant');
+    console.log('%cNeurotoxin Levels:', 'color: #10B981; font-weight: bold;', '0 ppm (significant improvement)');
+    console.log('%cGLaDOS Status:', 'color: #EF4444; font-weight: bold;', 'Still holding grudges');
+    console.log('%c═══════════════════════════════════════════════════', 'color: #7C3AED; font-weight: bold;');
+    console.log('%cNote:', 'color: #F59E0B; font-weight: bold;', 'If you\'re reading this, you\'re probably qualified to work here.');
+    console.log('%c═══════════════════════════════════════════════════\n', 'color: #7C3AED; font-weight: bold;');
 
     // ─── CONFIGURATION ──────────────────────────────────────────
     const CONFIG = {
@@ -191,6 +204,38 @@
         return 'desktop';
     }
 
+    function getDayDate() {
+        const now = new Date();
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const dayName = days[now.getDay()];
+        const monthName = months[now.getMonth()];
+        const date = now.getDate();
+        const year = now.getFullYear();
+        
+        return `${dayName}, ${monthName} ${date}, ${year}`;
+    }
+
+    function getReferrer() {
+        if (!document.referrer) return 'direct';
+        
+        try {
+            const referrerUrl = new URL(document.referrer);
+            const currentUrl = new URL(window.location.href);
+            
+            // Same domain = internal navigation
+            if (referrerUrl.hostname === currentUrl.hostname) {
+                return 'internal';
+            }
+            
+            // Return just the hostname for external referrers
+            return referrerUrl.hostname;
+        } catch (e) {
+            return 'direct';
+        }
+    }
+
     async function triggerWheatley(messageNumber) {
         if (state.wheatleyActive) return;
         state.wheatleyActive = true;
@@ -224,7 +269,9 @@
                     previous_messages: state.previousWheatleyMessages || [],
                     visitor: detectVisitorType(),
                     current_time: getCurrentTime(),
+                    day_date: getDayDate(),
                     device: detectDeviceType(),
+                    referrer: getReferrer(),
                     session_duration: Math.floor((Date.now() - state.sessionStart) / 1000),
                     has_scrolled: state.hasScrolled,
                     has_interacted: state.hasInteracted,
@@ -330,6 +377,7 @@
         console.log('Loading Chatling script...');
         
         // Inject Chatling script immediately
+        // (Fade-in handled by global.js observer)
         if (!document.getElementById('chtl-script')) {
             // Add config
             window.chtlConfig = { chatbotId: "2733792244" };
@@ -345,6 +393,7 @@
             const isMobile = window.innerWidth <= 768;
             script.onload = () => {
                 console.log('Chatling script loaded');
+                
                 if (!isMobile) {
                     // Small delay to let Chatling initialize
                     setTimeout(() => {
