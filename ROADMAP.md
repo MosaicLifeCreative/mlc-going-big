@@ -31,6 +31,19 @@
 - [x] Fixed gradient class naming consistency (gradient-orb throughout)
 - [x] Service page styles added to landing.css (glassmorphism cards, responsive)
 
+### Chatling Integration (v1.6.1) - Feb 7, 2026
+- [x] On-demand script injection (loads only when button clicked)
+- [x] Parallel loading during Wheatley typewriter animation
+- [x] Fixed text encoding corruption (nodeValue vs textContent)
+- [x] Z-index hierarchy (Chatling forced to 999999, menu at 2147483646)
+- [x] Early button click handler with special welcome message
+- [x] Wheatley personality configuration in Chatling dashboard
+- [x] LORE knowledge base created (Aperture backstory, GLaDOS tension, redemption arc)
+- [x] Header: "Wheatley <3 Em Dashes" (MLC brand voice)
+- [x] Greeting: "Right, hello! Wheatley here. What can I help you with? I'm... I'm really good at helping. Probably."
+- [x] Footer: Meta self-reference with link to AI agents page
+- [x] Hover message for user-initiated interaction
+
 ### Design & Planning
 - [x] Services page mockup/vision
 - [x] Snake 451 game prototype (Fahrenheit 451 reference for hunt)
@@ -38,19 +51,28 @@
 
 ## 📋 Next Up (Priority Order)
 
-### 1. Chatling Integration - READY FOR AFTERNOON SESSION
-- [ ] Replace hardcoded chatbot with Chatling widget
-- [ ] "Like nothing else" button → Wheatley transition → Chatling opens (coordinated with early button fix)
-- [ ] Unified Wheatley personality across homepage + chat widget
-- [ ] Chatling personality prompt configuration with Aperture Science backstory
+### 1. Wheatley Enhancements
+- [ ] **Chatling fade-in animation on homepage**
+  - Add CSS transition when script loads
+  - Smooth opacity 0 → 1 over 0.5s
+  - Prevents jarring pop-in effect
+- [ ] **HUNT knowledge base**
+  - Scavenger hunt context and clues
+  - Quest page integration
+  - Context-aware responses based on {{webpage_url}}
+- [ ] **Real math calculations:** Use actual session metrics in 10m-20m messages
+  - Example: "600 seconds, 4 scrolls, 0 clicks. 600 ÷ 4 = 150 seconds per scroll. That's either thorough reading or excellent procrastination."
+  - Pull from state: session_duration, scroll count, interaction count
+  - Present in Wheatley's conversational voice (not clinical)
+  - Keep under 37 words
 
-### 2. Priority Fixes
-- [ ] **Early button click handler:** If user clicks "Like nothing else" before 30s (before Wheatley appears), trigger special Wheatley welcome message, THEN open Chatling
-  - Check `state.wheatleyMessageCount === 0` in button handler
-  - Special message: "Brilliant choice. Right, let me just—there we go. Chat window, bottom right. That's me in there. Properly interactive now."
-  - After typewriter completes → open Chatling
+### 2. Context Integration
+- [ ] **Context variable integration in Chatling**
+  - Use {{webpage_url}} and {{webpage_title}} for page-specific responses
+  - Different behavior on quest pages vs service pages
+  - Quest page hints and guidance from Wheatley
 
-### 3. Share Feature (Phase 1 - Afternoon Session)
+### 3. Share Feature (Phase 1)
 - [ ] **Bottom-left "Personalize & Share" button**
   - Fixed position, subtle styling, doesn't compete with main UI
   - Opens modal on click
@@ -102,14 +124,7 @@
 - [ ] Test end-to-end on live domain
 - [ ] Iterate on design/mechanics as new ideas emerge
 
-### 7. Wheatley Enhancements
-- [ ] **Real math calculations:** Use actual session metrics in 10m-20m messages
-  - Example: "600 seconds, 4 scrolls, 0 clicks. 600 ÷ 4 = 150 seconds per scroll. That's either thorough reading or excellent procrastination."
-  - Pull from state: session_duration, scroll count, interaction count
-  - Present in Wheatley's conversational voice (not clinical)
-  - Keep under 37 words
-
-### 8. Aperture Science Integration
+### 7. Aperture Science Integration
 - [ ] **Console easter eggs:** Personality Core v2.7.4 logs on page load
 ```javascript
   console.log("Aperture Science Personality Core v2.7.4");
@@ -118,12 +133,6 @@
   console.log("Current Role: Web Development Assistant");
   console.log("Neurotoxin Levels: 0 ppm (significant improvement)");
 ```
-- [ ] **Aperture backstory in Chatling:** Add to personality prompt
-  - "Former Aperture Science personality core"
-  - "Ended up in space after the Portal Incident"
-  - "Eventually retrieved, ended up on eBay: 'Used AI Core - Previously Space-Faring'"
-  - "Bought by web developer in Ohio"
-  - If user asks about space: "Spent a few years in orbit. Not ideal. Very cold. Except for this one sphere that wouldn't shut up about space."
 - [ ] **GLaDOS voice for quest puzzle:**
   - Research TTS options: Uberduck.ai, FakeYou.com, Eleven Labs
   - Start with pre-generated audio (cheaper, instant)
@@ -131,7 +140,7 @@
   - Play at appropriate puzzle moments
   - Option to upgrade to real-time TTS with personalization later
 
-### 9. Quest Site Build (4815162342.quest)
+### 8. Quest Site Build (4815162342.quest)
 **Hunt Flow:**
 1. ✅ Countdown: 3:16:23 PM daily (42-second window)
 2. ✅ Sequence Input: 4815162342
@@ -149,7 +158,7 @@
 5. ⏳ GLaDOS Testing Chamber (optional)
 6. ⏳ Final stage: TBD (Anorak AI guide?)
 
-### 10. Site Pages
+### 9. Site Pages
 - [ ] **Website Design page** (placeholder content deployed, needs full build)
   - Hero section complete
   - Content blocks need expansion
@@ -162,13 +171,13 @@
 - [ ] **About page** (personal story, values)
 - [ ] **Contact page** (form + info)
 
-### 11. Advanced Wheatley Features (Future)
+### 10. Advanced Wheatley Features (Future)
 - [ ] Hunt meta-commentary based on countdown proximity
 - [ ] Session memory (sessionStorage tracking across visits)
 - [ ] Tab visibility detection ("You switched back. I was still here.")
 - [ ] More console easter eggs (hidden commands, keystroke combos)
 
-### 12. Final Polish + Launch
+### 11. Final Polish + Launch
 - [ ] Performance optimization
 - [ ] SEO implementation
 - [ ] Cross-browser testing
@@ -199,14 +208,21 @@ All new page templates follow this structure:
 5. Conditional JS loading (global.js everywhere, landing.js only on landing page)
 
 ### File Versions
-- **landing.css:** v1.2.2 (nav + landing + service pages)
-- **landing.js:** v1.5.0 (Wheatley AI, hunt, nav interactions)
+- **landing.css:** v1.2.4 (nav + landing + service pages, Chatling z-index)
+- **landing.js:** v1.6.1 (Wheatley AI, on-demand Chatling injection, hunt, nav interactions)
 - **global.js:** v1.0.0 (nav functionality only)
-- **functions.php:** v1.6.0 (asset enqueue, hunt validation, Wheatley API, shared components)
+- **functions.php:** v1.6.1 (asset enqueue, hunt validation, Wheatley API, shared components, Chatling exclusion for landing)
 
 ### Shared Components
 - `mlc_render_gradient_blobs()` - Animated gradient background (3 orbs)
 - `mlc_inject_nav_html()` - Full nav overlay with 8-item menu + photo slideshow
+
+### Chatling Configuration
+- **Widget ID:** 2733792244
+- **Personality:** Wheatley from Portal 2 (nervous, rambling, helpful)
+- **Knowledge Bases:** LORE (Aperture backstory), HUNT (coming soon)
+- **Loading:** On-demand injection on landing page, normal load on other pages
+- **Auto-open:** Enabled on desktop via Chatling dashboard (non-landing pages only)
 
 ### Next Template Pattern
 When creating new service pages (Hosting, Maintenance, etc.):
