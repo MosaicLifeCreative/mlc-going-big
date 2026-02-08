@@ -42,29 +42,20 @@ function mlc_toolkit_deactivate() {
 register_deactivation_hook(__FILE__, 'mlc_toolkit_deactivate');
 
 /**
- * Register short URL rewrite rules
+ * Handle /s/{code} share URLs.
+ * Checks REQUEST_URI directly — no dependency on WP rewrite rules.
+ * Fires early on 'init' (priority 1) before caching or template loading.
  */
-function mlc_toolkit_rewrite_rules() {
-    add_rewrite_rule('^s/([a-zA-Z0-9]+)/?$', 'index.php?mlc_share_code=$1', 'top');
-}
-add_action('init', 'mlc_toolkit_rewrite_rules');
+function mlc_toolkit_handle_share_url() {
+    $path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
 
-function mlc_toolkit_query_vars($vars) {
-    $vars[] = 'mlc_share_code';
-    return $vars;
-}
-add_filter('query_vars', 'mlc_toolkit_query_vars');
+    if (!preg_match('#^s/([a-zA-Z0-9]+)$#', $path, $matches)) return;
 
-/**
- * Handle short URL redirects
- */
-function mlc_toolkit_handle_redirect() {
-    $code = get_query_var('mlc_share_code');
-    if (!$code) return;
-
+    $code  = $matches[1];
     $share = MLC_Share::get_by_code($code);
+
     if (!$share) {
-        wp_redirect(home_url(), 302);
+        wp_redirect(home_url('/'), 302);
         exit;
     }
 
@@ -74,9 +65,8 @@ function mlc_toolkit_handle_redirect() {
         'user_agent' => isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field($_SERVER['HTTP_USER_AGENT']) : '',
     ]);
 
-    // Render a tiny bridge page that stores the personalization data in
-    // sessionStorage then redirects client-side. This avoids all server-side
-    // redirect issues (WP stripping query params, hash fragments, cookies).
+    // Render a tiny bridge page that stores the personalization in
+    // sessionStorage then redirects client-side.
     $encoded = esc_attr($share->url_encoded);
     $home    = esc_url(home_url('/'));
     ?>
@@ -92,7 +82,7 @@ function mlc_toolkit_handle_redirect() {
     <?php
     exit;
 }
-add_action('template_redirect', 'mlc_toolkit_handle_redirect');
+add_action('init', 'mlc_toolkit_handle_share_url', 1);
 
 /**
  * REST endpoint for creating share links (called from frontend JS)
