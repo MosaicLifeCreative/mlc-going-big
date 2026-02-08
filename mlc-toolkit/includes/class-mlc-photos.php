@@ -32,9 +32,18 @@ class MLC_Photos {
     }
 
     /**
-     * Get photos for frontend (randomized, with resolved URLs)
+     * Get photos for frontend (randomized, with resolved URLs).
+     * Result is cached per request so multiple calls return the same
+     * shuffled order (fixes caption/photo mismatch between PHP HTML
+     * rendering and JS localization).
      */
+    private static $frontend_cache = null;
+
     public static function get_frontend_data() {
+        if (self::$frontend_cache !== null) {
+            return self::$frontend_cache;
+        }
+
         $photos = self::get_all();
 
         // Resolve attachment URLs for any that use attachment IDs
@@ -53,17 +62,19 @@ class MLC_Photos {
             return !empty($p['url']);
         });
 
-        // Randomize order
+        // Randomize order (once per request)
         $photos = array_values($photos);
         shuffle($photos);
 
-        return array_map(function ($p) {
+        self::$frontend_cache = array_map(function ($p) {
             return [
                 'url'     => $p['url'],
                 'caption' => $p['caption'],
                 'credit'  => $p['credit'],
             ];
         }, $photos);
+
+        return self::$frontend_cache;
     }
 
     /**
