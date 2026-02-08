@@ -47,18 +47,23 @@
 
     // ─── UTILITY: URL PERSONALIZATION ──────────────────────────
     function getPersonalizationFromURL() {
-        // 1. Check URL param (?u=base64)
-        const params = new URLSearchParams(window.location.search);
-        let encoded = params.get('u');
+        let encoded = null;
 
-        // 2. Fallback: check cookie set by /s/{code} redirect
-        if (!encoded) {
-            const match = document.cookie.match(/(?:^|;\s*)mlc_share=([^;]+)/);
-            if (match) {
-                encoded = decodeURIComponent(match[1]);
-                // Clear the cookie — single use
-                document.cookie = 'mlc_share=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+        // 1. Check URL hash fragment (#mlc=base64) — set by /s/{code} redirect
+        if (window.location.hash && window.location.hash.includes('mlc=')) {
+            const hashStr = window.location.hash.substring(1); // strip leading #
+            const hashParams = new URLSearchParams(hashStr);
+            encoded = hashParams.get('mlc');
+            if (encoded) {
+                // Clean the hash so it doesn't persist on refresh/bookmarks
+                history.replaceState(null, '', window.location.pathname + window.location.search);
             }
+        }
+
+        // 2. Fallback: check URL query param (?u=base64) — direct links
+        if (!encoded) {
+            const params = new URLSearchParams(window.location.search);
+            encoded = params.get('u');
         }
 
         if (!encoded) return { name: null, context: null };
