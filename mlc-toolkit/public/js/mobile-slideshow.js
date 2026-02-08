@@ -20,6 +20,8 @@
     var captionTitle = null;
     var captionCredit = null;
     var counterEl = null;
+    var autoAdvanceTimer = null;
+    var SLIDESHOW_DURATION = 6000;
 
     /**
      * Build the overlay DOM (once, on first open)
@@ -98,19 +100,45 @@
         });
 
         var target = photoContainer.querySelector('[data-index="' + index + '"]');
-        if (target) target.classList.add('is-visible');
+        if (target) {
+            // Force animation restart for Ken Burns
+            target.style.animation = 'none';
+            target.offsetHeight;
+            target.style.animation = '';
+            target.classList.add('is-visible');
+        }
 
         if (captionTitle) captionTitle.textContent = photos[index].caption || '';
         if (captionCredit) captionCredit.textContent = photos[index].credit || '';
         if (counterEl) counterEl.textContent = (index + 1) + ' / ' + photos.length;
     }
 
+    function startAutoAdvance() {
+        stopAutoAdvance();
+        autoAdvanceTimer = setInterval(function () {
+            showPhoto(currentIndex + 1);
+        }, SLIDESHOW_DURATION);
+    }
+
+    function stopAutoAdvance() {
+        if (autoAdvanceTimer) {
+            clearInterval(autoAdvanceTimer);
+            autoAdvanceTimer = null;
+        }
+    }
+
+    function resetAutoAdvance() {
+        startAutoAdvance();
+    }
+
     function nextPhoto() {
         showPhoto(currentIndex + 1);
+        resetAutoAdvance();
     }
 
     function prevPhoto() {
         showPhoto(currentIndex - 1);
+        resetAutoAdvance();
     }
 
     function openOverlay() {
@@ -119,9 +147,11 @@
         showPhoto(0);
         overlayEl.classList.add('is-open');
         document.body.style.overflow = 'hidden';
+        startAutoAdvance();
     }
 
     function closeOverlay() {
+        stopAutoAdvance();
         if (overlayEl) {
             overlayEl.classList.remove('is-open');
         }

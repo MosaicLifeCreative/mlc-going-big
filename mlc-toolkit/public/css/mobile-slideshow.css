@@ -76,6 +76,12 @@
 
 .mlc-slideshow-overlay__img.is-visible {
     opacity: 1;
+    animation: mlcKenBurns 6s ease-in-out forwards;
+}
+
+@keyframes mlcKenBurns {
+    from { transform: scale(1); }
+    to { transform: scale(1.05); }
 }
 
 /* Caption */
