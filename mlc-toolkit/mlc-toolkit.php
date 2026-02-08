@@ -141,6 +141,30 @@ function mlc_toolkit_create_share($request) {
 }
 
 /**
+ * Legacy domain redirect for share URLs.
+ * When migrating from fresh.mosaiclifecreative.com to mosaiclifecreative.com,
+ * define MLC_OLD_DOMAINS in wp-config.php as a comma-separated string:
+ *   define('MLC_OLD_DOMAINS', 'fresh.mosaiclifecreative.com');
+ *
+ * Any request to the old domain will be redirected to the new domain,
+ * preserving the full path (so /s/{code} links keep working).
+ */
+function mlc_toolkit_legacy_domain_redirect() {
+    if (!defined('MLC_OLD_DOMAINS')) return;
+
+    $old_domains = array_map('trim', explode(',', MLC_OLD_DOMAINS));
+    $current_host = isset($_SERVER['HTTP_HOST']) ? strtolower($_SERVER['HTTP_HOST']) : '';
+
+    if (in_array($current_host, $old_domains, true)) {
+        $new_url = home_url($_SERVER['REQUEST_URI']);
+        nocache_headers();
+        wp_redirect($new_url, 301);
+        exit;
+    }
+}
+add_action('init', 'mlc_toolkit_legacy_domain_redirect', 0);
+
+/**
  * Localize photo data for global.js
  */
 function mlc_toolkit_localize_photos() {
@@ -172,3 +196,85 @@ function mlc_toolkit_frontend_assets() {
     );
 }
 add_action('wp_enqueue_scripts', 'mlc_toolkit_frontend_assets');
+
+/**
+ * Dashboard widget — Share Link metrics at a glance
+ */
+function mlc_toolkit_dashboard_widget() {
+    wp_add_dashboard_widget(
+        'mlc_share_metrics',
+        'Share Link Metrics',
+        'mlc_toolkit_dashboard_widget_render'
+    );
+}
+add_action('wp_dashboard_setup', 'mlc_toolkit_dashboard_widget');
+
+function mlc_toolkit_dashboard_widget_render() {
+    $stats = MLC_Share::get_stats();
+    $recent = MLC_Share::get_recent_activity(5);
+
+    ?>
+    <style>
+        .mlc-dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+        .mlc-dash-stat { text-align: center; padding: 12px 8px; background: #f6f7f7; border-radius: 8px; }
+        .mlc-dash-stat__value { font-size: 28px; font-weight: 700; color: #1d2327; line-height: 1.2; }
+        .mlc-dash-stat__label { font-size: 11px; color: #646970; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+        .mlc-dash-divider { border: none; border-top: 1px solid #f0f0f1; margin: 12px 0; }
+        .mlc-dash-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; border-bottom: 1px solid #f0f0f1; }
+        .mlc-dash-row:last-child { border-bottom: none; }
+        .mlc-dash-row__event { color: #1d2327; }
+        .mlc-dash-row__time { color: #646970; }
+        .mlc-dash-badge { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; }
+        .mlc-dash-badge--created { background: #e7f5ee; color: #00a32a; }
+        .mlc-dash-badge--clicked { background: #e8f0fe; color: #2271b1; }
+        .mlc-dash-footer { margin-top: 12px; text-align: right; }
+    </style>
+    <div class="mlc-dash-grid">
+        <div class="mlc-dash-stat">
+            <div class="mlc-dash-stat__value"><?php echo esc_html($stats['total_links']); ?></div>
+            <div class="mlc-dash-stat__label">Links</div>
+        </div>
+        <div class="mlc-dash-stat">
+            <div class="mlc-dash-stat__value"><?php echo esc_html($stats['total_clicks']); ?></div>
+            <div class="mlc-dash-stat__label">Clicks</div>
+        </div>
+        <div class="mlc-dash-stat">
+            <div class="mlc-dash-stat__value"><?php echo esc_html($stats['conversion_rate']); ?>%</div>
+            <div class="mlc-dash-stat__label">Click Rate</div>
+        </div>
+    </div>
+    <div class="mlc-dash-grid" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="mlc-dash-stat">
+            <div class="mlc-dash-stat__value"><?php echo esc_html($stats['clicks_today']); ?></div>
+            <div class="mlc-dash-stat__label">Clicks Today</div>
+        </div>
+        <div class="mlc-dash-stat">
+            <div class="mlc-dash-stat__value"><?php echo esc_html($stats['clicks_week']); ?></div>
+            <div class="mlc-dash-stat__label">Clicks This Week</div>
+        </div>
+    </div>
+    <?php if (!empty($recent)): ?>
+        <hr class="mlc-dash-divider">
+        <strong style="font-size: 12px; text-transform: uppercase; color: #646970; letter-spacing: 0.5px;">Recent Activity</strong>
+        <div style="margin-top: 8px;">
+            <?php foreach ($recent as $event): ?>
+                <div class="mlc-dash-row">
+                    <span class="mlc-dash-row__event">
+                        <span class="mlc-dash-badge mlc-dash-badge--<?php echo esc_attr($event->event_type); ?>">
+                            <?php echo $event->event_type === 'created' ? 'New' : 'Click'; ?>
+                        </span>
+                        <?php echo esc_html($event->name_display); ?>
+                        <?php if ($event->context): ?>
+                            <span style="color: #646970;">— <?php echo esc_html($event->context); ?></span>
+                        <?php endif; ?>
+                    </span>
+                    <span class="mlc-dash-row__time"><?php echo esc_html(human_time_diff(strtotime($event->event_time), current_time('timestamp')) . ' ago'); ?></span>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+    <div class="mlc-dash-footer">
+        <a href="<?php echo admin_url('admin.php?page=mlc-share-analytics'); ?>">View Full Analytics &rarr;</a>
+    </div>
+    <?php
+}

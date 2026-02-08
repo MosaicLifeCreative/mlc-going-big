@@ -47,19 +47,28 @@
 
     // ─── UTILITY: URL PERSONALIZATION ──────────────────────────
     function getPersonalizationFromURL() {
+        // 1. Check for already-decoded values (persists across reloads)
+        try {
+            const savedName = sessionStorage.getItem('mlc_share_name');
+            const savedContext = sessionStorage.getItem('mlc_share_context');
+            if (savedName) {
+                return { name: savedName, context: savedContext || null };
+            }
+        } catch (e) {}
+
         let encoded = null;
 
-        // 1. Check sessionStorage — set by /s/{code} bridge page
+        // 2. Check sessionStorage — set by /s/{code} bridge page
         try {
             encoded = sessionStorage.getItem('mlc_share');
             if (encoded) {
-                sessionStorage.removeItem('mlc_share'); // single use
+                sessionStorage.removeItem('mlc_share'); // consumed; decoded values persist below
             }
         } catch (e) {
             // sessionStorage blocked — continue to fallback
         }
 
-        // 2. Fallback: check URL query param (?u=base64) — direct links
+        // 3. Fallback: check URL query param (?u=base64) — direct links
         if (!encoded) {
             const params = new URLSearchParams(window.location.search);
             encoded = params.get('u');
@@ -70,11 +79,16 @@
         try {
             const decoded = atob(encoded);
             const parts = decoded.split('|');
+            const name = parts[0] || null;
+            const context = parts[1] || null;
 
-            return {
-                name: parts[0] || null,
-                context: parts[1] || null
-            };
+            // Persist decoded values for the session (survives page reloads)
+            try {
+                if (name) sessionStorage.setItem('mlc_share_name', name);
+                if (context) sessionStorage.setItem('mlc_share_context', context);
+            } catch (e) {}
+
+            return { name, context };
         } catch (e) {
             console.error('Failed to decode personalization:', e);
             return { name: null, context: null };

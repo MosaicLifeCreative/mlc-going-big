@@ -391,11 +391,12 @@ function mlc_inject_nav_html() {
                         <span class="nav-item__number">08</span>
                         <a href="#" class="nav-item__label">Contact</a>
                     </li>
+                    <li class="nav-item nav-item--photos" data-index="8">
+                        <span class="nav-item__number">09</span>
+                        <a href="#" class="nav-item__label" id="navPhotosBtn">Pretty Photos</a>
+                    </li>
                 </ul>
             </nav>
-
-            <!-- Mobile: View Pretty Photos button (hidden on desktop) -->
-            <button class="nav-photos-btn" id="navPhotosBtn">View Pretty Photos</button>
         </div>
 
         <div class="nav-overlay__right">

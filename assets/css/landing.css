@@ -1127,6 +1127,11 @@ body:has(#wheatley-message) .cursor-blink {
     .gradient-orb--3 { width: 200px; height: 200px; }
     .gradient-orb--4 { width: 150px; height: 150px; }
 
+    .phase-container {
+        min-height: 100px;
+        margin-bottom: 8px;
+    }
+
     /* Button fixes for mobile */
     .choice-buttons {
         flex-direction: column;
