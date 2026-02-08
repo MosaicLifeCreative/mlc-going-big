@@ -45,16 +45,35 @@ register_deactivation_hook(__FILE__, 'mlc_toolkit_deactivate');
  * Handle /s/{code} share URLs.
  * Checks REQUEST_URI directly — no dependency on WP rewrite rules.
  * Fires early on 'init' (priority 1) before caching or template loading.
+ *
+ * Cache-busting headers prevent SiteGround's Dynamic Cache (Nginx layer)
+ * from caching these responses and preventing PHP from executing on
+ * subsequent requests.
  */
 function mlc_toolkit_handle_share_url() {
-    $path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+    $raw_path = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+
+    // Account for WordPress in a subdirectory (e.g. /fresh/s/code)
+    $home_path = trim(parse_url(home_url(), PHP_URL_PATH) ?: '', '/');
+    $path = $raw_path;
+    if ($home_path && strpos($path, $home_path . '/') === 0) {
+        $path = substr($path, strlen($home_path) + 1);
+    }
 
     if (!preg_match('#^s/([a-zA-Z0-9]+)$#', $path, $matches)) return;
+
+    // Prevent SiteGround/Nginx from caching this response
+    nocache_headers();
+    header('X-Cache-Enabled: False');
+    if (!defined('DONOTCACHEPAGE')) {
+        define('DONOTCACHEPAGE', true);
+    }
 
     $code  = $matches[1];
     $share = MLC_Share::get_by_code($code);
 
     if (!$share) {
+        error_log('[MLC Share] Code not found in DB: ' . $code);
         wp_redirect(home_url('/'), 302);
         exit;
     }
@@ -65,16 +84,22 @@ function mlc_toolkit_handle_share_url() {
         'user_agent' => isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field($_SERVER['HTTP_USER_AGENT']) : '',
     ]);
 
+    error_log('[MLC Share] Click recorded for code: ' . $code . ' (link_id: ' . $share->id . ')');
+
     // Render a tiny bridge page that stores the personalization in
     // sessionStorage then redirects client-side.
     $encoded = esc_attr($share->url_encoded);
     $home    = esc_url(home_url('/'));
     ?>
     <!DOCTYPE html>
-    <html><head><meta charset="utf-8"><title>Redirecting...</title></head>
+    <html><head><meta charset="utf-8"><title>Redirecting...</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    </head>
     <body>
     <script>
-    sessionStorage.setItem('mlc_share','<?php echo $encoded; ?>');
+    try { sessionStorage.setItem('mlc_share','<?php echo $encoded; ?>'); } catch(e) {}
     window.location.replace('<?php echo $home; ?>');
     </script>
     <noscript><meta http-equiv="refresh" content="0;url=<?php echo $home; ?>"></noscript>
