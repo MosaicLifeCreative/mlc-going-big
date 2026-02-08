@@ -393,7 +393,7 @@ function mlc_inject_nav_html() {
                     </li>
                     <li class="nav-item nav-item--photos" data-index="8">
                         <span class="nav-item__number">09</span>
-                        <a href="#" class="nav-item__label" id="navPhotosBtn">View Pretty Photos</a>
+                        <a href="#" class="nav-item__label" id="navPhotosBtn">See Pretty Photos</a>
                     </li>
                 </ul>
             </nav>
