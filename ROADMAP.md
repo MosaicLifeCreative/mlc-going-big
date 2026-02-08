@@ -93,6 +93,7 @@
 ### 3. Share Feature Improvements
 - [x] ~~Context-Aware Wheatley Messages~~ (DONE — personalization block in system prompt)
 - [x] ~~Session persistence for share context~~ (DONE — survives page reloads)
+- [ ] **Email notification** when a new share link is created (wp_mail to admin)
 - [ ] **Gallery page:** "How Others Are Sharing This" (curated contexts)
 - [ ] **Manual curation interface** for admin
 - [ ] **Profanity filter** for auto-display
