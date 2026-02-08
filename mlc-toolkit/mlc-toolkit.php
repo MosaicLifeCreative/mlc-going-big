@@ -74,11 +74,22 @@ function mlc_toolkit_handle_redirect() {
         'user_agent' => isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field($_SERVER['HTTP_USER_AGENT']) : '',
     ]);
 
-    // Pass personalization via URL hash fragment.
-    // Hash fragments are purely client-side — they cannot be stripped by
-    // WordPress, caching plugins, or server-side redirects.
-    $hash = '#mlc=' . rawurlencode($share->url_encoded);
-    wp_redirect(home_url('/') . $hash, 302);
+    // Render a tiny bridge page that stores the personalization data in
+    // sessionStorage then redirects client-side. This avoids all server-side
+    // redirect issues (WP stripping query params, hash fragments, cookies).
+    $encoded = esc_attr($share->url_encoded);
+    $home    = esc_url(home_url('/'));
+    ?>
+    <!DOCTYPE html>
+    <html><head><meta charset="utf-8"><title>Redirecting...</title></head>
+    <body>
+    <script>
+    sessionStorage.setItem('mlc_share','<?php echo $encoded; ?>');
+    window.location.replace('<?php echo $home; ?>');
+    </script>
+    <noscript><meta http-equiv="refresh" content="0;url=<?php echo $home; ?>"></noscript>
+    </body></html>
+    <?php
     exit;
 }
 add_action('template_redirect', 'mlc_toolkit_handle_redirect');

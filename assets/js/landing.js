@@ -49,15 +49,14 @@
     function getPersonalizationFromURL() {
         let encoded = null;
 
-        // 1. Check URL hash fragment (#mlc=base64) — set by /s/{code} redirect
-        if (window.location.hash && window.location.hash.includes('mlc=')) {
-            const hashStr = window.location.hash.substring(1); // strip leading #
-            const hashParams = new URLSearchParams(hashStr);
-            encoded = hashParams.get('mlc');
+        // 1. Check sessionStorage — set by /s/{code} bridge page
+        try {
+            encoded = sessionStorage.getItem('mlc_share');
             if (encoded) {
-                // Clean the hash so it doesn't persist on refresh/bookmarks
-                history.replaceState(null, '', window.location.pathname + window.location.search);
+                sessionStorage.removeItem('mlc_share'); // single use
             }
+        } catch (e) {
+            // sessionStorage blocked — continue to fallback
         }
 
         // 2. Fallback: check URL query param (?u=base64) — direct links
