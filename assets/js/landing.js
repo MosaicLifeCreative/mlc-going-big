@@ -109,6 +109,10 @@
     state.userName = personalization.name;
     state.userContext = personalization.context;
 
+    if (state.userName || state.userContext) {
+        console.log('🔗 Share link detected:', { name: state.userName, context: state.userContext });
+    }
+
     // ─── DOM ELEMENTS ───────────────────────────────────────────
     const $ = (sel) => document.querySelector(sel);
 
