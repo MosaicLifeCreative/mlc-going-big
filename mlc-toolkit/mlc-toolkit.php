@@ -74,9 +74,11 @@ function mlc_toolkit_handle_redirect() {
         'user_agent' => isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field($_SERVER['HTTP_USER_AGENT']) : '',
     ]);
 
-    // Redirect to full URL with personalization param
-    $destination = add_query_arg('u', $share->url_encoded, home_url('/'));
-    wp_redirect($destination, 302);
+    // Pass personalization via cookie (query params get stripped by WP/plugins)
+    // Cookie expires in 5 minutes — just long enough for the redirect to land
+    setcookie('mlc_share', $share->url_encoded, time() + 300, '/', '', true, false);
+
+    wp_redirect(home_url('/'), 302);
     exit;
 }
 add_action('template_redirect', 'mlc_toolkit_handle_redirect');

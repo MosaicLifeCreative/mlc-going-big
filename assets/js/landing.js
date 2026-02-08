@@ -47,15 +47,26 @@
 
     // ─── UTILITY: URL PERSONALIZATION ──────────────────────────
     function getPersonalizationFromURL() {
+        // 1. Check URL param (?u=base64)
         const params = new URLSearchParams(window.location.search);
-        const encoded = params.get('u');
-        
+        let encoded = params.get('u');
+
+        // 2. Fallback: check cookie set by /s/{code} redirect
+        if (!encoded) {
+            const match = document.cookie.match(/(?:^|;\s*)mlc_share=([^;]+)/);
+            if (match) {
+                encoded = decodeURIComponent(match[1]);
+                // Clear the cookie — single use
+                document.cookie = 'mlc_share=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/';
+            }
+        }
+
         if (!encoded) return { name: null, context: null };
-        
+
         try {
             const decoded = atob(encoded);
             const parts = decoded.split('|');
-            
+
             return {
                 name: parts[0] || null,
                 context: parts[1] || null
