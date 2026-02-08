@@ -57,7 +57,7 @@
 - [x] Plugin scaffold with admin menu
 - [x] **Photo Slideshow Management:** Admin interface to add, remove, reorder photos
 - [x] **Photo Randomization:** Photos shuffled on each page load
-- [x] **Mobile Slideshow:** "View Pretty Photos" as 9th nav menu item (mobile only), full-screen overlay with swipe + arrow navigation
+- [x] **Mobile Slideshow:** "View Pretty Photos" as 9th nav menu item (mobile only), full-screen overlay with swipe + arrow navigation, Ken Burns animation, 6s auto-advance
 - [x] **Share URL Shortener:** `/s/{code}` short URLs with sessionStorage bridge page + SiteGround cache-busting headers
 - [x] **Share Analytics Tracking:** Records link creation and click events
 - [x] **Share Analytics Dashboard:** Summary stats, link table, top contexts, recent activity feed

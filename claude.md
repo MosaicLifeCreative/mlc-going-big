@@ -149,13 +149,16 @@ Fixed top-right. Opens full-screen overlay:
 - **Left panel:** Numbered nav items with hover effects
 - **Right panel:** Photo slideshow (4 Arizona photos, Ken Burns animation)
 
-**Photo slideshow mechanics:**
+**Photo slideshow mechanics (desktop + mobile):**
+- Ken Burns animation (scale 1→1.05 over 6s, `forwards` fill to prevent snap-back)
 - Auto-advances every 6 seconds
-- Manual controls: prev/next arrows
-- Pauses on manual navigation, resumes automatically
+- Manual controls: prev/next arrows (desktop), arrows + swipe (mobile)
+- Timer resets on manual navigation
 - Resets animation on each transition (force reflow technique)
 
 **Nav items:** Home, Website Design, Hosting, Maintenance, Email Marketing, AI Chat Agents, About, Contact, View Pretty Photos (mobile only)
+
+**Mobile "View Pretty Photos":** Opens full-screen overlay via MLC Toolkit plugin (`mobile-slideshow.js` + `mobile-slideshow.css`). Same photo set, same Ken Burns + auto-advance behavior as desktop nav.
 
 ### 5. Share Feature (v1.7.2 — Fully Integrated)
 
