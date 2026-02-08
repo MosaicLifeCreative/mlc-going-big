@@ -72,11 +72,11 @@
     background-position: center;
     opacity: 0;
     transition: opacity 0.6s ease;
+    animation: mlcKenBurns 6s ease-in-out forwards;
 }
 
 .mlc-slideshow-overlay__img.is-visible {
     opacity: 1;
-    animation: mlcKenBurns 6s ease-in-out forwards;
 }
 
 @keyframes mlcKenBurns {
