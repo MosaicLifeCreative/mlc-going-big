@@ -1,20 +1,26 @@
 // ════════════════════════════════════════════════════════════
 // GLOBAL SCRIPTS - ALL PAGES
-// Version: 1.1.0 | Last Updated: Feb 7, 2026
+// Version: 1.2.0 | Last Updated: Feb 8, 2026
 // ════════════════════════════════════════════════════════════
 
 (function() {
     'use strict';
 
     // ─── NAV CONFIGURATION ──────────────────────────────────────
+    // Photos come from MLC Toolkit plugin via wp_localize_script (mlcPhotos global)
+    // Fallback to hardcoded defaults if plugin not active
+    const fallbackPhotos = [
+        { caption: "Trail at Buffalo Park, Flagstaff", credit: "TREY KAUFFMAN" },
+        { caption: "Rincon Mountains, Tucson", credit: "TREY KAUFFMAN" },
+        { caption: "San Francisco Peaks, Flagstaff", credit: "TREY KAUFFMAN" },
+        { caption: "Sunset at Buffalo Park, Flagstaff", credit: "TREY KAUFFMAN" },
+        { caption: "Dharma Initiative, South Pacific", credit: "HUGO REYES" }
+    ];
+
     const CONFIG = {
-        navPhotos: [
-            { caption: "Trail at Buffalo Park, Flagstaff", credit: "TREY KAUFFMAN" },
-            { caption: "Rincon Mountains, Tucson", credit: "TREY KAUFFMAN" },
-            { caption: "San Francisco Peaks, Flagstaff", credit: "TREY KAUFFMAN" },
-            { caption: "Sunset at Buffalo Park, Flagstaff", credit: "TREY KAUFFMAN" },
-            { caption: "Dharma Intiative, South Pacific", credit: "HUGO REYES" }
-        ],
+        navPhotos: (typeof mlcPhotos !== 'undefined' && mlcPhotos.photos && mlcPhotos.photos.length > 0)
+            ? mlcPhotos.photos
+            : fallbackPhotos,
         slideshowDuration: 6000
     };
 
@@ -46,6 +52,11 @@
 
     // ─── NAV PHOTO SLIDESHOW ────────────────────────────────────
     function showSlide(index) {
+        // Wrap index to valid range
+        var photoCount = CONFIG.navPhotos.length;
+        if (photoCount === 0) return;
+        index = ((index % photoCount) + photoCount) % photoCount;
+
         if (els.navPhotoDefault) {
             els.navPhotoDefault.classList.remove('is-visible');
         }
@@ -62,10 +73,10 @@
             targetPhoto.classList.add('is-visible');
         }
 
-        if (els.navCaption && els.navCaptionTitle) {
+        if (els.navCaption && els.navCaptionTitle && CONFIG.navPhotos[index]) {
             els.navCaption.classList.add('is-visible');
             els.navCaptionTitle.textContent = CONFIG.navPhotos[index].caption;
-            
+
             if (els.navCaptionCredit) {
                 els.navCaptionCredit.textContent = CONFIG.navPhotos[index].credit;
             }

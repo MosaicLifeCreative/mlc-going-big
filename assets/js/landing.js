@@ -340,9 +340,11 @@
     async function displayWheatley(text) {
         // Debug: Ensure text is actually a string
         console.log('displayWheatley called with:', text, 'Type:', typeof text);
-        
-        if (state.currentPhase !== 4) {
-            state.currentPhase = 4;
+
+        if (state.phase !== 3) {
+            state.phase = 3;
+            state.displayedPhase = 3;
+            updatePhaseDisplay();
             showPhase();
             await sleep(300);
         }
@@ -525,66 +527,73 @@
     async function generateShareLink() {
         const name = els.shareName.value.trim();
         const context = els.shareContext.value.trim();
-        
+
         if (!name) {
             els.shareName.focus();
             return;
         }
-        
-        const url = generatePersonalizedURL(name, context);
-        
-        // Copy to clipboard
+
+        // Disable button during request
+        els.shareGenerate.disabled = true;
+        els.shareGenerate.textContent = 'Generating...';
+
         try {
-            await navigator.clipboard.writeText(url);
-            
-            // Show success message
+            // Call the MLC Toolkit plugin API to create a tracked short link
+            const response = await fetch('/wp-json/mlc/v1/share', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, context })
+            });
+
+            const data = await response.json();
+            let urlToCopy;
+
+            if (data.success && data.short_url) {
+                urlToCopy = data.short_url;
+            } else {
+                // Fallback to client-side URL if plugin API unavailable
+                urlToCopy = generatePersonalizedURL(name, context);
+            }
+
+            await copyToClipboard(urlToCopy);
+
             els.shareSuccessText.textContent = 'Link copied to clipboard!';
             els.shareSuccess.classList.add('is-visible');
-            
-            // Log analytics (simple version - could be expanded)
-            logShareGeneration(name, context, url);
-            
-            // Hide success after 3 seconds
+
             setTimeout(() => {
                 els.shareSuccess.classList.remove('is-visible');
             }, 3000);
-            
+        } catch (err) {
+            console.error('Share API error, falling back to client-side:', err);
+
+            // Fallback: generate URL client-side without tracking
+            const fallbackUrl = generatePersonalizedURL(name, context);
+            await copyToClipboard(fallbackUrl);
+
+            els.shareSuccessText.textContent = 'Link copied!';
+            els.shareSuccess.classList.add('is-visible');
+
+            setTimeout(() => {
+                els.shareSuccess.classList.remove('is-visible');
+            }, 3000);
+        } finally {
+            els.shareGenerate.disabled = false;
+            els.shareGenerate.textContent = 'Generate & Copy Link';
+        }
+    }
+
+    async function copyToClipboard(text) {
+        try {
+            await navigator.clipboard.writeText(text);
         } catch (err) {
             // Fallback for older browsers
-            console.error('Clipboard API failed:', err);
-            
-            // Create temporary input for fallback copy
             const tempInput = document.createElement('input');
-            tempInput.value = url;
+            tempInput.value = text;
             document.body.appendChild(tempInput);
             tempInput.select();
             document.execCommand('copy');
             document.body.removeChild(tempInput);
-            
-            els.shareSuccessText.textContent = 'Link copied!';
-            els.shareSuccess.classList.add('is-visible');
-            
-            setTimeout(() => {
-                els.shareSuccess.classList.remove('is-visible');
-            }, 3000);
         }
-    }
-
-    function logShareGeneration(name, context, url) {
-        // Simple analytics logging
-        // Future: send to server endpoint for tracking
-        const timestamp = new Date().toISOString();
-        
-        console.log('Share link generated:', {
-            timestamp,
-            name_length: name.length,
-            has_context: !!context,
-            context_length: context ? context.length : 0,
-            url_length: url.length
-        });
-        
-        // Could add fetch to server endpoint here for Phase 2
-        // fetch('/wp-json/mlc/v1/share-analytics', { ... })
     }
 
     // ─── TEXT SEQUENCE ──────────────────────────────────────────

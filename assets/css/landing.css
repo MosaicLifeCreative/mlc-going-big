@@ -5,7 +5,7 @@
  Author:       Trey Kauffman
  Author URI:   http://mosaiclifecreative.com
  Template:     Divi
- Version:      1.3.1
+ Version:      1.3.2
  Text Domain:  divi-child
 */
 
@@ -466,7 +466,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 40px;
+    margin-bottom: 16px;
 }
 
 .phase-text {
@@ -1133,16 +1133,19 @@ body:has(#wheatley-message) .cursor-blink {
         max-width: 400px;
         margin: 0 auto;
     }
-    
-    .btn {
-        width: 100%;
+
+    .choice-buttons .btn {
+        width: 100% !important;
+        min-width: 100% !important;
+        flex-shrink: 0;
+        box-sizing: border-box;
     }
-    
+
     /* Reverse visual order - primary on top */
     .btn--primary {
         order: -1;
     }
-    
+
     .btn--secondary {
         order: 1;
     }

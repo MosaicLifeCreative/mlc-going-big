@@ -1,7 +1,7 @@
 <?php
 /**
  * Divi Child Theme Functions
- * Version: 1.7.6 - Added Share Feature
+ * Version: 1.8.0 - MLC Toolkit plugin integration, dynamic photos
  * 
  * Enqueues parent and child theme styles and custom scripts.
  */
@@ -46,7 +46,7 @@ function mlc_enqueue_global_assets() {
         'mlc-global-css',
         get_stylesheet_directory_uri() . '/assets/css/landing.css',
         array(),
-        '1.3.1',
+        '1.3.2',
         'all'
     );
     
@@ -55,7 +55,7 @@ function mlc_enqueue_global_assets() {
         'mlc-global-js',
         get_stylesheet_directory_uri() . '/assets/js/global.js',
         array(),
-        '1.1.0',
+        '1.2.0',
         true
     );
 }
@@ -72,7 +72,7 @@ function mlc_enqueue_landing_assets() {
             'mlc-landing-js',
             get_stylesheet_directory_uri() . '/assets/js/landing.js',
             array('mlc-global-js'), // Dependency on global
-            '1.7.0',
+            '1.7.1',
             true
         );
     }
@@ -321,6 +321,22 @@ function mlc_render_gradient_blobs() {
 // ============================================
 
 function mlc_inject_nav_html() {
+    // Get photos from MLC Toolkit plugin if available, otherwise use hardcoded fallback
+    $photos = [];
+    if (class_exists('MLC_Photos')) {
+        $photos = MLC_Photos::get_frontend_data();
+    }
+
+    // Fallback to hardcoded photos if plugin not active or no photos configured
+    if (empty($photos)) {
+        $photos = [
+            ['url' => '/wp-content/uploads/2026/02/flagstaff-hike.jpg', 'caption' => 'Trail at Buffalo Park, Flagstaff', 'credit' => 'TREY KAUFFMAN'],
+            ['url' => '/wp-content/uploads/2026/02/tuscon-at-sunset.jpg', 'caption' => 'Rincon Mountains, Tucson', 'credit' => 'TREY KAUFFMAN'],
+            ['url' => '/wp-content/uploads/2026/02/buffalo-park-sunset.jpg', 'caption' => 'San Francisco Peaks, Flagstaff', 'credit' => 'TREY KAUFFMAN'],
+            ['url' => '/wp-content/uploads/2026/02/buffalo-park-scaled.jpg', 'caption' => 'Sunset at Buffalo Park, Flagstaff', 'credit' => 'TREY KAUFFMAN'],
+            ['url' => '/wp-content/uploads/2026/02/dharma-initiative.jpg', 'caption' => 'Dharma Initiative, South Pacific', 'credit' => 'HUGO REYES'],
+        ];
+    }
     ?>
     <!-- Hamburger Navigation Button -->
     <button class="hamburger" id="hamburgerBtn" aria-label="Open navigation">
@@ -373,19 +389,19 @@ function mlc_inject_nav_html() {
                     </li>
                 </ul>
             </nav>
+
+            <!-- Mobile: View Pretty Photos button (hidden on desktop) -->
+            <button class="nav-photos-btn" id="navPhotosBtn">View Pretty Photos</button>
         </div>
 
         <div class="nav-overlay__right">
-            <!-- Photo panels -->
-            <div class="nav-photo nav-photo--default is-default" id="navPhotoDefault" style="background-image: url('/wp-content/uploads/2026/02/flagstaff-hike.jpg');"></div>
-            <div class="nav-photo" data-photo="0" style="background-image: url('/wp-content/uploads/2026/02/flagstaff-hike.jpg');"></div>
-            <div class="nav-photo" data-photo="1" style="background-image: url('/wp-content/uploads/2026/02/tuscon-at-sunset.jpg');"></div>
-            <div class="nav-photo" data-photo="2" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-sunset.jpg');"></div>
-            <div class="nav-photo" data-photo="3" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-scaled.jpg');"></div>
-            <div class="nav-photo" data-photo="4" style="background-image: url('/wp-content/uploads/2026/02/dharma-initiative.jpg');"></div>
-            <div class="nav-photo" data-photo="5" style="background-image: url('/wp-content/uploads/2026/02/flagstaff-hike.jpg');"></div>
-            <div class="nav-photo" data-photo="6" style="background-image: url('/wp-content/uploads/2026/02/tuscon-at-sunset.jpg');"></div>
-            <div class="nav-photo" data-photo="7" style="background-image: url('/wp-content/uploads/2026/02/buffalo-park-sunset.jpg');"></div>
+            <!-- Photo panels (dynamically rendered) -->
+            <?php if (!empty($photos)): ?>
+                <div class="nav-photo nav-photo--default is-default" id="navPhotoDefault" style="background-image: url('<?php echo esc_url($photos[0]['url']); ?>');"></div>
+                <?php foreach ($photos as $i => $photo): ?>
+                    <div class="nav-photo" data-photo="<?php echo $i; ?>" style="background-image: url('<?php echo esc_url($photo['url']); ?>');"></div>
+                <?php endforeach; ?>
+            <?php endif; ?>
             <div class="nav-caption" id="navCaption">
                 <div class="nav-caption__title" id="navCaptionTitle">Photo 01</div>
                 <div class="nav-caption__credit">MLC</div>
