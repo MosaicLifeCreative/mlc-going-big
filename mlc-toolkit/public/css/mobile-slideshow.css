@@ -2,13 +2,14 @@
    Mobile Slideshow — "View Pretty Photos" full-screen overlay
    ═══════════════════════════════════════════════════════════ */
 
-/* "Pretty Photos" nav item — hidden on desktop (photos visible in right pane) */
-.nav-item--photos {
+/* "View Pretty Photos" nav item — hidden on desktop (photos visible in right pane).
+   Double class selector to beat .nav-item { display: flex } from landing.css */
+.nav-item.nav-item--photos {
     display: none;
 }
 
 @media (max-width: 768px) {
-    .nav-item--photos {
+    .nav-item.nav-item--photos {
         display: flex;
     }
 }

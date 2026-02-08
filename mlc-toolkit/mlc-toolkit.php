@@ -2,8 +2,8 @@
 /**
  * Plugin Name: MLC Toolkit
  * Plugin URI: https://mosaiclifecreative.com
- * Description: Mosaic Life Creative toolkit — slideshow photo management, share link analytics, and URL shortener.
- * Version: 1.0.0
+ * Description: Mosaic Life Creative toolkit — slideshow photo management, share link analytics, URL shortener, and dashboard widget.
+ * Version: 1.0.1
  * Author: Trey Kauffman
  * Author URI: https://mosaiclifecreative.com
  * Text Domain: mlc-toolkit
@@ -11,7 +11,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('MLC_TOOLKIT_VERSION', '1.0.0');
+define('MLC_TOOLKIT_VERSION', '1.0.1');
 define('MLC_TOOLKIT_PATH', plugin_dir_path(__FILE__));
 define('MLC_TOOLKIT_URL', plugin_dir_url(__FILE__));
 

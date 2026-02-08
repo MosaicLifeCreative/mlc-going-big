@@ -8,13 +8,14 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 
 ## Quick Start (For New Sessions)
 
-**Current Status:** Share Feature Phase 1 complete, Wheatley AI live, ready for Phase 2 enhancements
+**Current Status:** MLC Toolkit plugin live, Share Feature fully integrated (URL shortener, analytics, session-persistent personalization, dashboard widget), Wheatley AI live with context-aware messages
 
 **Next Priorities:**
-1. Context-aware Wheatley messages based on share URL parameters
-2. Analytics logging for share feature
-3. Photo slideshow expansion (50-100 photos with hunt clues)
-4. Quest site deployment (4815162342.quest)
+1. Photo slideshow expansion (50-100 photos with hunt clues)
+2. HUNT knowledge base for Chatling
+3. Weather API context for Wheatley
+4. Site pages (Services, How We Work, Examples, etc.)
+5. Quest site deployment (4815162342.quest)
 
 ---
 
@@ -23,9 +24,11 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 | File | Version | Status |
 |------|---------|--------|
 | `page-landing.php` | v2 | Landing page template with share feature |
-| `assets/css/landing.css` | 1.3.1 | All styles (nav + landing + services + share) |
-| `assets/js/landing.js` | 1.7.0 | Interactive behaviors + Wheatley + share |
-| `functions.php` | 1.7.6 | Enqueue scripts + hunt validation + Wheatley API |
+| `assets/css/landing.css` | 1.3.3 | All styles (nav + landing + services + share + mobile CTA fixes) |
+| `assets/js/landing.js` | 1.7.2 | Interactive behaviors + Wheatley + share API + session persistence |
+| `assets/js/global.js` | 1.2.0 | Nav with dynamic photo support, Chatling fade-in |
+| `functions.php` | 1.8.1 | Enqueue + hunt + Wheatley API + dynamic photos + 9-item nav |
+| `mlc-toolkit/` | 1.0.1 | Plugin: photo management, share analytics, URL shortener, dashboard widget |
 | `services-mockup.html` | Mockup | Services page vision/design |
 | `snake-451.html` | Prototype | Hunt game (needs point system refinement) |
 
@@ -36,15 +39,31 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 ```
 /wp-content/themes/divi-child/
 ├── page-landing.php          (Landing page template with share feature)
-├── functions.php              (v1.7.6 - Enqueue + hunt + Wheatley + cache busting)
+├── functions.php              (v1.8.1 - Enqueue + hunt + Wheatley + dynamic photos + 9-item nav)
 ├── assets/
 │   ├── css/
-│   │   └── landing.css       (v1.3.1 - includes share modal styles)
+│   │   └── landing.css       (v1.3.3 - includes share modal + mobile CTA fixes)
 │   └── js/
-│       └── landing.js        (v1.7.0 - includes share functionality)
+│       ├── global.js         (v1.2.0 - nav, dynamic photos, Chatling fade-in)
+│       └── landing.js        (v1.7.2 - Wheatley + share API + session persistence)
 ├── services-mockup.html       (Mockup, not deployed)
 ├── snake-451.html             (Hunt game prototype)
 └── claude.md / ROADMAP.md     (Documentation)
+
+/wp-content/plugins/mlc-toolkit/
+├── mlc-toolkit.php            (Main plugin: share URL handler, REST API, dashboard widget, legacy redirect)
+├── includes/
+│   ├── class-mlc-photos.php   (Photo management via WP options API)
+│   └── class-mlc-share.php    (Share links + click tracking, 2 DB tables)
+├── admin/
+│   ├── class-mlc-admin.php    (Admin menus + save handlers)
+│   ├── views/photos.php       (Drag-and-drop photo management)
+│   ├── views/share-analytics.php (Analytics dashboard)
+│   ├── css/admin.css
+│   └── js/admin-photos.js
+└── public/
+    ├── css/mobile-slideshow.css
+    └── js/mobile-slideshow.js
 ```
 
 ---
@@ -136,9 +155,9 @@ Fixed top-right. Opens full-screen overlay:
 - Pauses on manual navigation, resumes automatically
 - Resets animation on each transition (force reflow technique)
 
-**Nav items:** Home, Services, How We Work, Examples, Let's Talk, About, Contact
+**Nav items:** Home, Website Design, Hosting, Maintenance, Email Marketing, AI Chat Agents, About, Contact, View Pretty Photos (mobile only)
 
-### 5. Share Feature (v1.3.1)
+### 5. Share Feature (v1.7.2 — Fully Integrated)
 
 **Button:** Fixed position, glassmorphism styling
 - Desktop: bottom-left corner (20px, 20px)
@@ -148,17 +167,24 @@ Fixed top-right. Opens full-screen overlay:
 - Name field (required)
 - Context field (optional, 50 char limit with counter)
 - Preview section showing sample Wheatley greeting
-- Generate & Copy button with success feedback
-- URL encoding: `name|context` → Base64 → `?u=encoded`
+- Calls MLC Toolkit REST API (`POST /wp-json/mlc/v1/share`) to create tracked short link
+- Copies short URL (`/s/{code}`) to clipboard
 
-**Example URLs:**
-- `?u=Sm9yZGFufGRlc2lnbmluZyB0aGUgbG9nbw==` (Jordan|designing the logo)
-- `?u=U2FyYWh8Z290IGR1bXBlZA==` (Sarah|got dumped)
+**Short URL Pipeline:**
+1. `/s/{code}` → PHP handler on `init` hook (priority 1) checks `$_SERVER['REQUEST_URI']`
+2. Records click in DB, sends SiteGround cache-busting headers
+3. Renders bridge HTML page that sets `sessionStorage.setItem('mlc_share', encoded)`
+4. Client-side redirect to homepage
+5. `landing.js` reads sessionStorage, decodes name + context
+6. Stores decoded values in `mlc_share_name` / `mlc_share_context` (survives reloads)
+7. Passes `user_name` + `user_context` to Wheatley API
+8. `functions.php` builds `CRITICAL — PERSONALIZED VISITOR` block in system prompt
 
-**Phase 2 (Pending):**
-- Context-aware Wheatley first messages
-- Analytics logging (timestamp, name_hash, context)
-- Conversion tracking (link generation vs actual visits)
+**MLC Toolkit Plugin:**
+- Admin: MLC Toolkit > Slideshow Photos (drag-and-drop reorder)
+- Admin: MLC Toolkit > Share Analytics (stats, link table, activity feed)
+- Dashboard: Share Link Metrics widget (Screen Options toggle)
+- Legacy domain redirect: `define('MLC_OLD_DOMAINS', '...')` in wp-config.php
 
 ### 6. Scavenger Hunt System
 
@@ -414,9 +440,11 @@ BEHAVIOR:
 ## File Versions & Status
 
 **Current Deployed:**
-- CSS: v1.3.1 (includes share feature styles)
-- JS: v1.7.0 (includes share functionality)
-- PHP: v1.7.6 (updated cache busting for v1.3.1 CSS)
+- CSS: v1.3.3 (share + mobile CTA fixes + mobile spacing)
+- JS: v1.7.2 (share API integration + session-persistent personalization)
+- global.js: v1.2.0 (nav with dynamic photo support)
+- PHP: v1.8.1 (dynamic photos, plugin integration, 9-item nav)
+- MLC Toolkit: v1.0.1 (photo management, share analytics, URL shortener, dashboard widget)
 
 **Key Functions:**
 
@@ -436,9 +464,15 @@ BEHAVIOR:
 - `mlc_enqueue_landing_assets()` - Asset loading with version cache busting
 - `mlc_validate_hunt_sequence()` - Server-side validation (sequence + time)
 - `mlc_add_hunt_nonce()` - Security nonce injection
-- `mlc_wheatley_respond()` - Anthropic API endpoint
-- `mlc_inject_nav_html()` - Global nav injection via wp_body_open
+- `mlc_wheatley_respond()` - Anthropic API endpoint with share personalization support
+- `mlc_inject_nav_html()` - Global nav injection via wp_body_open (9 items, dynamic photos)
 - `mlc_render_gradient_blobs()` - Reusable gradient background
+
+**mlc-toolkit plugin:**
+- `mlc_toolkit_handle_share_url()` - `/s/{code}` handler (init hook, priority 1)
+- `mlc_toolkit_create_share()` - REST endpoint for creating share links
+- `mlc_toolkit_dashboard_widget_render()` - WP Dashboard metrics widget
+- `mlc_toolkit_legacy_domain_redirect()` - Old domain 301 redirect
 
 ---
 
@@ -461,18 +495,11 @@ define('ANTHROPIC_API_KEY', 'sk-ant-api03-...');
 
 ## Known Issues / Pending Work
 
-### 1. Share Feature Phase 2
-Context-aware Wheatley messages:
-- Parse URL parameter `?u=base64encoded`
-- Decode to get name + context
-- Personalize first Wheatley message based on context
-- Examples: "convincing boss" → sales pitch, "got dumped" → sympathetic distraction
-
-### 2. Share Analytics
-Track generated links and usage:
-- Log: timestamp, name_hash, context, encoded_url
-- Track: link generation vs actual visits (conversion)
-- Privacy-first: hash names before storing
+### ~~1. Share Feature Phase 2~~ — COMPLETE
+- [x] Context-aware Wheatley messages (personalization block in system prompt)
+- [x] Share analytics (MLC Toolkit plugin: link tracking, click recording, admin dashboard, WP dashboard widget)
+- [x] URL shortener (`/s/{code}`) with session-persistent personalization
+- [x] Legacy domain redirect support
 
 ### 3. Snake 451 Point System
 Current prototype needs refinement:
@@ -571,9 +598,10 @@ Current prototype needs refinement:
 - ✅ Preview functionality
 - ✅ Clipboard integration
 
-### Phase 4: Integration (NEXT)
-- 📋 Context-aware Wheatley messages from share URLs
-- 📋 Analytics logging for share feature
+### Phase 4: Integration (COMPLETE - Feb 8, 2026)
+- ✅ Context-aware Wheatley messages from share URLs
+- ✅ Share analytics (MLC Toolkit plugin with URL shortener, dashboard widget)
+- ✅ Session-persistent personalization (survives page reloads)
 - 📋 Chatling HUNT knowledge base
 
 ### Phase 5: Site Expansion (FUTURE)

@@ -51,15 +51,20 @@
 ### Homepage CTA Fixes - Feb 8, 2026
 - [x] Reduced padding between phase text and CTA buttons (40px → 16px)
 - [x] Fixed mobile button shrink/expand bug when Wheatley triggers
+- [x] Reduced mobile CTA spacing further (min-height 200→100px, margin 16→8px)
 
 ### MLC Toolkit Plugin (v1.0.0) - Feb 8, 2026
 - [x] Plugin scaffold with admin menu
 - [x] **Photo Slideshow Management:** Admin interface to add, remove, reorder photos
 - [x] **Photo Randomization:** Photos shuffled on each page load
-- [x] **Mobile Slideshow:** "View Pretty Photos" button in mobile nav, full-screen overlay with swipe + arrow navigation
-- [x] **Share URL Shortener:** `/s/{code}` short URLs with auto-redirect
+- [x] **Mobile Slideshow:** "View Pretty Photos" as 9th nav menu item (mobile only), full-screen overlay with swipe + arrow navigation
+- [x] **Share URL Shortener:** `/s/{code}` short URLs with sessionStorage bridge page + SiteGround cache-busting headers
 - [x] **Share Analytics Tracking:** Records link creation and click events
 - [x] **Share Analytics Dashboard:** Summary stats, link table, top contexts, recent activity feed
+- [x] **Dashboard Widget:** Share Link Metrics widget on WP Dashboard (Screen Options)
+- [x] **Share Personalization:** Context-aware Wheatley first messages via share URL personalization
+- [x] **Session Persistence:** Share personalization survives page reloads (sessionStorage)
+- [x] **Legacy Domain Redirect:** `MLC_OLD_DOMAINS` constant in wp-config.php for smooth migration
 - [x] **Theme Integration:** Dynamic photo rendering in nav, JS localization, graceful fallback if plugin disabled
 
 ---
@@ -86,9 +91,8 @@
   - Quest page hints and guidance from Wheatley
 
 ### 3. Share Feature Improvements
-- [ ] **Context-Aware Wheatley Messages**
-  - Update system prompt to personalize first message based on URL context
-  - Examples: "convincing boss" → sales pitch, "got dumped" → sympathetic distraction
+- [x] ~~Context-Aware Wheatley Messages~~ (DONE — personalization block in system prompt)
+- [x] ~~Session persistence for share context~~ (DONE — survives page reloads)
 - [ ] **Gallery page:** "How Others Are Sharing This" (curated contexts)
 - [ ] **Manual curation interface** for admin
 - [ ] **Profanity filter** for auto-display
@@ -146,23 +150,25 @@ All new page templates follow this structure:
 5. Conditional JS loading (global.js everywhere, landing.js only on landing page)
 
 ### File Versions
-- **landing.css:** v1.3.2 (nav + landing + services + share + CTA fixes)
-- **landing.js:** v1.7.1 (Wheatley AI, Chatling, hunt, nav, share with API integration)
+- **landing.css:** v1.3.3 (nav + landing + services + share + CTA fixes + mobile spacing)
+- **landing.js:** v1.7.2 (Wheatley AI, Chatling, hunt, nav, share API, session-persistent personalization)
 - **global.js:** v1.2.0 (nav with dynamic photo support, Chatling fade-in)
-- **functions.php:** v1.8.0 (dynamic photo rendering, plugin integration)
-- **mlc-toolkit plugin:** v1.0.0 (photo management, share analytics, URL shortener)
+- **functions.php:** v1.8.1 (dynamic photo rendering, plugin integration, 9-item nav with mobile photos)
+- **mlc-toolkit plugin:** v1.0.1 (photo management, share analytics, URL shortener, dashboard widget, legacy domain redirect)
 
 ### MLC Toolkit Plugin
 - **Location:** `/wp-content/plugins/mlc-toolkit/`
 - **Admin pages:** MLC Toolkit > Slideshow Photos, MLC Toolkit > Share Analytics
 - **REST endpoint:** `POST /wp-json/mlc/v1/share` (create tracked short link)
-- **Short URLs:** `/s/{code}` → redirects with click tracking
+- **Short URLs:** `/s/{code}` → sessionStorage bridge page + SiteGround cache-busting
+- **Dashboard widget:** Share Link Metrics (Screen Options toggle on WP Dashboard)
+- **Legacy redirect:** `MLC_OLD_DOMAINS` in wp-config.php for domain migration
 - **DB tables:** `mlc_share_links`, `mlc_share_clicks`
 - **Photo storage:** WordPress options API (`mlc_slideshow_photos`)
 
 ### Shared Components
 - `mlc_render_gradient_blobs()` - Animated gradient background (3 orbs)
-- `mlc_inject_nav_html()` - Full nav overlay with dynamic photos + mobile slideshow button
+- `mlc_inject_nav_html()` - Full nav overlay with dynamic photos + 9th "View Pretty Photos" menu item (mobile)
 
 ### Hunt System (Context — lives at 4815162342.quest)
 - Countdown: Daily 3:16:23 PM (Lost numbers: 3, 16, 23)

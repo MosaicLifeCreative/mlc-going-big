@@ -1,7 +1,7 @@
 <?php
 /**
  * Divi Child Theme Functions
- * Version: 1.8.0 - MLC Toolkit plugin integration, dynamic photos
+ * Version: 1.8.1 - MLC Toolkit integration, dynamic photos, 9-item nav
  * 
  * Enqueues parent and child theme styles and custom scripts.
  */
@@ -46,7 +46,7 @@ function mlc_enqueue_global_assets() {
         'mlc-global-css',
         get_stylesheet_directory_uri() . '/assets/css/landing.css',
         array(),
-        '1.3.2',
+        '1.3.3',
         'all'
     );
     
@@ -72,7 +72,7 @@ function mlc_enqueue_landing_assets() {
             'mlc-landing-js',
             get_stylesheet_directory_uri() . '/assets/js/landing.js',
             array('mlc-global-js'), // Dependency on global
-            '1.7.1',
+            '1.7.2',
             true
         );
     }
@@ -393,7 +393,7 @@ function mlc_inject_nav_html() {
                     </li>
                     <li class="nav-item nav-item--photos" data-index="8">
                         <span class="nav-item__number">09</span>
-                        <a href="#" class="nav-item__label" id="navPhotosBtn">Pretty Photos</a>
+                        <a href="#" class="nav-item__label" id="navPhotosBtn">View Pretty Photos</a>
                     </li>
                 </ul>
             </nav>
