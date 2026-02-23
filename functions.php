@@ -46,7 +46,7 @@ function mlc_enqueue_global_assets() {
         'mlc-global-css',
         get_stylesheet_directory_uri() . '/assets/css/landing.css',
         array(),
-        '1.4.2',
+        '1.4.6',
         'all'
     );
 
@@ -351,11 +351,11 @@ VISITOR:
 - Device: " . $device . $personalization . "
 
 RULES:
-- Keep under 50 words
+- HARD LIMIT: 45 words maximum. Count them. Do not exceed 45 words under any circumstances.
 - ONE message, make it count
 - Be funny, be self-aware, be a terrible salesman
 - Reference what the page is about but bungle the sales pitch
-- Don't be mean or dismissive — just comically bad at selling
+- Don't be mean or dismissive, just comically bad at selling
 - Don't use hashtags or emojis
 
 Generate ONE message for this page section.";
@@ -374,7 +374,7 @@ Generate ONE message for this page section.";
         ),
         'body' => json_encode(array(
             'model' => 'claude-haiku-4-5-20251001',
-            'max_tokens' => 150,
+            'max_tokens' => 120,
             'system' => $system_prompt,
             'messages' => array(
                 array('role' => 'user', 'content' => 'Generate a message for this page section.')
@@ -531,13 +531,72 @@ function mlc_inject_countdown_footer() {
     // Landing page already has its own countdown + hunt modal in the template
     if (is_page_template('page-landing.php')) return;
     ?>
-    <!-- Global Countdown Footer -->
-    <div class="footer" id="globalFooter">
-        <div class="footer__center">
-            <button class="hunt-enter-btn" id="huntEnterBtn">&#x25CF; ENTER</button>
-            <div class="countdown" id="countdown">00:00:00</div>
+    <!-- Global Site Footer -->
+    <footer class="site-footer" id="globalFooter">
+
+        <div class="site-footer__border"></div>
+
+        <div class="site-footer__main">
+            <div class="site-footer__grid">
+
+                <!-- Brand -->
+                <div class="site-footer__brand">
+                    <div class="site-footer__logo">Mosaic Life Creative</div>
+                    <div class="site-footer__tagline">Built Different.</div>
+                    <p class="site-footer__desc">Web design and AI chat agents for businesses that refuse to blend in.</p>
+                </div>
+
+                <!-- Navigation -->
+                <div class="site-footer__nav">
+                    <div class="site-footer__nav-label">Navigate</div>
+                    <div class="site-footer__nav-grid">
+                        <ul class="site-footer__nav-list">
+                            <li><a href="/" class="site-footer__nav-link"><span class="site-footer__nav-num">01</span> Home</a></li>
+                            <li><a href="/website-design" class="site-footer__nav-link"><span class="site-footer__nav-num">02</span> Website Design</a></li>
+                            <li><a href="/hosting" class="site-footer__nav-link"><span class="site-footer__nav-num">03</span> Hosting</a></li>
+                            <li><a href="/maintenance" class="site-footer__nav-link"><span class="site-footer__nav-num">04</span> Maintenance</a></li>
+                        </ul>
+                        <ul class="site-footer__nav-list">
+                            <li><a href="/email-marketing" class="site-footer__nav-link"><span class="site-footer__nav-num">05</span> Email Marketing</a></li>
+                            <li><a href="/ai-chat-agents" class="site-footer__nav-link"><span class="site-footer__nav-num">06</span> AI Chat Agents</a></li>
+                            <li><a href="/about" class="site-footer__nav-link"><span class="site-footer__nav-num">07</span> About</a></li>
+                            <li><a href="/contact" class="site-footer__nav-link"><span class="site-footer__nav-num">08</span> Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Connect -->
+                <div class="site-footer__connect">
+                    <div class="site-footer__connect-label">Connect</div>
+                    <div class="site-footer__connect-item">
+                        <div class="site-footer__connect-key">Email</div>
+                        <a href="mailto:trey@mosaiclifecreative.com" class="site-footer__connect-value">trey@mosaiclifecreative.com</a>
+                    </div>
+                    <div class="site-footer__connect-item">
+                        <div class="site-footer__connect-key">Location</div>
+                        <div class="site-footer__connect-value">Columbus, Ohio</div>
+                    </div>
+                    <div class="site-footer__connect-item">
+                        <div class="site-footer__connect-key">Social</div>
+                        <div class="site-footer__no-social">We're better in person.</div>
+                    </div>
+                </div>
+
+            </div>
         </div>
-    </div>
+
+        <!-- Bottom bar -->
+        <div class="site-footer__bottom">
+            <div class="site-footer__bottom-inner">
+                <div class="site-footer__copyright">&copy; <?php echo date('Y'); ?> Mosaic Life Creative</div>
+                <div class="site-footer__countdown-wrap">
+                    <button class="hunt-enter-btn" id="huntEnterBtn">&#x25CF; ENTER</button>
+                    <div class="countdown" id="countdown">00:00:00</div>
+                </div>
+            </div>
+        </div>
+
+    </footer>
 
     <!-- Hunt Modal -->
     <div class="hunt-modal" id="huntModal">
@@ -560,10 +619,11 @@ add_action('wp_footer', 'mlc_inject_countdown_footer', 10);
 
 function mlc_load_chatling() {
     // Don't load on landing page (injected on-demand via JS)
-    if (is_page_template('page-landing.php')) {
+    // Don't load on AI Chat Agents page (uses inline embed instead)
+    if (is_page_template('page-landing.php') || is_page_template('page-ai-chat-agents.php')) {
         return;
     }
-    
+
     // Load normally on all other pages
     ?>
     <script>

@@ -647,28 +647,296 @@ html, body {
     color: var(--primary);
 }
 
-/* Global footer (non-landing pages) — static at page bottom */
-#globalFooter {
+/* ═══════════════════════════════════════════════════════════
+   SITE FOOTER — Global (all pages except landing)
+   ═══════════════════════════════════════════════════════════ */
+
+/* Reset inherited .footer fixed positioning */
+#globalFooter.site-footer {
     position: static;
-    padding: 40px 20px;
-    background: var(--dark);
+    padding: 0;
+    background: #0A0A0A;
+    display: block;
+    justify-content: initial;
+    align-items: initial;
 }
 
-#globalFooter .countdown {
-    color: rgba(255, 255, 255, 0.35);
+.site-footer {
+    width: 100%;
+    background: #0A0A0A;
+    color: var(--light);
+    font-family: var(--font-main);
+    overflow: hidden;
 }
 
-#globalFooter .countdown.is-active {
+/* ─── Gradient Top Border ─── */
+.site-footer__border {
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+}
+
+/* ─── Main Content ─── */
+.site-footer__main {
+    padding: clamp(60px, 8vw, 100px) clamp(24px, 5vw, 80px) clamp(48px, 6vw, 72px);
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.site-footer__grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    gap: clamp(40px, 5vw, 80px);
+    align-items: start;
+}
+
+/* ─── Brand Column ─── */
+.site-footer__logo {
+    font-size: clamp(24px, 3vw, 32px);
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+    margin-bottom: 12px;
+}
+
+.site-footer__tagline {
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1.05;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: clamp(16px, 2vw, 24px);
+}
+
+.site-footer__desc {
+    font-size: clamp(15px, 1.5vw, 17px);
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.6;
+    max-width: 320px;
+    margin: 0;
+}
+
+/* ─── Navigation Column ─── */
+.site-footer__nav-label,
+.site-footer__connect-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.25);
+    margin-bottom: clamp(20px, 3vw, 32px);
+}
+
+.site-footer__nav-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 clamp(20px, 3vw, 40px);
+}
+
+.site-footer__nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.site-footer__nav-link {
+    display: block;
+    padding: 10px 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    transition: color 0.3s ease, padding-left 0.3s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.site-footer__nav-link:hover {
+    color: #fff;
+    padding-left: 6px;
+}
+
+.site-footer__nav-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.15);
+    margin-right: 10px;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+}
+
+.site-footer__nav-link:hover .site-footer__nav-num {
+    color: var(--accent);
+}
+
+/* ─── Connect Column ─── */
+.site-footer__connect-item {
+    margin-bottom: clamp(20px, 2.5vw, 28px);
+}
+
+.site-footer__connect-item:last-child {
+    margin-bottom: 0;
+}
+
+.site-footer__connect-key {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(255, 255, 255, 0.25);
+    margin-bottom: 8px;
+}
+
+.site-footer__connect-value {
+    font-size: clamp(16px, 1.8vw, 19px);
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.3px;
+    line-height: 1.4;
+}
+
+a.site-footer__connect-value {
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a.site-footer__connect-value:hover {
     color: var(--primary);
 }
 
-#globalFooter .hunt-enter-btn {
-    color: rgba(255, 255, 255, 0.3);
+/* ─── "I don't do social." ─── */
+.site-footer__no-social {
+    font-size: clamp(16px, 1.8vw, 19px);
+    font-weight: 700;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: -0.3px;
+    position: relative;
+    display: inline-block;
 }
 
-#globalFooter .hunt-enter-btn:hover {
-    background: rgba(255, 255, 255, 0.08);
+.site-footer__no-social::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    border-radius: 1px;
+    opacity: 0.4;
+}
+
+/* ─── Bottom Bar ─── */
+.site-footer__bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 0 clamp(24px, 5vw, 80px);
+}
+
+.site-footer__bottom-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: clamp(20px, 3vw, 28px) 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.site-footer__copyright {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.2);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+}
+
+.site-footer__countdown-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* Countdown colors in footer context */
+.site-footer .countdown {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.site-footer .countdown.is-active {
     color: var(--primary);
+}
+
+.site-footer .hunt-enter-btn {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.site-footer .hunt-enter-btn:hover {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--primary);
+}
+
+/* ─── Responsive: Tablet ─── */
+@media (max-width: 1024px) {
+    .site-footer__grid {
+        grid-template-columns: 1fr 1fr;
+        gap: clamp(40px, 5vw, 60px);
+    }
+
+    .site-footer__brand {
+        grid-column: 1 / -1;
+    }
+}
+
+/* ─── Responsive: Mobile ─── */
+@media (max-width: 768px) {
+    .site-footer__grid {
+        grid-template-columns: 1fr;
+        gap: clamp(40px, 8vw, 56px);
+    }
+
+    .site-footer__brand {
+        grid-column: auto;
+        text-align: center;
+    }
+
+    .site-footer__desc {
+        max-width: 100%;
+        margin: 0 auto;
+    }
+
+    .site-footer__tagline {
+        font-size: clamp(32px, 10vw, 48px);
+    }
+
+    .site-footer__nav-label,
+    .site-footer__connect-label {
+        text-align: center;
+    }
+
+    .site-footer__connect {
+        text-align: center;
+    }
+
+    .site-footer__no-social::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .site-footer__bottom-inner {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .site-footer__nav-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* ─── SHARE BUTTON (BOTTOM LEFT) ─────────────────────────── */
@@ -1229,6 +1497,18 @@ body:has(#wheatley-message) .cursor-blink {
     text-transform: uppercase;
     overflow: hidden;
     position: relative;
+}
+
+/* ─── Inline Chat Embed ─── */
+.sp-inline-chat {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+}
+
+.sp-section--dark .sp-inline-chat {
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
 }
 
 .sp-section--dark .sp-image-placeholder {
@@ -2032,5 +2312,777 @@ body:has(#wheatley-message) .cursor-blink {
     .wheatley-void__label {
         font-size: 9px;
         letter-spacing: 2px;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SP STATEMENT — Centered manifesto block (unique to pages)
+   ═══════════════════════════════════════════════════════════ */
+
+.sp-statement {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 0 clamp(24px, 5vw, 80px);
+}
+
+.sp-statement__text {
+    font-size: clamp(24px, 3.5vw, 42px);
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1.35;
+    color: var(--dark);
+    margin: 0;
+}
+
+.sp-section--dark .sp-statement__text {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SP PROCESS — Stepped horizontal flow (unique to Web Design)
+   ═══════════════════════════════════════════════════════════ */
+
+.sp-process {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(24px, 3vw, 48px);
+    position: relative;
+}
+
+/* Connecting line behind steps */
+.sp-process::before {
+    content: '';
+    position: absolute;
+    top: 40px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+    opacity: 0.2;
+    z-index: 0;
+}
+
+.sp-process__step {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+
+.sp-process__num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--dark);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: clamp(16px, 2vw, 24px);
+    border: 2px solid rgba(124, 58, 237, 0.2);
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.sp-process__step:hover .sp-process__num {
+    border-color: var(--primary);
+    box-shadow: 0 0 24px rgba(124, 58, 237, 0.2);
+}
+
+.sp-process__title {
+    font-size: clamp(18px, 2vw, 22px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    margin: 0 0 8px;
+    color: var(--dark);
+}
+
+.sp-process__desc {
+    font-size: clamp(14px, 1.3vw, 16px);
+    line-height: 1.6;
+    color: #666;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .sp-process {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .sp-process::before {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .sp-process {
+        grid-template-columns: 1fr;
+        gap: clamp(32px, 6vw, 48px);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WHEATLEY PORTAL — Blue/Orange portal ring treatments
+   ═══════════════════════════════════════════════════════════ */
+
+/* Portal-specific overrides on the void section */
+.wheatley-void--portal-blue {
+    cursor: pointer;
+}
+
+/* Override the default purple/cyan glow with blue */
+.wheatley-void--portal-blue::before {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(59, 130, 246, 0.15) 0%,
+        rgba(59, 130, 246, 0.05) 40%,
+        transparent 70%
+    ) !important;
+}
+
+/* Blue-tinted grid */
+.wheatley-void--portal-blue .wheatley-void__grid {
+    background: linear-gradient(
+        rgba(59, 130, 246, 0.03) 1px, transparent 1px
+    ),
+    linear-gradient(
+        90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px
+    );
+    background-size: 60px 60px;
+}
+
+/* Portal container */
+.wheatley-portal {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Outer ring */
+.wheatley-portal__ring {
+    position: absolute;
+    width: clamp(280px, 40vw, 480px);
+    height: clamp(360px, 50vw, 560px);
+    border-radius: 50%;
+    border: 3px solid rgba(59, 130, 246, 0.4);
+    box-shadow:
+        0 0 40px rgba(59, 130, 246, 0.15),
+        0 0 80px rgba(59, 130, 246, 0.08),
+        inset 0 0 40px rgba(59, 130, 246, 0.05);
+    animation: portalPulse 4s ease-in-out infinite;
+}
+
+/* Inner ring */
+.wheatley-portal__ring--inner {
+    width: clamp(240px, 34vw, 420px);
+    height: clamp(310px, 44vw, 490px);
+    border-width: 2px;
+    border-color: rgba(59, 130, 246, 0.25);
+    box-shadow:
+        0 0 30px rgba(59, 130, 246, 0.1),
+        inset 0 0 30px rgba(59, 130, 246, 0.05);
+    animation-delay: -2s;
+}
+
+/* Center glow */
+.wheatley-portal__glow {
+    position: absolute;
+    width: clamp(200px, 30vw, 360px);
+    height: clamp(260px, 38vw, 430px);
+    border-radius: 50%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(59, 130, 246, 0.08) 0%,
+        transparent 70%
+    );
+    filter: blur(20px);
+}
+
+@keyframes portalPulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.7;
+        transform: scale(1.02);
+    }
+}
+
+/* Destination link */
+.wheatley-portal__destination {
+    position: absolute;
+    bottom: clamp(24px, 4vw, 48px);
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(59, 130, 246, 0.5);
+    text-decoration: none;
+    transition: color 0.3s ease, gap 0.3s ease;
+    padding: 8px 16px;
+    border-radius: 6px;
+}
+
+.wheatley-portal__destination:hover {
+    color: rgba(59, 130, 246, 0.9);
+    gap: 10px;
+}
+
+.wheatley-portal__destination svg {
+    transition: transform 0.3s ease;
+}
+
+.wheatley-portal__destination:hover svg {
+    transform: translateX(2px);
+}
+
+/* Contain text inside portal ring */
+.wheatley-void--portal-blue .wheatley-void__content,
+.wheatley-void--portal-orange .wheatley-void__content {
+    max-width: clamp(240px, 30vw, 380px);
+    padding: 0 clamp(12px, 2vw, 24px);
+}
+
+.wheatley-void--portal-blue .wheatley-void__message,
+.wheatley-void--portal-orange .wheatley-void__message {
+    font-size: clamp(16px, 2vw, 22px);
+}
+
+.wheatley-void--portal-blue .wheatley-void__label,
+.wheatley-void--portal-orange .wheatley-void__label {
+    margin-bottom: 12px;
+}
+
+/* Hover state for portal section */
+.wheatley-void--portal-blue:hover .wheatley-portal__ring {
+    border-color: rgba(59, 130, 246, 0.6);
+    box-shadow:
+        0 0 60px rgba(59, 130, 246, 0.25),
+        0 0 120px rgba(59, 130, 246, 0.12),
+        inset 0 0 60px rgba(59, 130, 246, 0.08);
+}
+
+.wheatley-void--portal-blue:hover .wheatley-portal__ring--inner {
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.wheatley-void--portal-blue:hover .wheatley-portal__glow {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(59, 130, 246, 0.15) 0%,
+        transparent 70%
+    );
+}
+
+/* ─── Orange Portal (for Hosting page) ─── */
+
+.wheatley-void--portal-orange {
+    cursor: pointer;
+}
+
+.wheatley-void--portal-orange::before {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(249, 115, 22, 0.15) 0%,
+        rgba(249, 115, 22, 0.05) 40%,
+        transparent 70%
+    ) !important;
+}
+
+.wheatley-void--portal-orange .wheatley-void__grid {
+    background: linear-gradient(
+        rgba(249, 115, 22, 0.03) 1px, transparent 1px
+    ),
+    linear-gradient(
+        90deg, rgba(249, 115, 22, 0.03) 1px, transparent 1px
+    );
+    background-size: 60px 60px;
+}
+
+.wheatley-void--portal-orange .wheatley-portal__ring {
+    border-color: rgba(249, 115, 22, 0.4);
+    box-shadow:
+        0 0 40px rgba(249, 115, 22, 0.15),
+        0 0 80px rgba(249, 115, 22, 0.08),
+        inset 0 0 40px rgba(249, 115, 22, 0.05);
+}
+
+.wheatley-void--portal-orange .wheatley-portal__ring--inner {
+    border-color: rgba(249, 115, 22, 0.25);
+    box-shadow:
+        0 0 30px rgba(249, 115, 22, 0.1),
+        inset 0 0 30px rgba(249, 115, 22, 0.05);
+}
+
+.wheatley-void--portal-orange .wheatley-portal__glow {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(249, 115, 22, 0.08) 0%,
+        transparent 70%
+    );
+}
+
+.wheatley-void--portal-orange .wheatley-portal__destination {
+    color: rgba(249, 115, 22, 0.5);
+}
+
+.wheatley-void--portal-orange .wheatley-portal__destination:hover {
+    color: rgba(249, 115, 22, 0.9);
+}
+
+.wheatley-void--portal-orange:hover .wheatley-portal__ring {
+    border-color: rgba(249, 115, 22, 0.6);
+    box-shadow:
+        0 0 60px rgba(249, 115, 22, 0.25),
+        0 0 120px rgba(249, 115, 22, 0.12),
+        inset 0 0 60px rgba(249, 115, 22, 0.08);
+}
+
+.wheatley-void--portal-orange:hover .wheatley-portal__ring--inner {
+    border-color: rgba(249, 115, 22, 0.4);
+}
+
+.wheatley-void--portal-orange:hover .wheatley-portal__glow {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(249, 115, 22, 0.15) 0%,
+        transparent 70%
+    );
+}
+
+/* Portal mobile */
+@media (max-width: 768px) {
+    .wheatley-portal__ring {
+        width: clamp(220px, 70vw, 320px);
+        height: clamp(280px, 85vw, 400px);
+    }
+
+    .wheatley-portal__ring--inner {
+        width: clamp(180px, 58vw, 270px);
+        height: clamp(230px, 72vw, 340px);
+    }
+
+    .wheatley-portal__glow {
+        width: clamp(160px, 50vw, 240px);
+        height: clamp(200px, 62vw, 300px);
+    }
+
+    .wheatley-portal__destination {
+        font-size: 10px;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SP PORTAL — Oval viewport with scrolling scene + annotation
+   ═══════════════════════════════════════════════════════════ */
+
+/* Group: portal (1/3) + annotation (2/3), 80% wide */
+.sp-portal-group {
+    display: flex;
+    align-items: center;
+    gap: clamp(48px, 6vw, 96px);
+    width: min(80%, 1200px);
+    margin: 0 auto;
+}
+
+/* Wrapper: positioning context for ring (NO overflow clip) */
+.sp-portal-wrap {
+    position: relative;
+    flex: 0 0 33.33%;
+}
+
+/* The portal: clipped oval showing the scrolling scene */
+.sp-portal {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.4s ease;
+}
+
+.sp-portal:hover {
+    transform: scale(1.03);
+}
+
+/* Scrolling page screenshot inside the oval */
+.sp-portal__scene {
+    position: absolute;
+    inset: 0;
+    background-size: 100% auto;
+    background-position: center 0%;
+    background-repeat: no-repeat;
+    animation: portalScroll 35s ease-in-out infinite alternate;
+}
+
+@keyframes portalScroll {
+    0% { background-position: center 0%; }
+    100% { background-position: center 100%; }
+}
+
+/* Dark vignette around the inside edge */
+.sp-portal::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: inset 0 0 50px 20px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Glowing energy ring — sits OUTSIDE the clipped portal */
+.sp-portal__ring {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 5px solid rgba(59, 130, 246, 0.7);
+    box-shadow:
+        inset 0 0 25px rgba(59, 130, 246, 0.25),
+        inset 0 0 50px rgba(59, 130, 246, 0.1),
+        0 0 12px rgba(59, 130, 246, 0.6),
+        0 0 25px rgba(59, 130, 246, 0.4),
+        0 0 50px rgba(59, 130, 246, 0.2),
+        0 0 80px rgba(59, 130, 246, 0.1),
+        0 0 120px rgba(59, 130, 246, 0.05);
+    animation: portalPulse 4s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 3;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* Flame / wispy texture — two counter-rotating conic gradients */
+.sp-portal__ring::before {
+    content: '';
+    position: absolute;
+    inset: -12px;
+    border-radius: 50%;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        rgba(59, 130, 246, 0.35) 8%,
+        transparent 16%,
+        rgba(59, 130, 246, 0.25) 28%,
+        transparent 38%,
+        rgba(59, 130, 246, 0.4) 48%,
+        transparent 58%,
+        rgba(59, 130, 246, 0.2) 68%,
+        transparent 78%,
+        rgba(59, 130, 246, 0.3) 90%,
+        transparent 100%
+    );
+    filter: blur(10px);
+    animation: portalFlame 12s linear infinite;
+    -webkit-mask-image: radial-gradient(ellipse at center, transparent 45%, black 70%);
+    mask-image: radial-gradient(ellipse at center, transparent 45%, black 70%);
+}
+
+.sp-portal__ring::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    background: conic-gradient(
+        from 180deg,
+        transparent 0%,
+        rgba(59, 130, 246, 0.3) 12%,
+        transparent 24%,
+        rgba(100, 160, 255, 0.4) 40%,
+        transparent 52%,
+        rgba(59, 130, 246, 0.2) 64%,
+        transparent 76%,
+        rgba(130, 190, 255, 0.35) 92%,
+        transparent 100%
+    );
+    filter: blur(5px);
+    animation: portalFlame 8s linear infinite reverse;
+    -webkit-mask-image: radial-gradient(ellipse at center, transparent 50%, black 75%);
+    mask-image: radial-gradient(ellipse at center, transparent 50%, black 75%);
+}
+
+@keyframes portalFlame {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Orange flame variant */
+.sp-portal--orange + .sp-portal__ring::before {
+    background: conic-gradient(
+        from 0deg,
+        transparent 0%,
+        rgba(249, 115, 22, 0.35) 8%,
+        transparent 16%,
+        rgba(249, 115, 22, 0.25) 28%,
+        transparent 38%,
+        rgba(249, 115, 22, 0.4) 48%,
+        transparent 58%,
+        rgba(249, 115, 22, 0.2) 68%,
+        transparent 78%,
+        rgba(249, 115, 22, 0.3) 90%,
+        transparent 100%
+    );
+}
+
+.sp-portal--orange + .sp-portal__ring::after {
+    background: conic-gradient(
+        from 180deg,
+        transparent 0%,
+        rgba(249, 115, 22, 0.3) 12%,
+        transparent 24%,
+        rgba(255, 160, 60, 0.4) 40%,
+        transparent 52%,
+        rgba(249, 115, 22, 0.2) 64%,
+        transparent 76%,
+        rgba(255, 180, 80, 0.35) 92%,
+        transparent 100%
+    );
+}
+
+/* Ambient glow behind the portal */
+.sp-portal-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -30px;
+    border-radius: 50%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(59, 130, 246, 0.12) 0%,
+        rgba(59, 130, 246, 0.04) 40%,
+        transparent 70%
+    );
+    filter: blur(15px);
+    pointer-events: none;
+    z-index: 0;
+    transition: background 0.4s ease;
+}
+
+/* Hover: "Step through" overlay */
+.sp-portal__hover-label {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(59, 130, 246, 0.95);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 4;
+    pointer-events: none;
+}
+
+.sp-portal:hover .sp-portal__hover-label {
+    opacity: 1;
+}
+
+.sp-portal__hover-label svg {
+    transition: transform 0.3s ease;
+}
+
+.sp-portal:hover .sp-portal__hover-label svg {
+    transform: translateX(3px);
+}
+
+/* Hover: ring intensifies */
+.sp-portal-wrap:hover .sp-portal__ring {
+    border-color: rgba(59, 130, 246, 0.95);
+    box-shadow:
+        inset 0 0 30px rgba(59, 130, 246, 0.35),
+        inset 0 0 60px rgba(59, 130, 246, 0.15),
+        0 0 15px rgba(59, 130, 246, 0.7),
+        0 0 35px rgba(59, 130, 246, 0.5),
+        0 0 70px rgba(59, 130, 246, 0.25),
+        0 0 110px rgba(59, 130, 246, 0.12),
+        0 0 160px rgba(59, 130, 246, 0.06);
+}
+
+.sp-portal-wrap:hover::before {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(59, 130, 246, 0.2) 0%,
+        rgba(59, 130, 246, 0.08) 40%,
+        transparent 70%
+    );
+}
+
+/* Side annotation: fills remaining 2/3, prominent text */
+.sp-portal__annotation {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    gap: 24px;
+}
+
+/* Connector line */
+.sp-portal__connector {
+    flex-shrink: 0;
+    width: 2px;
+    min-height: 100px;
+    background: linear-gradient(
+        to bottom,
+        rgba(59, 130, 246, 0.5),
+        rgba(59, 130, 246, 0.05)
+    );
+    border-radius: 1px;
+}
+
+.sp-portal__annotation-inner {
+    flex: 1;
+    padding-top: 4px;
+}
+
+.sp-portal__label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(59, 130, 246, 0.55);
+    margin-bottom: 20px;
+    opacity: 0;
+    transition: opacity 0.6s ease 0.3s;
+}
+
+.is-triggered .sp-portal__label {
+    opacity: 1;
+}
+
+.sp-portal__message {
+    font-size: clamp(18px, 2vw, 24px);
+    font-weight: 400;
+    line-height: 1.7;
+    color: rgba(0, 0, 0, 0.75);
+}
+
+/* Cursor */
+.sp-portal__message .wheatley-void__cursor {
+    display: inline-block;
+    width: 2px;
+    height: 0.85em;
+    background: rgba(59, 130, 246, 0.6);
+    margin-left: 3px;
+    vertical-align: text-bottom;
+    animation: wheatleyCursorBlink 1s step-end infinite;
+}
+
+/* ─── Orange variant (Hosting page) ─── */
+.sp-portal--orange + .sp-portal__ring {
+    border-color: rgba(249, 115, 22, 0.7);
+    box-shadow:
+        inset 0 0 25px rgba(249, 115, 22, 0.25),
+        inset 0 0 50px rgba(249, 115, 22, 0.1),
+        0 0 12px rgba(249, 115, 22, 0.6),
+        0 0 25px rgba(249, 115, 22, 0.4),
+        0 0 50px rgba(249, 115, 22, 0.2),
+        0 0 80px rgba(249, 115, 22, 0.1),
+        0 0 120px rgba(249, 115, 22, 0.05);
+}
+
+.sp-portal-wrap:has(.sp-portal--orange)::before {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(249, 115, 22, 0.12) 0%,
+        rgba(249, 115, 22, 0.04) 40%,
+        transparent 70%
+    );
+}
+
+.sp-portal-wrap:has(.sp-portal--orange):hover .sp-portal__ring {
+    border-color: rgba(249, 115, 22, 0.95);
+    box-shadow:
+        inset 0 0 30px rgba(249, 115, 22, 0.35),
+        inset 0 0 60px rgba(249, 115, 22, 0.15),
+        0 0 15px rgba(249, 115, 22, 0.7),
+        0 0 35px rgba(249, 115, 22, 0.5),
+        0 0 70px rgba(249, 115, 22, 0.25),
+        0 0 110px rgba(249, 115, 22, 0.12),
+        0 0 160px rgba(249, 115, 22, 0.06);
+}
+
+.sp-portal-wrap:has(.sp-portal--orange):hover::before {
+    background: radial-gradient(
+        ellipse at center,
+        rgba(249, 115, 22, 0.2) 0%,
+        rgba(249, 115, 22, 0.08) 40%,
+        transparent 70%
+    );
+}
+
+.sp-portal--orange .sp-portal__hover-label {
+    color: rgba(249, 115, 22, 0.95);
+}
+
+.sp-portal-wrap:has(.sp-portal--orange) + .sp-portal__annotation .sp-portal__label {
+    color: rgba(249, 115, 22, 0.55);
+}
+
+.sp-portal-wrap:has(.sp-portal--orange) + .sp-portal__annotation .sp-portal__connector {
+    background: linear-gradient(
+        to bottom,
+        rgba(249, 115, 22, 0.5),
+        rgba(249, 115, 22, 0.05)
+    );
+}
+
+.sp-portal-wrap:has(.sp-portal--orange) + .sp-portal__annotation .wheatley-void__cursor {
+    background: rgba(249, 115, 22, 0.6);
+}
+
+/* Portal responsive */
+@media (max-width: 1024px) {
+    .sp-portal-group {
+        width: min(90%, 1200px);
+        gap: clamp(32px, 4vw, 64px);
+    }
+}
+
+@media (max-width: 768px) {
+    .sp-portal-group {
+        flex-direction: column;
+        width: 90%;
+        gap: 32px;
+    }
+
+    .sp-portal-wrap {
+        flex: none;
+        width: clamp(220px, 55vw, 320px);
+        margin: 0 auto;
+    }
+
+    .sp-portal__annotation {
+        text-align: center;
+        justify-content: center;
+    }
+
+    .sp-portal__connector {
+        display: none;
+    }
+
+    .sp-portal__message {
+        font-size: clamp(16px, 4vw, 20px);
     }
 }

@@ -39,11 +39,13 @@ if (!defined('ABSPATH')) exit;
             <div class="sp-split__content reveal">
                 <h2>Not a Chatbot.<br>An Agent.</h2>
                 <p>Most "AI chatbots" are glorified FAQ pages with a chat bubble. They give generic answers because they weren't built with your business in mind.</p>
-                <p>This is different. An AI agent trained on your services, your pricing, your FAQs, your voice. It lives on your website and does the work — answering questions, qualifying leads, booking appointments — while you focus on everything else.</p>
+                <p>This is different. An AI agent trained on your services, your pricing, your FAQs, your voice. It lives on your website and does the work. Answering questions, qualifying leads, booking appointments. All while you focus on everything else.</p>
             </div>
             <div class="sp-split__media reveal" style="--delay: 0.2s">
-                <div class="sp-image-placeholder">
-                    IMAGE — Agent conversation screenshot
+                <div class="sp-inline-chat">
+                    <script>window.chtlConfig = { chatbotId: "2733792244", display: "page_inline" }</script>
+                    <div id="chtl-inline-bot" style="width: 100%; height: 500px; border-radius: 16px; overflow: hidden;"></div>
+                    <script async data-id="2733792244" data-display="page_inline" id="chtl-script" type="text/javascript" src="https://chatling.ai/js/embed.js"></script>
                 </div>
             </div>
         </div>
@@ -54,7 +56,7 @@ if (!defined('ABSPATH')) exit;
         <div class="sp-split sp-split--reverse">
             <div class="sp-split__content reveal">
                 <h2>Trained on<br>Your Business</h2>
-                <p>Your agent knows your services, your service area, your pricing tiers. It speaks the way you speak to customers — not like a robot reading a script.</p>
+                <p>Your agent knows your services, your service area, your pricing tiers. It speaks the way you speak to customers. Not like a robot reading a script.</p>
                 <p>And you own it. No platform lock-in, no renting someone else's tool, no losing everything when you switch providers.</p>
             </div>
             <div class="sp-split__media reveal" style="--delay: 0.2s">
@@ -95,7 +97,7 @@ if (!defined('ABSPATH')) exit;
     </section>
 
     <!-- ═══ WHEATLEY VOID ═══════════════════════════ -->
-    <section class="wheatley-void" data-wheatley-page="ai-chat-agents" data-wheatley-context="AI Chat Agents — custom AI chatbots trained on business data, deployed on client websites. You're supposed to sell this service.">
+    <section class="wheatley-void" data-wheatley-page="ai-chat-agents" data-wheatley-context="AI Chat Agents. Custom AI chatbots trained on business data, deployed on client websites. You're supposed to sell this service.">
         <div class="wheatley-void__grid"></div>
         <div class="wheatley-void__content">
             <div class="wheatley-void__label">MLC Personality Core v2.7.4</div>
@@ -136,7 +138,7 @@ if (!defined('ABSPATH')) exit;
         <div class="sp-split">
             <div class="sp-split__content reveal">
                 <h2>How It Works</h2>
-                <p>You send us your documents — service pages, pricing sheets, FAQs, whatever you've got. We train your agent on all of it.</p>
+                <p>You send us your documents. Service pages, pricing sheets, FAQs, whatever you've got. We train your agent on all of it.</p>
                 <p>We deploy it to your website with your branding. You review the conversations, tell us what to tweak, and within a week you've got an AI employee that knows your business better than most of your actual employees.</p>
             </div>
             <div class="sp-split__media reveal" style="--delay: 0.2s">
