@@ -198,36 +198,41 @@
         const hamburger = document.getElementById('hamburgerBtn');
         if (!hamburger) return;
 
-        // Find all dark sections the hamburger might overlap
         const darkSections = document.querySelectorAll('.sp-hero, .sp-section--dark, .sp-cta');
         if (!darkSections.length) return;
 
-        // Set initial state immediately (observer only fires on changes)
-        const hamburgerY = hamburger.getBoundingClientRect().top + hamburger.getBoundingClientRect().height / 2;
-        let activeDark = 0;
-        darkSections.forEach(s => {
-            const rect = s.getBoundingClientRect();
-            if (rect.top <= hamburgerY && rect.bottom >= hamburgerY) activeDark++;
-        });
-        hamburger.classList.toggle('hamburger--light', activeDark > 0);
-
-        // Then observe for scroll changes
-        const observer = new IntersectionObserver(() => {
-            // Recount from scratch on each change to avoid drift
-            let count = 0;
+        // Core check — is the hamburger over a dark section right now?
+        function updateContrast() {
             const hY = hamburger.getBoundingClientRect().top + hamburger.getBoundingClientRect().height / 2;
+            let onDark = false;
             darkSections.forEach(s => {
                 const rect = s.getBoundingClientRect();
-                if (rect.top <= hY && rect.bottom >= hY) count++;
+                if (rect.top <= hY && rect.bottom >= hY) onDark = true;
             });
-            hamburger.classList.toggle('hamburger--light', count > 0);
-        }, {
-            // rootMargin: only check the top ~60px strip where the hamburger lives
+            hamburger.classList.toggle('hamburger--light', onDark);
+        }
+
+        // Set initial state
+        updateContrast();
+
+        // IntersectionObserver handles most transitions efficiently
+        const observer = new IntersectionObserver(() => updateContrast(), {
             rootMargin: '-0px 0px -95% 0px',
             threshold: 0
         });
-
         darkSections.forEach(s => observer.observe(s));
+
+        // Scroll listener catches fast scrolling the observer misses
+        let ticking = false;
+        window.addEventListener('scroll', function() {
+            if (!ticking) {
+                requestAnimationFrame(function() {
+                    updateContrast();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }, { passive: true });
     }
 
     if (document.readyState === 'loading') {

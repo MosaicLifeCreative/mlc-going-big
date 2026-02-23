@@ -8,11 +8,11 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 
 ## Quick Start (For New Sessions)
 
-**Current Status:** Service pages rebuilt with new `sp-` design system (full-bleed, scroll reveals). Wheatley page sections live (parallax void with bad salesman personality). Global countdown timer on all pages. AI Chat Agents page complete as pilot. 6 remaining page templates created (need content/design refinement).
+**Current Status:** Hosting page rebuilt with sp- system + orange portal. About page rebuilt with clean bio + Myst journal records + Wheatley as footnote [42]. Wheatley cursor cycles brand colors on each blink. Hamburger contrast bug fixed. Em-dash ban site-wide.
 
 **Next Priorities:**
-1. Apply sp- design + Wheatley sections to remaining 6 page templates
-2. Page-specific Wheatley treatments (blue/orange portals, maintenance hatch, corrupted email, etc.)
+1. Apply sp- design + Wheatley sections to remaining 3 pages (Maintenance, Email Marketing, Contact)
+2. Page-specific Wheatley treatments (terminal screen, corrupted email, minimal)
 3. Photo slideshow expansion (50-100 photos with hunt clues)
 4. HUNT knowledge base for Chatling
 5. Quest site deployment (4815162342.quest)
@@ -24,17 +24,17 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 | File | Version | Status |
 |------|---------|--------|
 | `page-landing.php` | v2 | Landing page template with share feature |
-| `page-ai-chat-agents.php` | v1 | AI Chat Agents — pilot sp- design + Wheatley void |
-| `page-website-design.php` | v1 | Website Design service page (sp- structure) |
-| `page-hosting.php` | v1 | Hosting service page (sp- structure) |
+| `page-ai-chat-agents.php` | v2 | AI Chat Agents — sp- design + Wheatley void + inline Chatling embed |
+| `page-website-design.php` | v2 | Website Design — full rebuild with sp- system + Portal 2-style oval portal |
+| `page-hosting.php` | v2 | Hosting - sp- system + orange portal linking to Website Design |
 | `page-maintenance.php` | v1 | Maintenance service page (sp- structure) |
 | `page-email-marketing.php` | v1 | Email Marketing service page (sp- structure) |
-| `page-about.php` | v1 | About page (sp- structure) |
+| `page-about.php` | v2 | About - clean bio + Myst journal records + Wheatley as footnote [42] |
 | `page-contact.php` | v1 | Contact page (sp- structure) |
-| `assets/css/landing.css` | 1.4.2 | All styles + sp- service page system + Wheatley void + global footer |
+| `assets/css/landing.css` | 1.4.8 | All styles + sp- system + sp-journal + Wheatley void + global footer + portal + cursor color cycling |
 | `assets/js/landing.js` | 1.7.2 | Interactive behaviors + Wheatley + share API + session persistence |
 | `assets/js/global.js` | 1.5.0 | Nav + Chatling + scroll reveals + countdown + Wheatley page sections |
-| `functions.php` | 1.9.0 | Enqueue + hunt + Wheatley APIs (homepage + page) + gradient blobs + countdown footer |
+| `functions.php` | 1.9.2 | Enqueue + hunt + Wheatley APIs (with SHADE directive) + gradient blobs + countdown footer + global footer + Chatling exclusion |
 | `mlc-toolkit/` | 1.0.1 | Plugin: photo management, share analytics, URL shortener, dashboard widget |
 | `services-mockup.html` | Mockup | Original services vision (superseded by sp- system) |
 | `snake-451.html` | Prototype | Hunt game (needs point system refinement) |
@@ -46,17 +46,17 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 ```
 /wp-content/themes/divi-child/
 ├── page-landing.php          (Landing page template with share feature)
-├── page-ai-chat-agents.php   (AI Chat Agents — pilot sp- design + Wheatley void)
-├── page-website-design.php   (Website Design service page)
-├── page-hosting.php          (Hosting service page)
+├── page-ai-chat-agents.php   (AI Chat Agents — sp- design + Wheatley void + inline Chatling embed)
+├── page-website-design.php   (Website Design — sp- system + Portal 2-style oval portal)
+├── page-hosting.php          (Hosting - sp- system + orange portal)
 ├── page-maintenance.php      (Maintenance service page)
 ├── page-email-marketing.php  (Email Marketing service page)
-├── page-about.php            (About page)
+├── page-about.php            (About - clean bio + Myst journal records)
 ├── page-contact.php          (Contact page)
-├── functions.php              (v1.9.0 - Enqueue + hunt + Wheatley APIs + gradient blobs + countdown)
+├── functions.php              (v1.9.2 - Enqueue + hunt + Wheatley APIs + SHADE + gradient blobs + countdown + footer)
 ├── assets/
 │   ├── css/
-│   │   └── landing.css       (v1.4.2 - sp- system + Wheatley void + global footer)
+│   │   └── landing.css       (v1.4.8 - sp- system + sp-journal + Wheatley void + footer + portal + cursor color cycling)
 │   └── js/
 │       ├── global.js         (v1.5.0 - nav + scroll reveals + countdown + Wheatley page sections)
 │       └── landing.js        (v1.7.2 - Wheatley + share API + session persistence)
@@ -100,8 +100,8 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 
 **AI Systems:**
 - Wheatley (homepage): Anthropic API (Claude Haiku 4.5) via `/wp-json/mlc/v1/wheatley` - PRODUCTION
-- Wheatley (service pages): Anthropic API via `/wp-json/mlc/v1/wheatley-page` - PRODUCTION (bad salesman personality)
-- Chatling (other pages): Client deployments at $99/mo
+- Wheatley (service pages): Anthropic API via `/wp-json/mlc/v1/wheatley-page` - PRODUCTION (bad salesman personality, max_tokens 120, 45 word limit)
+- Chatling (other pages): Client deployments at $99/mo (excluded from AI Chat Agents page via `is_page_template()` check, inline embed used instead)
 
 **Development Tools:**
 - VS Code with SFTP extension
@@ -120,13 +120,18 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 - Light: `#F8F8F8`
 
 **Typography: Plus Jakarta Sans**
-- Single font family, all weights
+- Primary font family, all weights
 - Weight preset: Bold (heading: 700, body: 400)
 - Monospace for code/counters: `SF Mono` → `Fira Code` fallback
+- Handwriting (About page journal only): Caveat (Google Fonts)
 
 **Tagline: "Built Different"**
 - Triple meaning: Apple adjacent without legal conflict, Gen X/millennial sports culture, literal business statement
 - Gets gradient treatment (`#7C3AED` → `#06B6D4`)
+
+**Writing Rule: NO EM-DASHES**
+- Never use em-dashes anywhere on the site. Period.
+- Use periods and short sentences instead. Rewrite to avoid them entirely.
 
 ---
 
@@ -348,14 +353,20 @@ RESPONSE RULES:
 - Label: "MLC Personality Core v2.7.4" (monospace)
 - Mobile: `background-attachment: scroll` fallback (iOS Safari limitation)
 
-**Page-Specific Treatments (PLANNED):**
-- AI Chat Agents: Raw void (COMPLETE — pilot)
-- Website Design: Blue portal → click navigates to Hosting
-- Hosting: Orange portal → click navigates to Website Design
+**Page-Specific Treatments:**
+- AI Chat Agents: Raw void + inline Chatling embed (COMPLETE)
+- Website Design: Blue oval portal with flame ring + side annotation (COMPLETE)
+- Hosting: Orange portal with flame ring → click navigates to Website Design (COMPLETE)
+- About: Wheatley disguised as footnote [42] in journal section, conspiratorial tone (COMPLETE)
 - Maintenance: Maintenance hatch or terminal screen (TBD)
-- Email Marketing: Corrupted email UI
-- About: Quiet, softer void
-- Contact: Minimal treatment
+- Email Marketing: Corrupted email UI (TBD)
+- Contact: Minimal treatment (TBD)
+
+**Wheatley Cursor Color Cycling:**
+- Cursor blinks through brand colors: purple → cyan → pink (inspired by Gemini)
+- Keyframes: `wheatleyCursorBlink` with 6 segments over 3.6s (1.2s per color: 0.6s on, 0.6s off)
+- Applied globally to `.wheatley-cursor` and `.wheatley-void__cursor`
+- Portal and footnote cursors get `vertical-align: middle` override
 
 **Bad Salesman Personality:**
 - Terrible at sales — undersells, gets distracted, says the quiet part out loud
@@ -363,6 +374,7 @@ RESPONSE RULES:
 - British cadence, same Wheatley voice
 - If share name exists: MUST use their name prominently
 - No pricing context (owner still deciding on public pricing)
+- SHADE directive: Name-drops Wix and Squarespace with casual pity (service pages only, not homepage)
 
 **Technical Notes:**
 - `background-attachment: fixed` does NOT work with CSS `transform` on the same element (transforms create new containing blocks). Grid parallax is on `.wheatley-void` background, perspective overlay is a separate child div.
@@ -393,7 +405,7 @@ BEHAVIOR:
 
 ## Service Page Design System (`sp-` prefix)
 
-**Status:** PRODUCTION — AI Chat Agents page complete as pilot. Replaces the old two-column card mockup.
+**Status:** PRODUCTION. AI Chat Agents complete as pilot. Website Design fully rebuilt with portal. Replaces the old two-column card mockup.
 
 ### Design Philosophy
 Full-bleed, full-width sections with dramatic scale. No more "cards in a container." Award-winning pages use edge-to-edge sections alternating dark/light, massive typography, split layouts, scroll-triggered reveals, and strategic whitespace.
@@ -417,11 +429,54 @@ Full-bleed, full-width sections with dramatic scale. No more "cards in a contain
 **4. Examples (`sp-examples`)** — Grid of clickable cards with hover lift
 - Used on AI Chat Agents for live client links
 
-**5. CTA (`sp-cta`)** — Full-width dark section, centered
+**5. Statement (`sp-statement`)** — Full-width manifesto/belief block
+- Dark background, large centered text
+- Used for brand manifesto or philosophical statement sections
+
+**6. Process (`sp-process`)** — Horizontal step-by-step layout
+- 4 numbered steps in a horizontal row (wraps on mobile)
+- Each step: number, title, description
+- Used on Website Design page for "How We Build"
+
+**7. Portal (`sp-portal`)** — Oval viewport with scrolling screenshot inside
+- True oval shape using `border-radius: 50%`
+- Inner scene: `background-image` with `@keyframes portalScroll` animating `background-position`
+- Wispy flame ring effect via `::before`/`::after` on `.sp-portal__ring`
+- Flame uses counter-rotating `conic-gradient` with `mask-image` radial-gradient to hide center
+- Structure: `.sp-portal-wrap` > `.sp-portal` (a tag, `overflow:hidden` clips scene) + `.sp-portal__ring` (outside clip)
+- Ring sits outside the overflow clip so flames are visible
+- Side annotation layout for Wheatley text alongside the portal
+- Orange variant: uses CSS `:has()` selector and `+` sibling combinator
+- Portal screenshots will need updating once all page content is final (don't do it yet)
+
+**8. CTA (`sp-cta`)** — Full-width dark section, centered
 - Title + subtitle + gradient button (purple → pink)
 
-**6. Wheatley Void (`wheatley-void`)** — Parallax break section
+**9. Wheatley Void (`wheatley-void`)** — Parallax break section
 - See "Wheatley Page Sections" above
+
+**10. Journal (`sp-journal`)** — Warm paper background, Myst/Portal hybrid aesthetic
+- Used on About page for company records/lore section
+- Warm paper bg (#FAF9F6) with subtle grid-line texture via ::before
+- Classification stamp: rotated, monospace, double border
+- 2-col grid: 280px sticky sidebar (dark card) + 1fr main content
+- Sidebar: Employee ID, AI Cores, redacted fields, GPS coords, status
+- Journal entries titled as "Ages" (Myst reference)
+- Margin notes: absolute positioned, rotated, Caveat handwriting font
+- Wheatley notes: monospace italic with "WHEATLEY //" prefix
+- Footnotes: Lost sequence [4], [8], [15], [16], [23], [42]
+- Redacted text: black bars, hover reveals purple text
+- Superscripts: 0.6em, monospace, purple, 50% opacity
+- Responsive: 1200px margin notes go relative, 768px sidebar stacks
+- Hunt clues embedded naturally in data-attributes, footnotes, margin notes
+
+**11. About Split (`sp-about-split`)** — Photo left + text right for bio section
+- Photo with `object-position: center 20%` for mobile face visibility
+- Used on About page dark section
+
+**12. Values (`sp-values` / `sp-value`)** — 3-column card grid
+- Gradient top border on each card
+- Used on About page for company beliefs
 
 ### Scroll Animations
 - `.reveal` class → IntersectionObserver (15% threshold) → `.in-view` class
@@ -438,10 +493,34 @@ Full-bleed, full-width sections with dramatic scale. No more "cards in a contain
 - CTA: `#0A0A0A` or gradient
 
 ### Page Template Pattern
-Each service page follows: `sp-hero` → 2-3 `sp-section` splits → `sp-features` → `wheatley-void` → `sp-cta`
+General pattern: `sp-hero` → content sections (splits, statement, process, portal) → `wheatley-void` → `sp-cta`
+
+**Website Design page pattern:** `sp-hero` → `sp-statement` manifesto → dark split (The Problem) → `sp-process` (How We Build, 4 steps) → dark split (Built Around Your Business) → portal section → `sp-cta`
+
+**Hosting page pattern:** `sp-hero` → `sp-statement` manifesto → dark split (Bargain Bin Hosting) → `sp-features` (The Stack, 6 items) → dark split (Managed Means Handled) → orange portal section → `sp-cta`
+
+**About page pattern:** `sp-hero` → `sp-statement` manifesto → dark `sp-about-split` (photo + bio) → `sp-values` (3 cards) → `sp-journal` (sidebar + Ages + footnotes with Wheatley as [42]) → `sp-cta`
+
+### Hamburger Contrast
+- IntersectionObserver detects dark/light sections for hamburger icon color
+- rAF-throttled scroll listener added as backup (IntersectionObserver alone misses fast scrolling)
+- Both methods call shared `updateContrast()` function in `global.js`
+
+### Global Footer
+3-column layout injected via `mlc_inject_site_footer()` in functions.php:
+- **Brand column:** Logo, tagline, copyright
+- **Navigate column:** Site navigation links
+- **Connect column:** "We're better in person." (in place of social links)
+- Gradient top border (purple to cyan)
+- Countdown timer + hunt button preserved in bottom bar
+- Selector: `#globalFooter.site-footer` (overrides inherited Divi `.footer` positioning)
+- CSS: ~250 lines in landing.css
 
 ### Reference Files
-- `page-ai-chat-agents.php` — Complete pilot, reference for all other pages
+- `page-website-design.php` — Full sp- system with blue portal section, reference for portal implementation
+- `page-hosting.php` — sp- system with orange portal variant, white-labeled hosting copy
+- `page-about.php` — Two-layer page: clean bio + Myst journal records, reference for sp-journal system
+- `page-ai-chat-agents.php` — Pilot page, reference for Wheatley void + inline Chatling embed
 - `services-mockup.html` — Original two-column mockup (superseded, kept for reference)
 
 ---
@@ -513,10 +592,10 @@ Each service page follows: `sp-hero` → 2-3 `sp-section` splits → `sp-feature
 ## File Versions & Status
 
 **Current Deployed:**
-- CSS: v1.4.2 (sp- service page system + Wheatley void + global footer + scroll reveals)
+- CSS: v1.4.8 (sp- system + sp-journal + Wheatley void + global footer + portal + cursor color cycling)
 - JS (landing): v1.7.2 (share API integration + session-persistent personalization)
-- JS (global): v1.5.0 (nav + scroll reveals + countdown + Wheatley page sections)
-- PHP: v1.9.0 (Wheatley page API + gradient blobs + countdown footer injection)
+- JS (global): v1.5.1 (nav + scroll reveals + countdown + Wheatley page sections + hamburger contrast fix)
+- PHP: v1.9.2 (Wheatley APIs with SHADE directive + global footer + Chatling exclusion)
 - MLC Toolkit: v1.0.1 (photo management, share analytics, URL shortener, dashboard widget)
 
 **Key Functions:**
@@ -548,6 +627,7 @@ Each service page follows: `sp-hero` → 2-3 `sp-section` splits → `sp-feature
 - `mlc_wheatley_page_respond()` - Service page Wheatley API endpoint (bad salesman)
 - `mlc_inject_nav_html()` - Global nav injection via wp_body_open (9 items, dynamic photos)
 - `mlc_inject_countdown_footer()` - Global countdown timer via wp_footer (skips landing page)
+- `mlc_inject_site_footer()` - Global 3-column footer (Brand | Navigate | Connect)
 - `mlc_render_gradient_blobs()` - Reusable gradient background for sp-hero sections
 
 **mlc-toolkit plugin:**
@@ -590,15 +670,12 @@ Current prototype needs refinement:
 - Don't rebuild yet - refinement session needed to determine progression
 
 ### 4. Remaining Site Pages — sp- Design + Wheatley Treatments
-All 7 page templates created. AI Chat Agents is the complete pilot. Remaining 6 need:
+All 7 page templates created. AI Chat Agents, Website Design, Hosting, and About are complete. Remaining 3 need:
 - Content refinement and image placeholders
 - Page-specific Wheatley treatments:
-  - Website Design: Blue portal → links to Hosting
-  - Hosting: Orange portal → links to Website Design
-  - Maintenance: Maintenance hatch or terminal (TBD)
-  - Email Marketing: Corrupted email UI
-  - About: Quiet, softer void
-  - Contact: Minimal treatment
+  - Maintenance: Maintenance hatch or terminal screen (TBD)
+  - Email Marketing: Corrupted email UI (TBD)
+  - Contact: Minimal treatment (TBD)
 
 ### 5. Advanced Wheatley Features
 - Hunt meta-commentary based on countdown proximity
@@ -694,10 +771,17 @@ All 7 page templates created. AI Chat Agents is the complete pilot. Remaining 6 
 
 ### Phase 5: Site Expansion (IN PROGRESS - Feb 23, 2026)
 - ✅ sp- design system (full-bleed sections, scroll reveals, dark/light rhythm)
-- ✅ AI Chat Agents page (pilot — complete with Wheatley void)
+- ✅ AI Chat Agents page (pilot with Wheatley void + inline Chatling embed)
+- ✅ Website Design page (full rebuild with sp- system + blue portal)
+- ✅ Hosting page (sp- system + orange portal + white-labeled copy)
+- ✅ About page (clean bio + Myst journal records + Wheatley as footnote [42])
 - ✅ Global countdown timer on all pages
-- ✅ Wheatley page section API + bad salesman personality
-- 📋 Remaining 6 pages: content refinement + page-specific Wheatley treatments
+- ✅ Global site footer (3-column: Brand | Navigate | Connect)
+- ✅ Wheatley page section API + bad salesman personality + SHADE directive
+- ✅ Portal system (oval viewport, flame ring, scrolling screenshot, side annotation)
+- ✅ Wheatley cursor color cycling (brand colors on each blink)
+- ✅ Hamburger contrast fix (rAF scroll listener backup)
+- 📋 Remaining 3 pages: Maintenance, Email Marketing, Contact
 - 📋 Quest site completion (Snake 451 + final stages)
 
 ### Phase 6: Polish & Launch (FUTURE)
@@ -830,14 +914,105 @@ All 7 page templates created. AI Chat Agents is the complete pilot. Remaining 6 
 - Status: IMPLEMENTED
 - Date: Feb 23, 2026
 
-**2026-02-23: Page-Specific Wheatley Treatments (PLANNED)**
-- Website Design: Blue portal → click navigates to Hosting
-- Hosting: Orange portal → click navigates to Website Design
+**2026-02-23: Page-Specific Wheatley Treatments (IN PROGRESS)**
+- Website Design: Blue oval portal with flame ring (COMPLETE)
+- AI Chat Agents: Inline Chatling embed replacing image placeholder (COMPLETE)
+- Hosting: Orange portal with flame ring → Website Design (COMPLETE)
+- About: Wheatley as footnote [42], conspiratorial tone (COMPLETE)
 - Maintenance: Maintenance hatch or terminal screen (TBD)
-- Email Marketing: Corrupted email UI
-- About: Quiet, softer void
-- Contact: Minimal treatment
-- Status: PLANNED — build after pilot approval
+- Email Marketing: Corrupted email UI (TBD)
+- Contact: Minimal treatment (TBD)
+- Status: 4 of 7 complete
+- Date: Feb 23, 2026
+
+**2026-02-23: Global Site Footer**
+- 3-column layout: Brand (logo + tagline + copyright) | Navigate (site links) | Connect ("We're better in person.")
+- Gradient top border (purple to cyan)
+- Countdown timer + hunt button preserved in bottom bar
+- "We're better in person." replaces social media links
+- Injected via `mlc_inject_site_footer()` in functions.php
+- Selector: `#globalFooter.site-footer` to override Divi `.footer` positioning
+- Status: IMPLEMENTED
+- Date: Feb 23, 2026
+
+**2026-02-23: Portal 2-Style Oval Portal**
+- True oval viewport with scrolling page screenshot inside
+- Wispy flame ring effect using counter-rotating conic-gradients with radial mask to hide center
+- HTML: `.sp-portal-wrap` > `.sp-portal` (a tag, overflow:hidden) + `.sp-portal__ring` (outside clip)
+- Ring must sit outside the overflow:hidden element so flames are not clipped
+- Orange variant uses CSS `:has()` selector + `+` sibling combinator
+- Side annotation layout for Wheatley commentary text
+- Portal screenshots need updating once all page content is final
+- Status: IMPLEMENTED on Website Design + Hosting pages
+- Date: Feb 23, 2026
+
+**2026-02-23: Website Design Page Rebuild**
+- Complete rebuild with sp- system sections
+- Sections: hero, sp-statement manifesto, dark split (The Problem), sp-process (How We Build, 4 horizontal steps), dark split (Built Around Your Business), portal section, CTA
+- New section types: sp-statement, sp-process (added to CSS)
+- Status: IMPLEMENTED
+- Date: Feb 23, 2026
+
+**2026-02-23: Inline Chatling Embed on AI Chat Agents**
+- Replaced image placeholder with inline Chatling widget embed
+- Chatling floating widget excluded from AI Chat Agents page via `is_page_template()` check in functions.php
+- Prevents duplicate Chatling instances on the same page
+- Status: IMPLEMENTED
+- Date: Feb 23, 2026
+
+**2026-02-23: Em-Dash Ban (Site-Wide)**
+- No em-dashes anywhere on the site, ever
+- Use periods and short sentences instead
+- Status: FINAL
+- Date: Feb 23, 2026
+
+**2026-02-23: Wheatley Page Prompt Tuning**
+- max_tokens reduced to 120 (from 150) for page Wheatley
+- Word limit set to 45 words for page sections
+- Keeps responses tighter for side annotations and void sections
+- Status: IMPLEMENTED
+- Date: Feb 23, 2026
+
+**2026-02-23: Wheatley SHADE Directive**
+- Wheatley encouraged to name-drop Wix and Squarespace with casual pity on service pages
+- Not on homepage (different Wheatley mode)
+- "Like you genuinely pity anyone using them"
+- Status: IMPLEMENTED in functions.php Wheatley page system prompt
+- Date: Feb 23, 2026
+
+**2026-02-23: Hosting Page Rebuild (White-Labeled)**
+- Full sp- system rebuild with orange portal linking to Website Design
+- White-labeled: SiteGround never mentioned, all "we" and "our infrastructure"
+- Safe to name real tech: Google Cloud, WAF, Memcached, CDN, WP-CLI, SSH
+- Copy tone: techy enough to impress, not so techy it intimidates
+- Status: IMPLEMENTED
+- Date: Feb 23, 2026
+
+**2026-02-23: About Page - Clean Bio + Myst Journal**
+- Two-layer design: standard sp- bio on top, journal records below
+- Journal uses Myst series aesthetic: "Ages" as chapter titles, "The Art" (D'ni Writing), warm paper
+- Sidebar: dark info card with Employee ID 2237, redacted fields, GPS coords
+- Margin notes: Caveat handwriting font, rotated, absolute positioned
+- Footnotes use Lost sequence [4,8,15,16,23,42] with circular references
+- Wheatley disguised as footnote [42] with conspiratorial tone (not salesman)
+- Hunt clues embedded naturally in data-attributes, footnotes, margin notes
+- No portal oval (reserved for Website Design / Hosting pair only)
+- Status: IMPLEMENTED
+- Date: Feb 23, 2026
+
+**2026-02-23: Wheatley Cursor Color Cycling**
+- Each blink cycles through brand colors: purple, cyan, pink (Gemini-inspired)
+- 3.6s animation cycle (1.2s per color: 0.6s visible, 0.6s hidden)
+- Applied globally to all Wheatley cursors
+- Portal and footnote cursors get `vertical-align: middle` for proper alignment
+- Status: IMPLEMENTED
+- Date: Feb 23, 2026
+
+**2026-02-23: Hamburger Contrast Fix**
+- IntersectionObserver alone missed fast scrolling transitions
+- Added rAF-throttled scroll listener as backup calling shared `updateContrast()` function
+- Both methods in global.js `initHamburgerContrast()`
+- Status: IMPLEMENTED
 - Date: Feb 23, 2026
 
 ---

@@ -1,0 +1,12 @@
+<svg viewBox="0 0 700 700" xmlns="http://www.w3.org/2000/svg">
+  <!-- ML monogram — solid purple, transparent background
+       Use on any background. Versatile version. -->
+  <path
+    d="M 100,540 L 100,100 L 300,340 L 495,100 L 495,590 L 610,590"
+    stroke="#7C3AED"
+    stroke-width="90"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
+</svg>

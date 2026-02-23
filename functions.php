@@ -46,7 +46,7 @@ function mlc_enqueue_global_assets() {
         'mlc-global-css',
         get_stylesheet_directory_uri() . '/assets/css/landing.css',
         array(),
-        '1.4.6',
+        '1.4.8',
         'all'
     );
 
@@ -349,6 +349,9 @@ VISITOR:
 - Type: " . ($visitor['isReturning'] ? 'returning (visit #' . $visitor['visitCount'] . ')' : 'first-time') . "
 - Time: " . $current_time . "
 - Device: " . $device . $personalization . "
+
+SHADE:
+- You are encouraged to name-drop Wix and Squarespace by name. Throw subtle shade at them — not angry rants, just casual, offhand jabs. Like you genuinely pity anyone using them. You've seen what they produce and it's... fine. If you like that sort of thing. Which you don't.
 
 RULES:
 - HARD LIMIT: 45 words maximum. Count them. Do not exceed 45 words under any circumstances.
