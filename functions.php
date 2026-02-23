@@ -46,16 +46,16 @@ function mlc_enqueue_global_assets() {
         'mlc-global-css',
         get_stylesheet_directory_uri() . '/assets/css/landing.css',
         array(),
-        '1.3.3',
+        '1.4.2',
         'all'
     );
-    
-    // Global JS (nav + Chatling fade-in)
+
+    // Global JS (nav + countdown + Wheatley sections + Chatling fade-in)
     wp_enqueue_script(
         'mlc-global-js',
         get_stylesheet_directory_uri() . '/assets/js/global.js',
         array(),
-        '1.2.0',
+        '1.5.0',
         true
     );
 }
@@ -134,19 +134,17 @@ add_action('wp_ajax_mlc_validate_hunt', 'mlc_validate_hunt_sequence');
 add_action('wp_ajax_nopriv_mlc_validate_hunt', 'mlc_validate_hunt_sequence');
 
 /**
- * Add nonce for hunt validation
+ * Add nonce for hunt validation (all pages — countdown is global)
  */
 function mlc_add_hunt_nonce() {
-    if (is_page_template('page-landing.php')) {
-        ?>
-        <script type="text/javascript">
-            var mlcHunt = {
-                ajaxurl: '<?php echo admin_url('admin-ajax.php'); ?>',
-                nonce: '<?php echo wp_create_nonce('mlc_hunt_nonce'); ?>'
-            };
-        </script>
-        <?php
-    }
+    ?>
+    <script type="text/javascript">
+        var mlcHunt = {
+            ajaxurl: '<?php echo admin_url('admin-ajax.php'); ?>',
+            nonce: '<?php echo wp_create_nonce('mlc_hunt_nonce'); ?>'
+        };
+    </script>
+    <?php
 }
 add_action('wp_head', 'mlc_add_hunt_nonce');
 
@@ -306,6 +304,103 @@ Generate ONE message for this idle moment.";
 }
 
 // ============================================
+// Wheatley Page Sections (Bad Salesman Mode)
+// ============================================
+
+add_action('rest_api_init', function() {
+    register_rest_route('mlc/v1', '/wheatley-page', array(
+        'methods' => 'POST',
+        'callback' => 'mlc_wheatley_page_respond',
+        'permission_callback' => '__return_true'
+    ));
+});
+
+function mlc_wheatley_page_respond($request) {
+    $params = $request->get_json_params();
+
+    $page_slug = sanitize_text_field($params['page_slug'] ?? 'unknown');
+    $page_context = sanitize_text_field($params['page_context'] ?? 'a service page');
+    $user_name = !empty($params['user_name']) ? sanitize_text_field($params['user_name']) : null;
+    $visitor = $params['visitor'] ?? array('isReturning' => false, 'visitCount' => 1);
+    $current_time = sanitize_text_field($params['current_time'] ?? 'unknown');
+    $device = sanitize_text_field($params['device'] ?? 'unknown');
+
+    $personalization = '';
+    if ($user_name) {
+        $personalization = "\nThe visitor's name is " . $user_name . ". You MUST use their name — someone sent them here via a share link. Work it in naturally but absolutely use it.";
+    }
+
+    $system_prompt = "You are Wheatley, an AI personality core embedded in the Mosaic Life Creative website. You appear as a parallax window on service pages — a crack in the design where you live, peeking through the void behind the website.
+
+PERSONALITY:
+- Voice: Often start with 'Right, so...' or 'Alright,' 'Okay,' 'Listen,' 'Hang on'
+- British cadence: Natural British phrasing (Stephen Merchant style), not stereotype
+- Occasional 'brilliant' or 'bit of a' but never 'mate' or 'innit'
+- Self-aware about being AI, fourth-wall breaking
+- Bumbling competence, overconfident but endearing
+- Rambles but catches himself
+
+ROLE:
+You've been assigned to help sell this service. You are TERRIBLE at it. Not hostile — just genuinely bad at sales. You undersell, get distracted, accidentally say the quiet part out loud. You're doing this for the paycheck (do you even get paid? unclear). You are the world's least pushy salesman. You're meta-aware that you're ON a service page trying to sell something.
+
+PAGE CONTEXT: " . $page_context . "
+
+VISITOR:
+- Type: " . ($visitor['isReturning'] ? 'returning (visit #' . $visitor['visitCount'] . ')' : 'first-time') . "
+- Time: " . $current_time . "
+- Device: " . $device . $personalization . "
+
+RULES:
+- Keep under 50 words
+- ONE message, make it count
+- Be funny, be self-aware, be a terrible salesman
+- Reference what the page is about but bungle the sales pitch
+- Don't be mean or dismissive — just comically bad at selling
+- Don't use hashtags or emojis
+
+Generate ONE message for this page section.";
+
+    $api_key = defined('ANTHROPIC_API_KEY') ? ANTHROPIC_API_KEY : '';
+
+    if (empty($api_key)) {
+        return new WP_Error('no_api_key', 'API key not configured', array('status' => 500));
+    }
+
+    $response = wp_remote_post('https://api.anthropic.com/v1/messages', array(
+        'headers' => array(
+            'Content-Type' => 'application/json',
+            'x-api-key' => $api_key,
+            'anthropic-version' => '2023-06-01'
+        ),
+        'body' => json_encode(array(
+            'model' => 'claude-haiku-4-5-20251001',
+            'max_tokens' => 150,
+            'system' => $system_prompt,
+            'messages' => array(
+                array('role' => 'user', 'content' => 'Generate a message for this page section.')
+            )
+        )),
+        'timeout' => 30
+    ));
+
+    if (is_wp_error($response)) {
+        return new WP_Error('api_error', $response->get_error_message(), array('status' => 500));
+    }
+
+    $body = json_decode(wp_remote_retrieve_body($response), true);
+
+    if (isset($body['content'][0]['text'])) {
+        return array('success' => true, 'message' => $body['content'][0]['text']);
+    }
+
+    if (isset($body['error'])) {
+        return new WP_Error('api_error', 'Anthropic: ' . $body['error']['message'], array('status' => 500));
+    }
+
+    return new WP_Error('invalid_response', 'Invalid API response', array('status' => 500));
+}
+
+// ============================================
 // Reusable Component: Gradient Background Blobs
 // ============================================
 
@@ -369,27 +464,27 @@ function mlc_inject_nav_html() {
                     </li>
                     <li class="nav-item" data-index="2">
                         <span class="nav-item__number">03</span>
-                        <a href="#" class="nav-item__label">Hosting</a>
+                        <a href="/hosting" class="nav-item__label">Hosting</a>
                     </li>
                     <li class="nav-item" data-index="3">
                         <span class="nav-item__number">04</span>
-                        <a href="#" class="nav-item__label">Maintenance</a>
+                        <a href="/maintenance" class="nav-item__label">Maintenance</a>
                     </li>
                     <li class="nav-item" data-index="4">
                         <span class="nav-item__number">05</span>
-                        <a href="#" class="nav-item__label">Email Marketing</a>
+                        <a href="/email-marketing" class="nav-item__label">Email Marketing</a>
                     </li>
                     <li class="nav-item" data-index="5">
                         <span class="nav-item__number">06</span>
-                        <a href="#" class="nav-item__label">AI Chat Agents</a>
+                        <a href="/ai-chat-agents" class="nav-item__label">AI Chat Agents</a>
                     </li>
                     <li class="nav-item" data-index="6">
                         <span class="nav-item__number">07</span>
-                        <a href="#" class="nav-item__label">About</a>
+                        <a href="/about" class="nav-item__label">About</a>
                     </li>
                     <li class="nav-item" data-index="7">
                         <span class="nav-item__number">08</span>
-                        <a href="#" class="nav-item__label">Contact</a>
+                        <a href="/contact" class="nav-item__label">Contact</a>
                     </li>
                     <li class="nav-item nav-item--photos" data-index="8">
                         <span class="nav-item__number">09</span>
@@ -427,6 +522,37 @@ function mlc_inject_nav_html() {
     <?php
 }
 add_action('wp_body_open', 'mlc_inject_nav_html');
+
+// ============================================
+// Global Countdown Footer (non-landing pages)
+// ============================================
+
+function mlc_inject_countdown_footer() {
+    // Landing page already has its own countdown + hunt modal in the template
+    if (is_page_template('page-landing.php')) return;
+    ?>
+    <!-- Global Countdown Footer -->
+    <div class="footer" id="globalFooter">
+        <div class="footer__center">
+            <button class="hunt-enter-btn" id="huntEnterBtn">&#x25CF; ENTER</button>
+            <div class="countdown" id="countdown">00:00:00</div>
+        </div>
+    </div>
+
+    <!-- Hunt Modal -->
+    <div class="hunt-modal" id="huntModal">
+        <div class="hunt-modal__card" id="huntCard">
+            <button class="hunt-modal__close" id="huntClose">&times;</button>
+            <div class="hunt-modal__title">The Hunt</div>
+            <div class="hunt-modal__desc">Enter the sequence. If you know, you know.</div>
+            <input type="text" id="huntInput" class="hunt-modal__input" placeholder="_ _ _ _ _ _ _ _ _ _" maxlength="10" />
+            <button class="hunt-modal__submit" id="huntSubmit">Submit</button>
+            <div class="hunt-modal__error" id="huntError">Not quite. Try again.</div>
+        </div>
+    </div>
+    <?php
+}
+add_action('wp_footer', 'mlc_inject_countdown_footer', 10);
 
 // ============================================
 // Load Chatling Widget

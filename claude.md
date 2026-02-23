@@ -8,13 +8,13 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 
 ## Quick Start (For New Sessions)
 
-**Current Status:** MLC Toolkit plugin live, Share Feature fully integrated (URL shortener, analytics, session-persistent personalization, dashboard widget), Wheatley AI live with context-aware messages
+**Current Status:** Service pages rebuilt with new `sp-` design system (full-bleed, scroll reveals). Wheatley page sections live (parallax void with bad salesman personality). Global countdown timer on all pages. AI Chat Agents page complete as pilot. 6 remaining page templates created (need content/design refinement).
 
 **Next Priorities:**
-1. Photo slideshow expansion (50-100 photos with hunt clues)
-2. HUNT knowledge base for Chatling
-3. Weather API context for Wheatley
-4. Site pages (Services, How We Work, Examples, etc.)
+1. Apply sp- design + Wheatley sections to remaining 6 page templates
+2. Page-specific Wheatley treatments (blue/orange portals, maintenance hatch, corrupted email, etc.)
+3. Photo slideshow expansion (50-100 photos with hunt clues)
+4. HUNT knowledge base for Chatling
 5. Quest site deployment (4815162342.quest)
 
 ---
@@ -24,12 +24,19 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 | File | Version | Status |
 |------|---------|--------|
 | `page-landing.php` | v2 | Landing page template with share feature |
-| `assets/css/landing.css` | 1.3.3 | All styles (nav + landing + services + share + mobile CTA fixes) |
+| `page-ai-chat-agents.php` | v1 | AI Chat Agents — pilot sp- design + Wheatley void |
+| `page-website-design.php` | v1 | Website Design service page (sp- structure) |
+| `page-hosting.php` | v1 | Hosting service page (sp- structure) |
+| `page-maintenance.php` | v1 | Maintenance service page (sp- structure) |
+| `page-email-marketing.php` | v1 | Email Marketing service page (sp- structure) |
+| `page-about.php` | v1 | About page (sp- structure) |
+| `page-contact.php` | v1 | Contact page (sp- structure) |
+| `assets/css/landing.css` | 1.4.2 | All styles + sp- service page system + Wheatley void + global footer |
 | `assets/js/landing.js` | 1.7.2 | Interactive behaviors + Wheatley + share API + session persistence |
-| `assets/js/global.js` | 1.2.0 | Nav with dynamic photo support, Chatling fade-in |
-| `functions.php` | 1.8.1 | Enqueue + hunt + Wheatley API + dynamic photos + 9-item nav |
+| `assets/js/global.js` | 1.5.0 | Nav + Chatling + scroll reveals + countdown + Wheatley page sections |
+| `functions.php` | 1.9.0 | Enqueue + hunt + Wheatley APIs (homepage + page) + gradient blobs + countdown footer |
 | `mlc-toolkit/` | 1.0.1 | Plugin: photo management, share analytics, URL shortener, dashboard widget |
-| `services-mockup.html` | Mockup | Services page vision/design |
+| `services-mockup.html` | Mockup | Original services vision (superseded by sp- system) |
 | `snake-451.html` | Prototype | Hunt game (needs point system refinement) |
 
 ---
@@ -39,16 +46,23 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 ```
 /wp-content/themes/divi-child/
 ├── page-landing.php          (Landing page template with share feature)
-├── functions.php              (v1.8.1 - Enqueue + hunt + Wheatley + dynamic photos + 9-item nav)
+├── page-ai-chat-agents.php   (AI Chat Agents — pilot sp- design + Wheatley void)
+├── page-website-design.php   (Website Design service page)
+├── page-hosting.php          (Hosting service page)
+├── page-maintenance.php      (Maintenance service page)
+├── page-email-marketing.php  (Email Marketing service page)
+├── page-about.php            (About page)
+├── page-contact.php          (Contact page)
+├── functions.php              (v1.9.0 - Enqueue + hunt + Wheatley APIs + gradient blobs + countdown)
 ├── assets/
 │   ├── css/
-│   │   └── landing.css       (v1.3.3 - includes share modal + mobile CTA fixes)
+│   │   └── landing.css       (v1.4.2 - sp- system + Wheatley void + global footer)
 │   └── js/
-│       ├── global.js         (v1.2.0 - nav, dynamic photos, Chatling fade-in)
+│       ├── global.js         (v1.5.0 - nav + scroll reveals + countdown + Wheatley page sections)
 │       └── landing.js        (v1.7.2 - Wheatley + share API + session persistence)
-├── services-mockup.html       (Mockup, not deployed)
+├── services-mockup.html       (Original mockup, superseded by sp- system)
 ├── snake-451.html             (Hunt game prototype)
-└── claude.md / ROADMAP.md     (Documentation)
+└── CLAUDE.md / ROADMAP.md     (Documentation)
 
 /wp-content/plugins/mlc-toolkit/
 ├── mlc-toolkit.php            (Main plugin: share URL handler, REST API, dashboard widget, legacy redirect)
@@ -85,7 +99,8 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 - **CRITICAL:** Sendy directory at `/sendy` (DO NOT OVERWRITE during migrations)
 
 **AI Systems:**
-- Wheatley (homepage): Anthropic API (Claude Haiku 4.5) - PRODUCTION
+- Wheatley (homepage): Anthropic API (Claude Haiku 4.5) via `/wp-json/mlc/v1/wheatley` - PRODUCTION
+- Wheatley (service pages): Anthropic API via `/wp-json/mlc/v1/wheatley-page` - PRODUCTION (bad salesman personality)
 - Chatling (other pages): Client deployments at $99/mo
 
 **Development Tools:**
@@ -191,11 +206,14 @@ Fixed top-right. Opens full-screen overlay:
 
 ### 6. Scavenger Hunt System
 
-**Countdown timer** — fixed bottom-right corner. Targets 3:16:23 PM daily (Lost numbers: 3, 16, 23). Displays as `HH:MM:SS` in monospace.
+**Countdown timer** — Global on all pages. Static footer at bottom of page content (NOT fixed/sticky). Dark background with light text. Targets 3:16:23 PM daily (Lost numbers: 3, 16, 23). Displays as `HH:MM:SS` in monospace.
+- Landing page: countdown lives in `page-landing.php` footer, logic in `landing.js`
+- All other pages: countdown injected via `mlc_inject_countdown_footer()` wp_footer hook, logic in `global.js`
+- global.js skips countdown init on landing page (checks `mlc-landing-page` body class)
 
 **42-second window:** When countdown hits zero, an `● ENTER` button appears for exactly 42 seconds. Timer displays `00:00:00` with active styling during window.
 
-**Hunt modal:** Dark card with numeric input. Target sequence: `4815162342`. 
+**Hunt modal:** Dark card with numeric input. Target sequence: `4815162342`.
 
 **Server-side validation (CRITICAL):**
 - PHP validates BOTH sequence AND time window
@@ -306,10 +324,50 @@ RESPONSE RULES:
 ```
 
 ### Integration Strategy
-- **Homepage:** Wheatley proactive (time-based takeover)
+- **Homepage:** Wheatley proactive (time-based takeover of headline)
+- **Service pages:** Wheatley page sections — parallax void windows embedded in page content
 - **Other pages:** Chatling widget (bottom right, same personality)
 - **Continuity:** Same Wheatley voice across entire site
 - **No Chatling on homepage** to avoid conflict
+
+### Wheatley Page Sections (v1.5.0 — PRODUCTION)
+
+**Concept:** Full-width parallax "void" sections embedded in service pages. Wheatley appears as a bad salesman — terrible at selling, doing it for the paycheck. Triggered when the section scrolls into view.
+
+**Architecture:**
+- HTML: `<section class="wheatley-void" data-wheatley-page="..." data-wheatley-context="...">`
+- JS: IntersectionObserver (threshold 0.3) triggers API call when visible
+- API: `/wp-json/mlc/v1/wheatley-page` with bad salesman system prompt
+- Display: Typewriter effect at 28ms/char with blinking cursor
+- No caching — fresh message on every page load
+
+**Visual Design (CSS):**
+- `.wheatley-void` — full-width, dark bg, `background-attachment: fixed` for parallax
+- Perspective grid overlay (`transform: perspective(300px) rotateX(40deg)`)
+- Radial glow (purple/cyan), scanlines, edge vignette
+- Label: "MLC Personality Core v2.7.4" (monospace)
+- Mobile: `background-attachment: scroll` fallback (iOS Safari limitation)
+
+**Page-Specific Treatments (PLANNED):**
+- AI Chat Agents: Raw void (COMPLETE — pilot)
+- Website Design: Blue portal → click navigates to Hosting
+- Hosting: Orange portal → click navigates to Website Design
+- Maintenance: Maintenance hatch or terminal screen (TBD)
+- Email Marketing: Corrupted email UI
+- About: Quiet, softer void
+- Contact: Minimal treatment
+
+**Bad Salesman Personality:**
+- Terrible at sales — undersells, gets distracted, says the quiet part out loud
+- Self-aware about being bad at this ("I'm supposed to tell you this is amazing")
+- British cadence, same Wheatley voice
+- If share name exists: MUST use their name prominently
+- No pricing context (owner still deciding on public pricing)
+
+**Technical Notes:**
+- `background-attachment: fixed` does NOT work with CSS `transform` on the same element (transforms create new containing blocks). Grid parallax is on `.wheatley-void` background, perspective overlay is a separate child div.
+- `background-attachment: fixed` doesn't work on iOS Safari — CSS uses `@supports` or media query fallback to `scroll`
+- Removed all IP references: no "Aperture Science", no "Portal 2 Wheatley" in visible UI or prompts
 
 **Chatling Personality Prompt (Draft):**
 ```
@@ -333,46 +391,58 @@ BEHAVIOR:
 
 ---
 
-## Services Page Vision
+## Service Page Design System (`sp-` prefix)
 
-### Design
-**Layout:** Two-column split
-- Left: AI Agents (Intelligent Connection)
-- Right: Websites (Digital Presence)
+**Status:** PRODUCTION — AI Chat Agents page complete as pilot. Replaces the old two-column card mockup.
 
-**Visual Style:**
-- White cards on light background (`#F8F8F8`)
-- Gradient accent borders (top edge: 4px)
-  - AI Agents: purple → cyan
-  - Websites: cyan → pink
-- Hover effect: subtle lift (4px translateY)
-- Clean, professional, scannable
+### Design Philosophy
+Full-bleed, full-width sections with dramatic scale. No more "cards in a container." Award-winning pages use edge-to-edge sections alternating dark/light, massive typography, split layouts, scroll-triggered reveals, and strategic whitespace.
 
-### Content Structure (Per Service)
-1. **Label:** Uppercase, small, color-coded
-2. **Title:** Large, bold, what it is
-3. **Description:** Why it matters, plain language
-4. **Features:** 4 bullet points, what you get
-5. **Pricing:** Transparent, upfront
-6. **CTA:** "Learn More" button (color-matched)
+### Section Types
 
-### Pricing (Transparent)
-**AI Agents:**
-- Starting at $99/month
-- $500 setup (waived with website project)
+**1. Hero (`sp-hero`)** — Full viewport width, dark bg, massive centered text
+- Title: `clamp(60px, 14vw, 160px)`, bold, white
+- Subtitle: `clamp(20px, 3vw, 28px)`, muted white
+- Gradient blob background via `mlc_render_gradient_blobs()`
 
-**Websites:**
-- Starting at $3,500
-- Ongoing support: $150/month
+**2. Split Section (`sp-section` + `sp-split`)** — Text on one side, image on the other
+- `sp-section--light` / `sp-section--dark` for alternating color rhythm
+- `sp-split--reverse` for image-left/text-right
+- Image placeholders in `sp-split__media`
 
-### Bottom CTA
-"Not sure which one you need? Let's figure it out together."
-→ "Let's Talk" button
+**3. Features (`sp-features`)** — Large numbered items (01, 02, 03, 04)
+- `sp-feature__number` — huge (120px+), 5% opacity background element
+- Staggered reveal with `--delay` custom property
 
-**Key Principle:** "Pick one. Or combine both. Most clients need both."
+**4. Examples (`sp-examples`)** — Grid of clickable cards with hover lift
+- Used on AI Chat Agents for live client links
 
-### File
-`services-mockup.html` - Complete interactive mockup with Royal Digital palette, Plus Jakarta Sans, mobile responsive
+**5. CTA (`sp-cta`)** — Full-width dark section, centered
+- Title + subtitle + gradient button (purple → pink)
+
+**6. Wheatley Void (`wheatley-void`)** — Parallax break section
+- See "Wheatley Page Sections" above
+
+### Scroll Animations
+- `.reveal` class → IntersectionObserver (15% threshold) → `.in-view` class
+- CSS: `opacity: 0` + `translateY(40px)` → `opacity: 1` + `translateY(0)`, 0.8s ease
+- Staggered via `--delay` custom property on each element
+- JS in `global.js` `initScrollReveal()`
+
+### Color Rhythm (alternating sections)
+- Hero: `#0A0A0A` (dark)
+- Section 1: `#F8F8F8` (light)
+- Section 2: `#0A0A0A` (dark)
+- Features: `#F8F8F8` (light)
+- Wheatley: `#0A0A0A` (void)
+- CTA: `#0A0A0A` or gradient
+
+### Page Template Pattern
+Each service page follows: `sp-hero` → 2-3 `sp-section` splits → `sp-features` → `wheatley-void` → `sp-cta`
+
+### Reference Files
+- `page-ai-chat-agents.php` — Complete pilot, reference for all other pages
+- `services-mockup.html` — Original two-column mockup (superseded, kept for reference)
 
 ---
 
@@ -443,10 +513,10 @@ BEHAVIOR:
 ## File Versions & Status
 
 **Current Deployed:**
-- CSS: v1.3.3 (share + mobile CTA fixes + mobile spacing)
-- JS: v1.7.2 (share API integration + session-persistent personalization)
-- global.js: v1.2.0 (nav with dynamic photo support)
-- PHP: v1.8.1 (dynamic photos, plugin integration, 9-item nav)
+- CSS: v1.4.2 (sp- service page system + Wheatley void + global footer + scroll reveals)
+- JS (landing): v1.7.2 (share API integration + session-persistent personalization)
+- JS (global): v1.5.0 (nav + scroll reveals + countdown + Wheatley page sections)
+- PHP: v1.9.0 (Wheatley page API + gradient blobs + countdown footer injection)
 - MLC Toolkit: v1.0.1 (photo management, share analytics, URL shortener, dashboard widget)
 
 **Key Functions:**
@@ -463,13 +533,22 @@ BEHAVIOR:
 - `detectDeviceType()` - Platform detection (mobile, tablet, desktop)
 - `initShareFeature()` - Share modal setup, URL encoding, clipboard (NEW - Feb 7, 2026)
 
+**global.js:**
+- `initScrollReveal()` - IntersectionObserver for `.reveal` elements (15% threshold)
+- `initCountdown()` - Global countdown timer + hunt modal (skips on landing page)
+- `initWheatleySection()` - Finds `[data-wheatley-page]`, triggers on visibility (30% threshold)
+- `fetchWheatleyPageMessage()` - API call to `/wp-json/mlc/v1/wheatley-page` with full context
+- `wheatleyTypewriter()` - Character-by-character display at 28ms/char
+
 **functions.php:**
 - `mlc_enqueue_landing_assets()` - Asset loading with version cache busting
 - `mlc_validate_hunt_sequence()` - Server-side validation (sequence + time)
-- `mlc_add_hunt_nonce()` - Security nonce injection
-- `mlc_wheatley_respond()` - Anthropic API endpoint with share personalization support
+- `mlc_add_hunt_nonce()` - Security nonce injection (global, all pages)
+- `mlc_wheatley_respond()` - Homepage Wheatley API endpoint
+- `mlc_wheatley_page_respond()` - Service page Wheatley API endpoint (bad salesman)
 - `mlc_inject_nav_html()` - Global nav injection via wp_body_open (9 items, dynamic photos)
-- `mlc_render_gradient_blobs()` - Reusable gradient background
+- `mlc_inject_countdown_footer()` - Global countdown timer via wp_footer (skips landing page)
+- `mlc_render_gradient_blobs()` - Reusable gradient background for sp-hero sections
 
 **mlc-toolkit plugin:**
 - `mlc_toolkit_handle_share_url()` - `/s/{code}` handler (init hook, priority 1)
@@ -510,17 +589,23 @@ Current prototype needs refinement:
 - Makes 451 achievable while keeping Fahrenheit 451 reference
 - Don't rebuild yet - refinement session needed to determine progression
 
-### 4. Remaining Site Pages
-- Services (mockup complete, needs build)
-- How We Work (timeline/stepper design)
-- Examples (card grid, not portfolio)
-- Let's Talk (Calendly + simple form)
+### 4. Remaining Site Pages — sp- Design + Wheatley Treatments
+All 7 page templates created. AI Chat Agents is the complete pilot. Remaining 6 need:
+- Content refinement and image placeholders
+- Page-specific Wheatley treatments:
+  - Website Design: Blue portal → links to Hosting
+  - Hosting: Orange portal → links to Website Design
+  - Maintenance: Maintenance hatch or terminal (TBD)
+  - Email Marketing: Corrupted email UI
+  - About: Quiet, softer void
+  - Contact: Minimal treatment
 
 ### 5. Advanced Wheatley Features
 - Hunt meta-commentary based on countdown proximity
 - Session memory (sessionStorage tracking)
 - Tab visibility detection
 - Console easter eggs
+- Weather API context for Wheatley messages
 
 ---
 
@@ -607,11 +692,12 @@ Current prototype needs refinement:
 - ✅ Session-persistent personalization (survives page reloads)
 - 📋 Chatling HUNT knowledge base
 
-### Phase 5: Site Expansion (FUTURE)
-- 📋 Services page build
-- 📋 How We Work page
-- 📋 Examples page
-- 📋 Let's Talk page
+### Phase 5: Site Expansion (IN PROGRESS - Feb 23, 2026)
+- ✅ sp- design system (full-bleed sections, scroll reveals, dark/light rhythm)
+- ✅ AI Chat Agents page (pilot — complete with Wheatley void)
+- ✅ Global countdown timer on all pages
+- ✅ Wheatley page section API + bad salesman personality
+- 📋 Remaining 6 pages: content refinement + page-specific Wheatley treatments
 - 📋 Quest site completion (Snake 451 + final stages)
 
 ### Phase 6: Polish & Launch (FUTURE)
@@ -692,10 +778,10 @@ Current prototype needs refinement:
 - Solution: PHP validates both sequence AND time window
 - Status: IMPLEMENTED and tested
 
-**2026-02-04: Services page design approved**
-- Layout: Two-column split (AI Agents / Websites)
-- Style: Clean cards, gradient accents, transparent pricing
-- Status: Mockup complete, ready for build
+**2026-02-04: Services page design approved** *(SUPERSEDED by sp- system Feb 23)*
+- Original: Two-column split cards (AI Agents / Websites)
+- Replaced by: Full-bleed sp- section system with scroll reveals
+- File `services-mockup.html` kept for reference
 
 **2026-02-07: Share Feature URL Encoding**
 - Format: `name|context` → Base64 → `?u=encoded`
@@ -710,6 +796,49 @@ Current prototype needs refinement:
 - Rationale: Desktop users have space, mobile needs vertical stacking
 - Status: FINALIZED in v1.3.1
 - Date: Feb 7, 2026
+
+**2026-02-23: sp- Service Page Design System**
+- Replaced old two-column card design with full-bleed section system
+- New `sp-` CSS prefix to avoid conflicts with old `.service-*` styles
+- Edge-to-edge sections, massive typography, split layouts, scroll reveals
+- AI Chat Agents built as pilot — reference for all other pages
+- Status: PRODUCTION (pilot complete)
+- Date: Feb 23, 2026
+
+**2026-02-23: Wheatley Page Sections — Bad Salesman**
+- Wheatley appears in parallax "void" sections on service pages
+- Personality: terrible salesman doing it for the paycheck (not hostile, just bad)
+- New API endpoint: `/wp-json/mlc/v1/wheatley-page`
+- No caching — fresh message on every page load
+- Share name MUST be used prominently if available
+- Status: PRODUCTION (AI Chat Agents pilot)
+- Date: Feb 23, 2026
+
+**2026-02-23: Global Countdown Timer**
+- Hunt countdown now appears on all pages (not just landing)
+- Static footer at bottom of content (NOT fixed/sticky)
+- Landing page uses its own countdown (landing.js), global.js skips it
+- Other pages: injected via `mlc_inject_countdown_footer()` wp_footer hook
+- Status: IMPLEMENTED
+- Date: Feb 23, 2026
+
+**2026-02-23: Wheatley IP Cleanup**
+- Removed "Aperture Science" from visible UI (now "MLC Personality Core v2.7.4")
+- Removed "Portal 2 Wheatley" from API system prompts
+- Console easter eggs in landing.js kept (developer-only, more defensible)
+- Rationale: Reduce Valve trademark risk while preserving personality
+- Status: IMPLEMENTED
+- Date: Feb 23, 2026
+
+**2026-02-23: Page-Specific Wheatley Treatments (PLANNED)**
+- Website Design: Blue portal → click navigates to Hosting
+- Hosting: Orange portal → click navigates to Website Design
+- Maintenance: Maintenance hatch or terminal screen (TBD)
+- Email Marketing: Corrupted email UI
+- About: Quiet, softer void
+- Contact: Minimal treatment
+- Status: PLANNED — build after pilot approval
+- Date: Feb 23, 2026
 
 ---
 
