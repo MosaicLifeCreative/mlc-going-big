@@ -29,8 +29,15 @@ if (!defined('ABSPATH')) exit;
     <section class="sp-hero">
         <?php mlc_render_gradient_blobs(); ?>
         <h1 class="sp-hero__title reveal">Let's<br>Talk</h1>
-        <p class="sp-hero__subtitle reveal" style="--delay: 0.15s">We read every message. We respond to every one. No ticket queue, no auto-reply.</p>
+        <p class="sp-hero__subtitle reveal" style="--delay: 0.15s">Real conversations start here.</p>
         <div class="sp-hero__accent reveal" style="--delay: 0.3s"></div>
+    </section>
+
+    <!-- ═══ STATEMENT ═════════════════════════════════ -->
+    <section class="sp-section sp-section--light">
+        <div class="sp-statement reveal">
+            <p class="sp-statement__text">We don't do ticket queues. We don't do 48-hour SLAs. You send a message, a real person reads it, and you hear back the same day.</p>
+        </div>
     </section>
 
     <!-- ═══ FORM + CONTACT INFO ═══════════════════════ -->
@@ -43,7 +50,7 @@ if (!defined('ABSPATH')) exit;
                     <?php echo do_shortcode('[contact-form-7 id="99c0016" title="MLC Contact Form"]'); ?>
                 </div>
 
-                <div class="sp-contact-info reveal" style="--delay: 0.15s">
+                <div class="sp-contact-info sp-contact-info--dark reveal" style="--delay: 0.15s">
                     <div class="sp-contact-info__item">
                         <div class="sp-contact-info__label">Email</div>
                         <div class="sp-contact-info__value">

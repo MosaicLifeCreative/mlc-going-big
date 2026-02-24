@@ -2501,6 +2501,25 @@ body:has(#wheatley-message) .cursor-blink {
     opacity: 0.5;
 }
 
+/* Contact info — dark card variant */
+.sp-contact-info--dark {
+    background: var(--dark) !important;
+    border-top: 4px solid;
+    border-image: linear-gradient(135deg, var(--primary), var(--secondary)) 1;
+}
+
+.sp-contact-info--dark .sp-contact-info__label {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.sp-contact-info--dark .sp-contact-info__value {
+    color: #fff;
+}
+
+.sp-contact-info--dark .sp-contact-info__value a {
+    color: var(--primary);
+}
+
 /* Contact info hint text */
 .sp-contact-info__hint {
     font-size: 12px;
@@ -2508,6 +2527,15 @@ body:has(#wheatley-message) .cursor-blink {
     color: rgba(0, 0, 0, 0.3);
     margin-top: 2px;
     letter-spacing: 0;
+}
+
+.sp-contact-info--dark .sp-contact-info__hint {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+/* CF7 generates <br> tags between labels and inputs */
+.sp-contact-form .wpcf7-form br {
+    display: none;
 }
 
 /* ─── RESPONSIVE ───────────────────────────────── */
