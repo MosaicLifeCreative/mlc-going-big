@@ -46,7 +46,7 @@ function mlc_enqueue_global_assets() {
         'mlc-global-css',
         get_stylesheet_directory_uri() . '/assets/css/landing.css',
         array(),
-        '1.5.7',
+        '1.6.2',
         'all'
     );
 
@@ -55,7 +55,7 @@ function mlc_enqueue_global_assets() {
         'mlc-global-js',
         get_stylesheet_directory_uri() . '/assets/js/global.js',
         array(),
-        '1.5.1',
+        '1.5.3',
         true
     );
 }

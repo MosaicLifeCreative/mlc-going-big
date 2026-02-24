@@ -106,7 +106,7 @@
 - [ ] **Custom photo captions and credits** per image
 
 ### 5. Site Pages (sp- Design System)
-- [x] **AI Chat Agents** (sp- system + Wheatley void + inline Chatling embed)
+- [x] **AI Chat Agents** (sp- system + Wheatley void + inline Chatling embed + Pixar images + See It Live chat window cards)
 - [x] **Website Design** (sp- system + blue portal + Pixar images)
 - [x] **Hosting** (sp- system + orange portal, white-labeled + Pixar images)
 - [x] **About** (sp- system + Myst journal records + Wheatley footnote [42])
@@ -118,6 +118,7 @@
 - [x] **Email Marketing** — subscription trap (stressed) + infrastructure calm (relaxed)
 - [x] **Website Design** — generic template hallway + custom design excitement
 - [x] **Hosting** — server chaos (stressed) + walking away relaxed (wave)
+- [x] **AI Chat Agents** — training holographic assistant + deployed laptop website
 - [ ] **Maintenance** — TBD (2 placeholders in page)
 - [ ] **Contact** — TBD (no images, form-focused page)
 
@@ -189,9 +190,9 @@ All new page templates follow this structure:
 5. Conditional JS loading (global.js everywhere, landing.js only on landing page)
 
 ### File Versions
-- **landing.css:** v1.5.6 (sp- system + corrupted inbox + terminal + CF7 overrides + contact dark card + portal + cursor color cycling)
+- **landing.css:** v1.6.2 (sp- system + corrupted inbox + terminal + CF7 overrides + contact dark card + portal + cursor color cycling + chat window cards)
 - **landing.js:** v1.7.2 (Wheatley AI, Chatling, hunt, nav, share API, session-persistent personalization)
-- **global.js:** v1.5.0 (nav + scroll reveals + countdown + Wheatley page sections + hamburger contrast)
+- **global.js:** v1.5.3 (nav + scroll reveals + countdown + Wheatley page sections + hamburger contrast + Chatling scroll guard + chat cascade animation)
 - **functions.php:** v1.9.2 (Wheatley APIs + SHADE + gradient blobs + countdown + global footer)
 - **mlc-toolkit plugin:** v1.0.1 (photo management, share analytics, URL shortener, dashboard widget, legacy domain redirect)
 

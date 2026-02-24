@@ -60,9 +60,7 @@ if (!defined('ABSPATH')) exit;
                 <p>And you own it. No platform lock-in, no renting someone else's tool, no losing everything when you switch providers.</p>
             </div>
             <div class="sp-split__media reveal" style="--delay: 0.2s">
-                <div class="sp-image-placeholder">
-                    IMAGE — Dashboard or training interface
-                </div>
+                <img src="/wp-content/uploads/2026/02/ai-chat-agent-training-holographic-assistant.png" alt="Business owner handing colorful documents to a friendly glowing holographic AI assistant floating above his desk in a warm modern office" loading="lazy">
             </div>
         </div>
     </section>
@@ -108,27 +106,61 @@ if (!defined('ABSPATH')) exit;
     <!-- ═══ LIVE EXAMPLES (Dark) ═══ -->
     <section class="sp-section sp-section--dark">
         <div class="sp-section__inner">
-            <div class="sp-split">
-                <div class="sp-split__content reveal">
-                    <h2>See It Live</h2>
-                    <p>These aren't mockups or demos. These are real AI agents running on real businesses, handling real conversations right now. Visit any of them and start a chat.</p>
-                </div>
-                <div class="reveal" style="--delay: 0.15s">
-                    <div class="sp-examples">
-                        <a href="https://blackburnschimney.com" target="_blank" rel="noopener" class="sp-example">
-                            <div class="sp-example__name">Blackburn's Chimney</div>
-                            <div class="sp-example__desc">Chimney sweeping & repair</div>
-                        </a>
-                        <a href="https://ohiopropertybrothers.com" target="_blank" rel="noopener" class="sp-example">
-                            <div class="sp-example__name">Ohio Property Brothers</div>
-                            <div class="sp-example__desc">Property services</div>
-                        </a>
-                        <a href="https://noebull.com" target="_blank" rel="noopener" class="sp-example">
-                            <div class="sp-example__name">Noebull</div>
-                            <div class="sp-example__desc">Service business</div>
-                        </a>
+            <h2 class="sp-examples__heading reveal">See It Live</h2>
+            <p class="sp-examples__desc reveal" style="--delay: 0.1s">These aren't mockups. These are real AI agents on real businesses, handling real conversations right now. Click any of them and start a chat.</p>
+            <div class="sp-examples reveal" style="--delay: 0.2s">
+
+                <a href="https://blackburnschimney.com" target="_blank" rel="noopener" class="sp-example">
+                    <div class="sp-example__titlebar" style="background: #7e1c27">
+                        <svg class="sp-example__titlebar-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="rgba(255,255,255,0.9)"/></svg>
+                        <span class="sp-example__titlebar-name">Blackburn's Chimney</span>
                     </div>
-                </div>
+                    <div class="sp-example__chat-body">
+                        <div class="sp-example__msg sp-example__msg--visitor">
+                            <div class="sp-example__msg-bubble">I can smell gas even when my fireplace isn't lit. Is that dangerous?</div>
+                        </div>
+                        <div class="sp-example__msg sp-example__msg--agent">
+                            <div class="sp-example__msg-bubble">That's definitely something to take seriously. A gas smell when the unit is off could mean a valve issue or a venting problem. I'd recommend not using it until we can get someone out to inspect it. Want me to help you schedule a service call?</div>
+                        </div>
+                    </div>
+                    <div class="sp-example__input"><span>Type here...</span></div>
+                </a>
+
+                <a href="https://ohiopropertybrothers.com" target="_blank" rel="noopener" class="sp-example">
+                    <div class="sp-example__titlebar" style="background: #bb0000">
+                        <svg class="sp-example__titlebar-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="rgba(255,255,255,0.9)"/></svg>
+                        <span class="sp-example__titlebar-name">Ohio Property Brothers</span>
+                    </div>
+                    <div class="sp-example__chat-body">
+                        <div class="sp-example__msg sp-example__msg--visitor">
+                            <div class="sp-example__msg-bubble">I'm looking to redesign my kitchen.</div>
+                        </div>
+                        <div class="sp-example__msg sp-example__msg--agent">
+                            <div class="sp-example__msg-bubble">Kitchen remodels are one of our most popular projects. To give you a ballpark, it helps to know a few things. Are you thinking a full layout change, or more of a cosmetic refresh with new cabinets and countertops?</div>
+                        </div>
+                    </div>
+                    <div class="sp-example__input"><span>Type here...</span></div>
+                </a>
+
+                <a href="https://noebull.com" target="_blank" rel="noopener" class="sp-example">
+                    <div class="sp-example__titlebar" style="background: #ebb929">
+                        <svg class="sp-example__titlebar-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" fill="rgba(255,255,255,0.9)"/></svg>
+                        <span class="sp-example__titlebar-name">Noebull Automotive</span>
+                    </div>
+                    <div class="sp-example__chat-body">
+                        <div class="sp-example__msg sp-example__msg--visitor">
+                            <div class="sp-example__msg-bubble">My car is making funny noises.</div>
+                        </div>
+                        <div class="sp-example__msg sp-example__msg--agent">
+                            <div class="sp-example__msg-bubble">That could be a few things depending on when you hear it. Does it happen when you're braking, accelerating, turning, or just idling? That'll help us narrow it down before you bring it in.</div>
+                        </div>
+                        <div class="sp-example__msg sp-example__msg--agent">
+                            <div class="sp-example__msg-bubble">Would you like me to help you schedule an appointment?</div>
+                        </div>
+                    </div>
+                    <div class="sp-example__input"><span>Type here...</span></div>
+                </a>
+
             </div>
         </div>
     </section>
@@ -142,9 +174,7 @@ if (!defined('ABSPATH')) exit;
                 <p>We deploy it to your website with your branding. You review the conversations, tell us what to tweak, and within a week you've got an AI employee that knows your business better than most of your actual employees.</p>
             </div>
             <div class="sp-split__media reveal" style="--delay: 0.2s">
-                <div class="sp-image-placeholder">
-                    IMAGE — Setup process or deployment
-                </div>
+                <img src="/wp-content/uploads/2026/02/ai-chat-agent-deployed-laptop-website.png" alt="Satisfied business owner leaning back in his chair with arms crossed while a friendly glowing AI assistant waves from a chat bubble on his laptop screen" loading="lazy">
             </div>
         </div>
     </section>

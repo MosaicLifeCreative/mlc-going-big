@@ -1,6 +1,6 @@
 // ════════════════════════════════════════════════════════════
 // GLOBAL SCRIPTS - ALL PAGES
-// Version: 1.5.0 | Last Updated: Feb 23, 2026
+// Version: 1.5.3 | Last Updated: Feb 24, 2026
 // ════════════════════════════════════════════════════════════
 
 (function() {
@@ -14,6 +14,28 @@
             localStorage.setItem('mlc_visited', Date.now().toString());
         } catch (e) { /* localStorage blocked */ }
     })();
+
+    // ─── CHATLING INLINE EMBED SCROLL FIX ─────────────────────
+    // Chatling scrolls the page to its embed on init. Guard against
+    // any programmatic scroll for 3s, but back off on user input.
+    const chtlInline = document.getElementById('chtl-inline-bot');
+    if (chtlInline) {
+        let userInteracted = false;
+        const markInteraction = () => { userInteracted = true; };
+        ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(evt =>
+            document.addEventListener(evt, markInteraction, { once: true, passive: true })
+        );
+        const scrollGuard = () => {
+            if (!userInteracted && window.scrollY > 0) window.scrollTo(0, 0);
+        };
+        window.addEventListener('scroll', scrollGuard);
+        setTimeout(() => {
+            window.removeEventListener('scroll', scrollGuard);
+            ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(evt =>
+                document.removeEventListener(evt, markInteraction)
+            );
+        }, 3000);
+    }
 
     // ─── NAV CONFIGURATION ──────────────────────────────────────
     // Photos come from MLC Toolkit plugin via wp_localize_script (mlcPhotos global)
@@ -272,6 +294,39 @@
         document.addEventListener('DOMContentLoaded', initReveal);
     } else {
         initReveal();
+    }
+
+    // ─── CHAT EXAMPLE CASCADE ANIMATION ─────────────────────────
+    // Messages appear one at a time when chat cards scroll into view
+    function initChatCascade() {
+        const container = document.querySelector('.sp-examples');
+        if (!container) return;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                observer.unobserve(entry.target);
+
+                const cards = entry.target.querySelectorAll('.sp-example');
+                let globalDelay = 0;
+                cards.forEach(card => {
+                    const msgs = card.querySelectorAll('.sp-example__msg');
+                    msgs.forEach(msg => {
+                        setTimeout(() => msg.classList.add('msg-visible'), globalDelay);
+                        globalDelay += 800;
+                    });
+                    globalDelay += 400; // extra pause between cards
+                });
+            });
+        }, { threshold: 0.2 });
+
+        observer.observe(container);
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initChatCascade);
+    } else {
+        initChatCascade();
     }
 
     // ─── COUNTDOWN TIMER (NON-LANDING PAGES) ───────────────────

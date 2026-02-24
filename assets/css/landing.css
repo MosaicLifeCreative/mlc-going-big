@@ -1729,52 +1729,125 @@ body:has(#wheatley-message) .cursor-blink {
     color: rgba(255, 255, 255, 0.5);
 }
 
-/* ─── SP EXAMPLES (Clickable Cards) ────────────── */
+/* ─── SP EXAMPLES (Chat Window Cards) ──────────── */
+
+.sp-examples__heading {
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 800;
+    letter-spacing: -2px;
+    color: #fff;
+    margin: 0 0 16px;
+    text-align: center;
+}
+
+.sp-examples__desc {
+    font-size: clamp(16px, 1.8vw, 19px);
+    color: rgba(255, 255, 255, 0.55);
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
 
 .sp-examples {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: clamp(16px, 2vw, 24px);
-    max-width: 1400px;
-    margin: clamp(32px, 4vw, 56px) auto 0;
+    gap: clamp(16px, 2vw, 28px);
+    max-width: 1200px;
+    margin: clamp(40px, 5vw, 64px) auto 0;
 }
 
 .sp-example {
-    display: block;
-    padding: clamp(24px, 3vw, 36px);
-    background: rgba(124, 58, 237, 0.04);
-    border: 1px solid rgba(124, 58, 237, 0.12);
-    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    background: #f5f5f5;
+    border-radius: 16px;
+    overflow: hidden;
     text-decoration: none;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.sp-section--dark .sp-example {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.1);
-}
-
 .sp-example:hover {
     transform: translateY(-6px);
-    box-shadow: 0 16px 40px rgba(124, 58, 237, 0.12);
-    border-color: rgba(124, 58, 237, 0.3);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
 }
 
-.sp-example__name {
-    font-size: clamp(18px, 2vw, 22px);
-    font-weight: 700;
-    color: var(--primary);
-    margin: 0 0 6px;
+.sp-example__titlebar {
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.sp-example__desc {
-    font-size: clamp(14px, 1.5vw, 16px);
-    color: rgba(0, 0, 0, 0.5);
-    margin: 0;
+.sp-example__titlebar-icon {
+    flex-shrink: 0;
 }
 
-.sp-section--dark .sp-example__desc {
-    color: rgba(255, 255, 255, 0.4);
+.sp-example__titlebar-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.2px;
+}
+
+.sp-example__chat-body {
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+}
+
+.sp-example__msg {
+    display: flex;
+}
+
+.sp-example__msg--visitor {
+    justify-content: flex-end;
+}
+
+.sp-example__msg--agent {
+    justify-content: flex-start;
+}
+
+.sp-example__msg-bubble {
+    max-width: 88%;
+    padding: 10px 14px;
+    border-radius: 14px;
+    font-size: clamp(12px, 1.2vw, 13px);
+    line-height: 1.55;
+}
+
+.sp-example__msg--visitor .sp-example__msg-bubble {
+    background: var(--primary);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+
+.sp-example__msg--agent .sp-example__msg-bubble {
+    background: #e8e8e8;
+    color: rgba(0, 0, 0, 0.8);
+    border-bottom-left-radius: 4px;
+}
+
+.sp-example__input {
+    padding: 14px 18px;
+    background: #eee;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.3);
+}
+
+/* Chat message cascade animation */
+.sp-example__msg {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.sp-example__msg.msg-visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* ─── SP CTA (Full-Width) ──────────────────────── */
@@ -1901,10 +1974,19 @@ body:has(#wheatley-message) .cursor-blink {
 }
 
 .sp-value {
+    position: relative;
     padding: clamp(28px, 3vw, 40px);
     border-radius: 16px;
-    border-top: 4px solid;
-    border-image: linear-gradient(135deg, var(--primary), var(--secondary)) 1;
+    overflow: hidden;
+}
+.sp-value::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
 }
 
 .sp-section--light .sp-value {
@@ -2576,6 +2658,7 @@ body:has(#wheatley-message) .cursor-blink {
 
     .sp-examples {
         grid-template-columns: 1fr;
+        max-width: 400px;
     }
 
     .sp-about-split {
