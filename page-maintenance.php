@@ -49,9 +49,7 @@ if (!defined('ABSPATH')) exit;
                 <p>The agency that built your site? They moved on six months ago. And the "I'll just click Update All" approach? That's how you end up staring at a white screen on a Tuesday morning wondering what happened.</p>
             </div>
             <div class="sp-split__media reveal" style="--delay: 0.2s">
-                <div class="sp-image-placeholder">
-                    IMAGE — Business owner staring at broken/crashed website screen
-                </div>
+                <img src="/wp-content/uploads/2026/02/website-maintenance-broken-site-panic.png" alt="Panicked business owner staring at laptop screen full of red warning errors and notification popups in a dark office" loading="lazy">
             </div>
         </div>
     </section>
@@ -104,9 +102,7 @@ if (!defined('ABSPATH')) exit;
                 <p>Maintenance is a fraction of what it costs to rebuild after something goes wrong. And unlike the agency that built your site and moved on, we actually stick around.</p>
             </div>
             <div class="sp-split__media reveal" style="--delay: 0.2s">
-                <div class="sp-image-placeholder">
-                    IMAGE — Calm business owner with site health dashboard showing green status
-                </div>
+                <img src="/wp-content/uploads/2026/02/website-maintenance-confident-conference-room.png" alt="Confident business owner sitting in conference room with arms crossed, green site health dashboard showing zero issues on wall monitor behind him" loading="lazy">
             </div>
         </div>
     </section>
