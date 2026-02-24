@@ -49,9 +49,7 @@ if (!defined('ABSPATH')) exit;
                 <p>You need something people actually remember. A site that feels like walking into your best showroom, not browsing a template gallery.</p>
             </div>
             <div class="sp-split__media reveal" style="--delay: 0.2s">
-                <div class="sp-image-placeholder">
-                    IMAGE — Generic template collage vs custom design
-                </div>
+                <img src="/wp-content/uploads/2026/02/website-design-generic-template-hallway.png" alt="Overwhelmed business owner walking through endless hallway of identical generic website templates" loading="lazy">
             </div>
         </div>
     </section>
@@ -94,9 +92,7 @@ if (!defined('ABSPATH')) exit;
                 <p>We build for the person on their phone at 10 PM deciding between you and the other guy. That decision takes about three seconds. Your website needs to win it.</p>
             </div>
             <div class="sp-split__media reveal" style="--delay: 0.2s">
-                <div class="sp-image-placeholder">
-                    IMAGE — Custom design process or before/after
-                </div>
+                <img src="/wp-content/uploads/2026/02/custom-website-design-business-owner-excited.png" alt="Excited business owner pointing at a custom website design on his monitor in a warm creative office" loading="lazy">
             </div>
         </div>
     </section>

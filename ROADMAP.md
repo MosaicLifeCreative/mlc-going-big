@@ -105,14 +105,21 @@
   - Upload via MLC Toolkit admin page
 - [ ] **Custom photo captions and credits** per image
 
-### 5. Site Pages
-- [ ] **Website Design page** (placeholder deployed, needs full content build)
-- [ ] **Services overview page** (from mockup - two-column AI Agents + Websites)
-- [ ] **How We Work page** (timeline/stepper design)
-- [ ] **Examples page** (card grid, not portfolio)
-- [ ] **Let's Talk page** (Calendly + simple form)
-- [ ] **About page** (personal story, values)
-- [ ] **Contact page** (form + info)
+### 5. Site Pages (sp- Design System)
+- [x] **AI Chat Agents** (sp- system + Wheatley void + inline Chatling embed)
+- [x] **Website Design** (sp- system + blue portal + Pixar images)
+- [x] **Hosting** (sp- system + orange portal, white-labeled) — 2 image placeholders remaining
+- [x] **About** (sp- system + Myst journal records + Wheatley footnote [42])
+- [x] **Email Marketing** (sp- system + corrupted inbox Wheatley treatment + Pixar images)
+- [ ] **Maintenance** (sp- system + Wheatley terminal/hatch treatment TBD)
+- [ ] **Contact** (sp- system + minimal Wheatley treatment TBD)
+
+### 5b. Page Images (Pixar-Style, Consistent Character)
+- [x] **Email Marketing** — subscription trap (stressed) + infrastructure calm (relaxed)
+- [x] **Website Design** — generic template hallway + custom design excitement
+- [ ] **Hosting** — server chaos + dashboard monitoring (2 placeholders)
+- [ ] **Maintenance** — TBD (page not yet rebuilt)
+- [ ] **Contact** — TBD (page not yet rebuilt)
 
 ### 6. Advanced Wheatley Features (Future)
 - [ ] Hunt meta-commentary based on countdown proximity
@@ -127,6 +134,18 @@
 - [ ] Mobile QA
 - [ ] Analytics setup
 - [ ] Launch checklist execution
+
+---
+
+## Post-Launch
+
+### 8. Product Showcase Page
+- [ ] **Page or section to show off other web products**
+  - Shelf
+  - ManlyMan
+  - WP dev tools plugin
+  - Design approach TBD (could be standalone page or section on About/Services)
+  - Should demonstrate range beyond client work (products, tools, side projects)
 
 ---
 
@@ -151,10 +170,10 @@ All new page templates follow this structure:
 5. Conditional JS loading (global.js everywhere, landing.js only on landing page)
 
 ### File Versions
-- **landing.css:** v1.3.3 (nav + landing + services + share + CTA fixes + mobile spacing)
+- **landing.css:** v1.4.9 (sp- system + corrupted inbox + image border-radius + portal + cursor color cycling)
 - **landing.js:** v1.7.2 (Wheatley AI, Chatling, hunt, nav, share API, session-persistent personalization)
-- **global.js:** v1.2.0 (nav with dynamic photo support, Chatling fade-in)
-- **functions.php:** v1.8.1 (dynamic photo rendering, plugin integration, 9-item nav with mobile photos)
+- **global.js:** v1.5.0 (nav + scroll reveals + countdown + Wheatley page sections + hamburger contrast)
+- **functions.php:** v1.9.2 (Wheatley APIs + SHADE + gradient blobs + countdown + global footer)
 - **mlc-toolkit plugin:** v1.0.1 (photo management, share analytics, URL shortener, dashboard widget, legacy domain redirect)
 
 ### MLC Toolkit Plugin

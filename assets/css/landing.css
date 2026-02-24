@@ -1499,6 +1499,13 @@ body:has(#wheatley-message) .cursor-blink {
     position: relative;
 }
 
+/* ─── Direct images in split media ─── */
+.sp-split__media > img {
+    width: 100%;
+    border-radius: 16px;
+    display: block;
+}
+
 /* ─── Inline Chat Embed ─── */
 .sp-inline-chat {
     width: 100%;
@@ -2622,6 +2629,238 @@ body:has(#wheatley-message) .cursor-blink {
     }
 
     .wheatley-void__label {
+        font-size: 9px;
+        letter-spacing: 2px;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SP CORRUPTED INBOX — Email Marketing Wheatley treatment
+   Fake email inbox UI with glitching competitor rows
+   ═══════════════════════════════════════════════════════════ */
+
+.sp-corrupted-inbox {
+    position: relative;
+    width: 100%;
+    min-height: clamp(520px, 70vh, 740px);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 79px,
+            rgba(124, 58, 237, 0.05) 79px,
+            rgba(124, 58, 237, 0.05) 80px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 79px,
+            rgba(124, 58, 237, 0.05) 79px,
+            rgba(124, 58, 237, 0.05) 80px
+        ),
+        #050505;
+    background-attachment: fixed, fixed, fixed;
+}
+
+/* Radial glow */
+.sp-corrupted-inbox::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        ellipse 60% 50% at 50% 50%,
+        rgba(124, 58, 237, 0.1) 0%,
+        rgba(6, 182, 212, 0.04) 35%,
+        transparent 70%
+    );
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Scanlines */
+.sp-corrupted-inbox::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.06) 2px,
+        rgba(0, 0, 0, 0.06) 4px
+    );
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Content layer */
+.sp-corrupted-inbox__content {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 40px clamp(20px, 5vw, 80px);
+}
+
+/* System label */
+.sp-corrupted-inbox__label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: rgba(124, 58, 237, 0.3);
+    text-transform: uppercase;
+    margin-bottom: 28px;
+}
+
+/* Inbox panel card */
+.sp-corrupted-inbox__panel {
+    width: 100%;
+    max-width: 580px;
+    background: rgba(17, 17, 17, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5), 0 0 40px rgba(124, 58, 237, 0.05);
+}
+
+/* Header bar */
+.sp-corrupted-inbox__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+/* Email rows */
+.sp-corrupted-inbox__row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    font-family: var(--font-mono);
+    font-size: clamp(11px, 1.4vw, 13px);
+    color: rgba(255, 255, 255, 0.25);
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sp-corrupted-inbox__sender {
+    flex: 0 0 clamp(90px, 15vw, 140px);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: rgba(255, 255, 255, 0.35);
+}
+
+.sp-corrupted-inbox__subject {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sp-corrupted-inbox__time {
+    flex: 0 0 auto;
+    color: rgba(255, 255, 255, 0.15);
+    font-size: 10px;
+}
+
+/* Glitch animation for corrupted rows */
+.sp-corrupted-inbox__row--corrupted {
+    animation: inboxGlitch 4s ease-in-out infinite;
+    animation-delay: var(--delay, 0s);
+}
+
+@keyframes inboxGlitch {
+    0%, 85%, 100% { transform: translateX(0); opacity: 1; }
+    88%           { transform: translateX(3px); opacity: 0.55; }
+    90%           { transform: translateX(-2px); opacity: 0.8; }
+    92%           { transform: translateX(1px); opacity: 0.65; }
+    95%           { transform: translateX(0); opacity: 1; }
+}
+
+/* Separator between corrupted rows and Wheatley email */
+.sp-corrupted-inbox__separator {
+    margin: 4px 20px;
+    border-top: 1px dashed rgba(124, 58, 237, 0.15);
+}
+
+/* Wheatley email section */
+.sp-corrupted-inbox__email {
+    padding: 16px 20px 24px;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.sp-corrupted-inbox__field {
+    font-family: var(--font-mono);
+    font-size: clamp(11px, 1.4vw, 13px);
+    color: rgba(255, 255, 255, 0.4);
+    margin-bottom: 6px;
+    line-height: 1.5;
+}
+
+.sp-corrupted-inbox__field-label {
+    color: var(--primary);
+    margin-right: 6px;
+}
+
+/* Message body — where typewriter text appears */
+.sp-corrupted-inbox__body {
+    font-family: var(--font-main);
+    font-size: clamp(18px, 2.8vw, 26px);
+    font-weight: 400;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.75);
+    margin-top: 16px;
+    min-height: 40px;
+    letter-spacing: -0.3px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .sp-corrupted-inbox {
+        min-height: clamp(460px, 65vh, 600px);
+        background-attachment: scroll;
+    }
+
+    .sp-corrupted-inbox__panel {
+        max-width: 100%;
+    }
+
+    .sp-corrupted-inbox__row {
+        font-size: 11px;
+        padding: 10px 16px;
+        gap: 8px;
+    }
+
+    .sp-corrupted-inbox__sender {
+        flex: 0 0 80px;
+    }
+
+    .sp-corrupted-inbox__header {
+        padding: 12px 16px;
+    }
+
+    .sp-corrupted-inbox__email {
+        padding: 14px 16px 20px;
+    }
+
+    .sp-corrupted-inbox__body {
+        font-size: clamp(16px, 4.5vw, 22px);
+    }
+
+    .sp-corrupted-inbox__label {
         font-size: 9px;
         letter-spacing: 2px;
     }

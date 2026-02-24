@@ -8,14 +8,15 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 
 ## Quick Start (For New Sessions)
 
-**Current Status:** Hosting page rebuilt with sp- system + orange portal. About page rebuilt with clean bio + Myst journal records + Wheatley as footnote [42]. Wheatley cursor cycles brand colors on each blink. Hamburger contrast bug fixed. Em-dash ban site-wide.
+**Current Status:** Email Marketing page rebuilt with sp- system + corrupted inbox Wheatley treatment. Website Design + Email Marketing pages have final Pixar-style images (image placeholders replaced). 5 of 7 pages complete. Hosting page still has 2 image placeholders. Wheatley cursor cycles brand colors on each blink. Em-dash ban site-wide.
 
 **Next Priorities:**
-1. Apply sp- design + Wheatley sections to remaining 3 pages (Maintenance, Email Marketing, Contact)
-2. Page-specific Wheatley treatments (terminal screen, corrupted email, minimal)
-3. Photo slideshow expansion (50-100 photos with hunt clues)
-4. HUNT knowledge base for Chatling
-5. Quest site deployment (4815162342.quest)
+1. Generate Pixar-style images for Hosting page (2 placeholders remaining)
+2. Apply sp- design + Wheatley sections to remaining 2 pages (Maintenance, Contact)
+3. Page-specific Wheatley treatments (terminal screen, minimal)
+4. Photo slideshow expansion (50-100 photos with hunt clues)
+5. HUNT knowledge base for Chatling
+6. Quest site deployment (4815162342.quest)
 
 ---
 
@@ -28,10 +29,10 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 | `page-website-design.php` | v2 | Website Design — full rebuild with sp- system + Portal 2-style oval portal |
 | `page-hosting.php` | v2 | Hosting - sp- system + orange portal linking to Website Design |
 | `page-maintenance.php` | v1 | Maintenance service page (sp- structure) |
-| `page-email-marketing.php` | v1 | Email Marketing service page (sp- structure) |
+| `page-email-marketing.php` | v2 | Email Marketing - sp- system + corrupted inbox Wheatley treatment |
 | `page-about.php` | v2 | About - clean bio + Myst journal records + Wheatley as footnote [42] |
 | `page-contact.php` | v1 | Contact page (sp- structure) |
-| `assets/css/landing.css` | 1.4.8 | All styles + sp- system + sp-journal + Wheatley void + global footer + portal + cursor color cycling |
+| `assets/css/landing.css` | 1.4.9 | All styles + sp- system + sp-journal + Wheatley void + corrupted inbox + global footer + portal + cursor color cycling |
 | `assets/js/landing.js` | 1.7.2 | Interactive behaviors + Wheatley + share API + session persistence |
 | `assets/js/global.js` | 1.5.0 | Nav + Chatling + scroll reveals + countdown + Wheatley page sections |
 | `functions.php` | 1.9.2 | Enqueue + hunt + Wheatley APIs (with SHADE directive) + gradient blobs + countdown footer + global footer + Chatling exclusion |
@@ -50,13 +51,13 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 ├── page-website-design.php   (Website Design — sp- system + Portal 2-style oval portal)
 ├── page-hosting.php          (Hosting - sp- system + orange portal)
 ├── page-maintenance.php      (Maintenance service page)
-├── page-email-marketing.php  (Email Marketing service page)
+├── page-email-marketing.php  (Email Marketing - sp- system + corrupted inbox)
 ├── page-about.php            (About - clean bio + Myst journal records)
 ├── page-contact.php          (Contact page)
 ├── functions.php              (v1.9.2 - Enqueue + hunt + Wheatley APIs + SHADE + gradient blobs + countdown + footer)
 ├── assets/
 │   ├── css/
-│   │   └── landing.css       (v1.4.8 - sp- system + sp-journal + Wheatley void + footer + portal + cursor color cycling)
+│   │   └── landing.css       (v1.4.9 - sp- system + sp-journal + Wheatley void + corrupted inbox + footer + portal + cursor color cycling)
 │   └── js/
 │       ├── global.js         (v1.5.0 - nav + scroll reveals + countdown + Wheatley page sections)
 │       └── landing.js        (v1.7.2 - Wheatley + share API + session persistence)
@@ -359,7 +360,7 @@ RESPONSE RULES:
 - Hosting: Orange portal with flame ring → click navigates to Website Design (COMPLETE)
 - About: Wheatley disguised as footnote [42] in journal section, conspiratorial tone (COMPLETE)
 - Maintenance: Maintenance hatch or terminal screen (TBD)
-- Email Marketing: Corrupted email UI (TBD)
+- Email Marketing: Corrupted inbox UI with glitching competitor emails (COMPLETE)
 - Contact: Minimal treatment (TBD)
 
 **Wheatley Cursor Color Cycling:**
@@ -478,6 +479,15 @@ Full-bleed, full-width sections with dramatic scale. No more "cards in a contain
 - Gradient top border on each card
 - Used on About page for company beliefs
 
+**13. Corrupted Inbox (`sp-corrupted-inbox`)** — Fake email client Wheatley treatment
+- Dark section with wheatley-void grid/scanline/glow background
+- Centered inbox panel card (dark bg, monospace, rounded corners)
+- 4 corrupted competitor email rows (Mailchimp, Constant Contact, no-reply, billing) with `@keyframes inboxGlitch` staggered animation
+- Separator, then Wheatley's "email" with FROM/SUBJ fields and typewriter body
+- Reuses `wheatleyCursorBlink` animation and `wheatley-void__grid` perspective layer
+- `data-wheatley-page="email-marketing"` triggers existing `initWheatleySection()` in global.js
+- Used on Email Marketing page
+
 ### Scroll Animations
 - `.reveal` class → IntersectionObserver (15% threshold) → `.in-view` class
 - CSS: `opacity: 0` + `translateY(40px)` → `opacity: 1` + `translateY(0)`, 0.8s ease
@@ -501,6 +511,8 @@ General pattern: `sp-hero` → content sections (splits, statement, process, por
 
 **About page pattern:** `sp-hero` → `sp-statement` manifesto → dark `sp-about-split` (photo + bio) → `sp-values` (3 cards) → `sp-journal` (sidebar + Ages + footnotes with Wheatley as [42]) → `sp-cta`
 
+**Email Marketing page pattern:** `sp-hero` → `sp-statement` manifesto (subscription trap) → dark split (The Subscription Trap) → `sp-features` (4 items: campaigns, automation, segmentation, analytics) → dark split (Infrastructure You Own) → `sp-corrupted-inbox` (Wheatley in fake email UI) → `sp-cta`
+
 ### Hamburger Contrast
 - IntersectionObserver detects dark/light sections for hamburger icon color
 - rAF-throttled scroll listener added as backup (IntersectionObserver alone misses fast scrolling)
@@ -520,6 +532,7 @@ General pattern: `sp-hero` → content sections (splits, statement, process, por
 - `page-website-design.php` — Full sp- system with blue portal section, reference for portal implementation
 - `page-hosting.php` — sp- system with orange portal variant, white-labeled hosting copy
 - `page-about.php` — Two-layer page: clean bio + Myst journal records, reference for sp-journal system
+- `page-email-marketing.php` — sp- system with corrupted inbox Wheatley treatment, white-labeled Sendy/AWS copy
 - `page-ai-chat-agents.php` — Pilot page, reference for Wheatley void + inline Chatling embed
 - `services-mockup.html` — Original two-column mockup (superseded, kept for reference)
 
@@ -592,7 +605,7 @@ General pattern: `sp-hero` → content sections (splits, statement, process, por
 ## File Versions & Status
 
 **Current Deployed:**
-- CSS: v1.4.8 (sp- system + sp-journal + Wheatley void + global footer + portal + cursor color cycling)
+- CSS: v1.4.9 (sp- system + sp-journal + Wheatley void + corrupted inbox + global footer + portal + cursor color cycling)
 - JS (landing): v1.7.2 (share API integration + session-persistent personalization)
 - JS (global): v1.5.1 (nav + scroll reveals + countdown + Wheatley page sections + hamburger contrast fix)
 - PHP: v1.9.2 (Wheatley APIs with SHADE directive + global footer + Chatling exclusion)
@@ -670,14 +683,33 @@ Current prototype needs refinement:
 - Don't rebuild yet - refinement session needed to determine progression
 
 ### 4. Remaining Site Pages — sp- Design + Wheatley Treatments
-All 7 page templates created. AI Chat Agents, Website Design, Hosting, and About are complete. Remaining 3 need:
+All 7 page templates created. AI Chat Agents, Website Design, Hosting, About, and Email Marketing are complete (5 of 7). Remaining 2 need:
 - Content refinement and image placeholders
 - Page-specific Wheatley treatments:
   - Maintenance: Maintenance hatch or terminal screen (TBD)
-  - Email Marketing: Corrupted email UI (TBD)
   - Contact: Minimal treatment (TBD)
 
-### 5. Advanced Wheatley Features
+### 5. Page Images — Pixar-Style Generation
+Consistent Pixar-quality 3D animated illustration style across all service pages. Recurring character: slim, average-build small business owner with warm skin, short neat brown hair, brown eyebrows, large expressive eyes, dress shirt with loosened necktie.
+
+**Style rules for DALL-E prompts:**
+- "Pixar theatrical release quality" (NOT claymation, NOT stop-motion)
+- Same character description in every prompt for consistency
+- "Every element should look like a rendered Pixar set piece, not a photograph"
+- Hand anatomy note required: "Hands should have exactly five fingers each, properly proportioned"
+- Screen content: "Numbers and icons only, no words or text" (AI generates gibberish text)
+- Background must stay in animated world (avoid DSLR bokeh / photorealism)
+
+**Image status:**
+- Email Marketing: 2 images complete (subscription trap + infrastructure calm)
+- Website Design: 2 images complete (template hallway + custom design excitement)
+- Hosting: 2 placeholders remaining (server chaos + dashboard monitoring)
+- AI Chat Agents: No image needed (inline Chatling embed)
+- About: No image placeholders
+- Maintenance: TBD (page not yet rebuilt)
+- Contact: TBD (page not yet rebuilt)
+
+### 6. Advanced Wheatley Features
 - Hunt meta-commentary based on countdown proximity
 - Session memory (sessionStorage tracking)
 - Tab visibility detection
@@ -781,7 +813,8 @@ All 7 page templates created. AI Chat Agents, Website Design, Hosting, and About
 - ✅ Portal system (oval viewport, flame ring, scrolling screenshot, side annotation)
 - ✅ Wheatley cursor color cycling (brand colors on each blink)
 - ✅ Hamburger contrast fix (rAF scroll listener backup)
-- 📋 Remaining 3 pages: Maintenance, Email Marketing, Contact
+- ✅ Email Marketing page (sp- system + corrupted inbox Wheatley treatment)
+- 📋 Remaining 2 pages: Maintenance, Contact
 - 📋 Quest site completion (Snake 451 + final stages)
 
 ### Phase 6: Polish & Launch (FUTURE)
@@ -920,9 +953,9 @@ All 7 page templates created. AI Chat Agents, Website Design, Hosting, and About
 - Hosting: Orange portal with flame ring → Website Design (COMPLETE)
 - About: Wheatley as footnote [42], conspiratorial tone (COMPLETE)
 - Maintenance: Maintenance hatch or terminal screen (TBD)
-- Email Marketing: Corrupted email UI (TBD)
+- Email Marketing: Corrupted inbox UI with glitching competitor emails (COMPLETE)
 - Contact: Minimal treatment (TBD)
-- Status: 4 of 7 complete
+- Status: 5 of 7 complete
 - Date: Feb 23, 2026
 
 **2026-02-23: Global Site Footer**
