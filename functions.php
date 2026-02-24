@@ -380,7 +380,9 @@ Generate ONE message for this page section.";
             'max_tokens' => 120,
             'system' => $system_prompt,
             'messages' => array(
-                array('role' => 'user', 'content' => 'Generate a message for this page section.')
+                array('role' => 'user', 'content' => $page_slug === 'contact'
+                    ? 'Draft a short message as if you are the visitor writing to MLC through their contact form. Your output goes directly into the textarea. No commentary, no meta-text, just the draft message itself.'
+                    : 'Generate a message for this page section.')
             )
         )),
         'timeout' => 30

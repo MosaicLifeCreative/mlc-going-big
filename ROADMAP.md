@@ -139,7 +139,24 @@
 
 ## Post-Launch
 
-### 8. Product Showcase Page
+### 8. Client Proposal System
+- [ ] **Custom post type** (`mlc_proposal`) for individual client proposals
+- [ ] **MLC Toolkit plugin integration** for creating and managing proposals
+  - Add/remove services with pricing per proposal
+  - Upload client logo
+  - Set accent color(s) to match client branding
+  - Set PIN or password for proposal access
+- [ ] **Frontend template** (`single-mlc_proposal.php`) with sp- design system styling
+  - Password/PIN gate before viewing
+  - Client logo + custom accent colors applied via inline CSS variables
+  - Service line items with pricing
+  - Total / summary section
+  - Accept / contact CTA
+- [ ] **Unique URLs** per proposal (e.g., `/proposal/client-name/`)
+- [ ] **Admin UI** in MLC Toolkit for proposal CRUD
+- [ ] **Proposal status tracking** (draft, sent, viewed, accepted, expired)
+
+### 9. Product Showcase Page
 - [ ] **Page or section to show off other web products**
   - Shelf
   - ManlyMan
@@ -170,7 +187,7 @@ All new page templates follow this structure:
 5. Conditional JS loading (global.js everywhere, landing.js only on landing page)
 
 ### File Versions
-- **landing.css:** v1.5.3 (sp- system + corrupted inbox + terminal + CF7 overrides + image border-radius + portal + cursor color cycling)
+- **landing.css:** v1.5.6 (sp- system + corrupted inbox + terminal + CF7 overrides + contact dark card + portal + cursor color cycling)
 - **landing.js:** v1.7.2 (Wheatley AI, Chatling, hunt, nav, share API, session-persistent personalization)
 - **global.js:** v1.5.0 (nav + scroll reveals + countdown + Wheatley page sections + hamburger contrast)
 - **functions.php:** v1.9.2 (Wheatley APIs + SHADE + gradient blobs + countdown + global footer)
