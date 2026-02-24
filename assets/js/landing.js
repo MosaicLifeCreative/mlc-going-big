@@ -193,58 +193,51 @@
     function checkIdleTime() {
         const now = Date.now();
         const timeOnPage = Math.floor((now - state.sessionStart) / 1000);
-        
+
         state.idleTime = timeOnPage;
-        
-        // Stop all idle checks if Chatling has taken over
-        if (state.wheatleyActive || state.chatlingHandoff) return;
-        
-        const thresholds = [30, 180, 600, 1200, 1800];
-        
-        for (let i = 0; i < thresholds.length; i++) {
-            if (timeOnPage >= thresholds[i] && state.wheatleyMessageCount === i) {
-                triggerWheatley(i + 1);
-                state.wheatleyMessageCount++;
-                break;
-            }
-        }
-        
-        if (timeOnPage >= 1800 && timeOnPage < 5400 && timeOnPage % 600 === 0) {
-            const extraMessages = Math.floor((timeOnPage - 1800) / 600);
-            if (state.wheatleyMessageCount === 5 + extraMessages) {
-                triggerWheatley(6 + extraMessages);
-                state.wheatleyMessageCount++;
-            }
+
+        // Don't fire while tab is hidden or during active message
+        if (state.wheatleyActive || state.chatlingHandoff || document.hidden) return;
+
+        // 90-minute finale
+        if (timeOnPage >= 5400 && state.wheatleyMessageCount < 999) {
+            state.wheatleyMessageCount = 999;
+            triggerWheatley(999);
+            return;
         }
 
-        if (timeOnPage >= 5400 && state.wheatleyMessageCount < 999) {
-            triggerWheatley(999);
-            state.wheatleyMessageCount = 999;
+        // Find the latest threshold we've passed (skips missed ones from backgrounded tabs)
+        const thresholds = [30, 180, 600, 1200, 1800];
+        let targetCount = 0;
+        for (let i = 0; i < thresholds.length; i++) {
+            if (timeOnPage >= thresholds[i]) targetCount = i + 1;
+        }
+
+        // Extra messages after 30m (every 10m)
+        if (timeOnPage >= 1800 && timeOnPage < 5400) {
+            targetCount = 5 + Math.floor((timeOnPage - 1800) / 600) + 1;
+        }
+
+        // Only fire if we haven't reached this message yet
+        if (targetCount > state.wheatleyMessageCount) {
+            state.wheatleyMessageCount = targetCount;
+            triggerWheatley(targetCount);
         }
     }
 
     // ─── CONTEXT DETECTION ────────────────────────────────
-    function detectVisitorType() {
-        const visitKey = 'mlc_visited';
-        const countKey = 'mlc_visit_count';
-        
-        let isReturning = false;
-        let visitCount = 1;
-        
+    // Cached visitor info (set once on page load, reused for all Wheatley triggers)
+    const cachedVisitor = (function() {
         try {
-            const lastVisit = localStorage.getItem(visitKey);
-            if (lastVisit) {
-                isReturning = true;
-                visitCount = parseInt(localStorage.getItem(countKey) || '1') + 1;
-            }
-            
-            localStorage.setItem(visitKey, Date.now().toString());
-            localStorage.setItem(countKey, visitCount.toString());
+            const count = parseInt(localStorage.getItem('mlc_visit_count') || '0');
+            return { isReturning: count > 0, visitCount: count };
         } catch (e) {
-            // localStorage blocked - treat as new visitor
+            return { isReturning: false, visitCount: 1 };
         }
-        
-        return { isReturning, visitCount };
+    })();
+
+    function detectVisitorType() {
+        return cachedVisitor;
     }
 
     function getCurrentTime() {
@@ -432,7 +425,17 @@
             textNode.nodeValue += messageText[i];
             await sleep(30);
         }
-        
+
+        // Convert markdown links to real <a> tags after typing finishes
+        // Matches [text](url) pattern
+        const raw = wheatleyContainer.textContent;
+        if (raw.includes('](')) {
+            wheatleyContainer.innerHTML = raw.replace(
+                /\[([^\]]+)\]\(([^)]+)\)/g,
+                '<a href="$2" style="color: var(--secondary); text-decoration: underline; text-decoration-color: rgba(6,182,212,0.3); text-underline-offset: 4px; transition: color 0.3s ease;">$1</a>'
+            );
+        }
+
         // Add cursor
         const cursor = document.createElement('span');
         cursor.className = 'wheatley-cursor';

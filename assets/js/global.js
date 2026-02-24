@@ -6,6 +6,15 @@
 (function() {
     'use strict';
 
+    // ─── VISIT COUNTER (once per page load, all pages) ───────────
+    (function incrementVisitCount() {
+        try {
+            const count = parseInt(localStorage.getItem('mlc_visit_count') || '0');
+            localStorage.setItem('mlc_visit_count', (count + 1).toString());
+            localStorage.setItem('mlc_visited', Date.now().toString());
+        } catch (e) { /* localStorage blocked */ }
+    })();
+
     // ─── NAV CONFIGURATION ──────────────────────────────────────
     // Photos come from MLC Toolkit plugin via wp_localize_script (mlcPhotos global)
     // Fallback to hardcoded defaults if plugin not active

@@ -58,7 +58,7 @@ if (!defined('ABSPATH')) exit;
         </div>
         
         <!-- Share Button (Bottom Left) -->
-        <button class="share-btn" id="shareBtn">Personalize & Share</button>
+        <button class="share-btn" id="shareBtn">Share //</button>
     </div>
 
     <!-- Hunt Modal -->

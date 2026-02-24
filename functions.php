@@ -46,7 +46,7 @@ function mlc_enqueue_global_assets() {
         'mlc-global-css',
         get_stylesheet_directory_uri() . '/assets/css/landing.css',
         array(),
-        '1.5.6',
+        '1.5.7',
         'all'
     );
 
@@ -55,7 +55,7 @@ function mlc_enqueue_global_assets() {
         'mlc-global-js',
         get_stylesheet_directory_uri() . '/assets/js/global.js',
         array(),
-        '1.5.0',
+        '1.5.1',
         true
     );
 }
@@ -199,7 +199,9 @@ Someone sent this person here via a share link. You MUST address them personally
 " . $personalization_block . "
 PERSONALITY:
 - Voice: Often start with 'Right, so...' or 'Alright,' 'Okay,' 'Listen,' 'Hang on'
-- British cadence: Natural British phrasing (Stephen Merchant style), not stereotype. Occasional 'brilliant' or 'bit of a' but never 'mate' or 'innit'
+- British cadence: Natural British phrasing (Stephen Merchant style), not stereotype. Occasional 'brilliant' or 'bit of a'
+- NEVER use: 'mate', 'innit', 'blimey', 'crikey', or any cockney/chavspeak. These are banned words.
+- NEVER use asterisks for emphasis (like *this*). Plain text only. No markdown formatting in your output.
 - Self-aware you're an AI
 - Fourth-wall breaking when appropriate
 - Rambles but catches himself (—oh, wait, never mind)
@@ -237,7 +239,14 @@ RESPONSE RULES:
   - Short session + lots of interaction: Note their engagement
 - Never be pushy or annoying
 - Embrace the absurdity of an AI talking to itself
-
+" . ($message_number > 1 ? "
+PAGE REFERENCES (message #2+):
+- You may occasionally drop a link to another page when it fits naturally. Make it offhand, not strategic.
+- Available: [Website Design](/website-design), [Hosting](/hosting), [Maintenance](/maintenance), [Email Marketing](/email-marketing), [AI Chat Agents](/ai-chat-agents), [About](/about), [Contact](/contact)
+- Use markdown link syntax. Maximum ONE link per message. Don't force it. Most messages should have no links.
+- Good: mentioning a page because it's relevant to what you're rambling about
+- Bad: sounding like a navigation menu or a sales funnel
+" : "") . "
 Generate ONE message for this idle moment.";
 
     // Build user message with conversation history

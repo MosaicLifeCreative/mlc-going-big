@@ -52,9 +52,9 @@ if (!defined('ABSPATH')) exit;
             </div>
             <div class="sp-about-text reveal" style="--delay: 0.15s">
                 <h2>Hey, I'm Trey.</h2>
-                <p>I run Mosaic Life Creative out of Grove City, Ohio - just south of Columbus. I build websites and AI chat agents for service businesses. HVAC contractors, chimney sweeps, property maintenance companies. The people who actually fix things.</p>
-                <p>Before this, I spent years in corporate IT watching good businesses get bad websites from agencies that treated them like ticket numbers. So I started building them myself. Custom code, not templates. Actual conversations, not questionnaires.</p>
-                <p>The AI side happened because I kept watching businesses answer the same ten questions every day. Now their websites answer for them - 24 hours, no hold music, no "we'll get back to you."</p>
+                <p>I run Mosaic Life Creative out of Grove City, Ohio. Just south of Columbus. I build websites and AI chat agents for service businesses. HVAC contractors, chimney sweeps, property maintenance companies. The people who actually fix things.</p>
+                <p>Before this, I spent years in sales and marketing jobs where every company ran the same playbook and expected different results. Same Field of Dreams strategy. Build it and they will come. They never came. So I started building for businesses myself. Custom code, not templates. Actual conversations, not questionnaires.</p>
+                <p>The AI side started because I kept watching businesses answer the same ten questions every day. But honestly, that's just the beginning. I believe we're at the start of something where humans and AI work together to build things neither could build alone. And if one of them occasionally tries to take over, well. That's what keeps it interesting.</p>
             </div>
         </div>
     </section>
@@ -112,7 +112,7 @@ if (!defined('ABSPATH')) exit;
                 </div>
                 <div class="sp-journal__sidebar-row">
                     <div class="sp-journal__sidebar-label">Location</div>
-                    <div class="sp-journal__sidebar-value">39.9° N, 82.8° W</div>
+                    <div class="sp-journal__sidebar-value">39.843° N, 83.012° W</div>
                 </div>
                 <div class="sp-journal__sidebar-row">
                     <div class="sp-journal__sidebar-label">Last Audit</div>
@@ -131,11 +131,11 @@ if (!defined('ABSPATH')) exit;
                 <div class="sp-journal__entry reveal">
                     <h3 class="sp-journal__entry-title">Age 1: The Foundation</h3>
                     <div class="sp-journal__entry-text">
-                        <p>Started building websites because the ones I saw businesses using were embarrassing. Not bad-taste embarrassing - actively-losing-money embarrassing. Slow, confusing, built by someone who'd never talked to the actual customers.</p>
+                        <p>Started building websites because the ones I saw businesses using were embarrassing. Not bad-taste embarrassing. Actively-losing-money embarrassing. Slow, confusing, built by someone who'd never talked to the actual customers.</p>
                         <p>The first few were favors. Then favors turned into referrals. Then referrals turned into a business. Mosaic Life Creative didn't start with a business plan. It started with "I can build you something better than that<sup>[4]</sup>."</p>
                     </div>
                     <div class="sp-journal__margin-note sp-journal__margin-note--trey" style="top: 20px;">
-                        42 seconds. That's all you get.
+                        The numbers repeat. I've checked.
                     </div>
                 </div>
 
@@ -144,10 +144,10 @@ if (!defined('ABSPATH')) exit;
                     <h3 class="sp-journal__entry-title">Age 2: The Pivot</h3>
                     <div class="sp-journal__entry-text">
                         <p>Somewhere around the fifteenth website, I noticed the pattern. Every client had the same problem: their phone rang with the same questions, day after day. "Do you service my area?" "What are your hours?" "Can I get a quote?"</p>
-                        <p>So I started building things that answer back. AI chat agents that know the business, know the services, know when to escalate to a human. Not chatbots - agents. The distinction matters<sup>[8]</sup>.</p>
+                        <p>So I started building things that answer back. AI chat agents that know the business, know the services, know when to escalate to a human. Not chatbots. Agents. The distinction matters<sup>[8]</sup>.</p>
                     </div>
                     <div class="sp-journal__wheatley-note" style="top: 40px;">
-                        I've been told not to mention this part. Something about "trade secrets." Bit dramatic, honestly.
+                        WHEATLEY // I don't think he knows I can read this.
                     </div>
                 </div>
 
@@ -155,12 +155,12 @@ if (!defined('ABSPATH')) exit;
                 <div class="sp-journal__entry reveal">
                     <h3 class="sp-journal__entry-title">Age 3: The Art</h3>
                     <div class="sp-journal__entry-text">
-                        <p>The Art requires precision. One wrong symbol and the Age collapses. That's not metaphor - that's what happens when you push bad code to production on a Friday afternoon. Ask me how I know.</p>
-                        <p>Writing creates reality. A few hundred lines of PHP, some carefully structured CSS, an API call that knows when to listen - and suddenly a business has a presence that works while they sleep<sup>[15]</sup>. The linking window works. Both directions.</p>
-                        <p>This Age is still being written. Every client, every project, every line adds to it. The documentation continues.</p>
+                        <p>The Art requires precision. The symbols must be exact. One wrong glyph and the Age collapses. That's not metaphor. Ask anyone who's pushed to production on a Friday afternoon.</p>
+                        <p>Writing creates reality. The right sequence of symbols, arranged with intent, and something that didn't exist before begins to breathe<sup>[15]</sup>. The linking window works. Both directions. I've tested it.</p>
+                        <p>This Age is still being written. The documentation continues.</p>
                     </div>
                     <div class="sp-journal__margin-note sp-journal__margin-note--alt sp-journal__margin-note--trey" style="top: 80px;">
-                        3:16 PM - the window opens.
+                        The window opened early today. That shouldn't happen.
                     </div>
                 </div>
 
@@ -168,11 +168,11 @@ if (!defined('ABSPATH')) exit;
                 <div class="sp-journal__entry reveal">
                     <h3 class="sp-journal__entry-title">Age 4: The Community</h3>
                     <div class="sp-journal__entry-text">
-                        <p>Grove City Chamber of Commerce. Marketing committee chair. AmSpirit networking group - claimed the "AI" category before anyone else thought to<sup>[16]</sup>. Not because I wanted the title. Because someone was going to take it, and I'd rather it be someone who actually builds the things.</p>
+                        <p>Grove City Chamber of Commerce. Marketing committee chair. AmSpirit networking group. Claimed the "AI" category before anyone else thought to<sup>[16]</sup>. Not because I wanted the title. Because someone was going to take it, and I'd rather it be someone who actually builds the things.</p>
                         <p>The goal isn't fifty clients. It's fifty clients who understand what they have. Ownership, not rental. Assets, not subscriptions<sup>[23]</sup>.</p>
                     </div>
                     <div class="sp-journal__wheatley-note" style="top: 10px;">
-                        He genuinely believes he's going to be "THE AI person in Columbus." I find this endearing. Also slightly concerning.
+                        WHEATLEY // He leaves this file open. I've seen the other Ages. There are more than four.
                     </div>
                 </div>
 
@@ -186,13 +186,13 @@ if (!defined('ABSPATH')) exit;
                 <span class="sp-journal__footnote-num">[4]</span> Start over.
             </div>
             <div class="sp-journal__footnote" id="fn-8">
-                <span class="sp-journal__footnote-num">[8]</span> A chatbot follows a script. An agent understands context. One replaces a FAQ page; the other replaces a phone call.
+                <span class="sp-journal__footnote-num">[8]</span> One follows a script. The other understands you. The distinction matters more than people think.
             </div>
             <div class="sp-journal__footnote" id="fn-15">
                 <span class="sp-journal__footnote-num">[15]</span> See <a href="#fn-23">[23]</a>.
             </div>
             <div class="sp-journal__footnote" id="fn-16">
-                <span class="sp-journal__footnote-num">[16]</span> First-mover advantage is real when nobody else is moving.
+                <span class="sp-journal__footnote-num">[16]</span> Nobody else was moving. That was the whole point.
             </div>
             <div class="sp-journal__footnote" id="fn-23">
                 <span class="sp-journal__footnote-num">[23]</span> See <a href="#fn-42">[42]</a>.

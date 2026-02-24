@@ -140,21 +140,23 @@
 ## Post-Launch
 
 ### 8. Client Proposal System
-- [ ] **Custom post type** (`mlc_proposal`) for individual client proposals
-- [ ] **MLC Toolkit plugin integration** for creating and managing proposals
+- [ ] **Custom post type** (`mlc_proposal`) registered in MLC Toolkit plugin
+- [ ] **Admin UI** in MLC Toolkit for proposal CRUD
   - Add/remove services with pricing per proposal
-  - Upload client logo
-  - Set accent color(s) to match client branding
-  - Set PIN or password for proposal access
+  - Upload client logo (WP media library)
+  - Set accent color via hex input (output as `--proposal-accent` CSS variable)
+  - Set numeric PIN for access gate (4-6 digits, stored as post meta)
 - [ ] **Frontend template** (`single-mlc_proposal.php`) with sp- design system styling
-  - Password/PIN gate before viewing
-  - Client logo + custom accent colors applied via inline CSS variables
+  - Custom PIN gate (branded, AJAX check, not WP default password form)
+  - Client logo + accent color applied via inline CSS variables
   - Service line items with pricing
   - Total / summary section
-  - Accept / contact CTA
+  - "Accept Proposal" button (updates status, sends wp_mail notification)
 - [ ] **Unique URLs** per proposal (e.g., `/proposal/client-name/`)
-- [ ] **Admin UI** in MLC Toolkit for proposal CRUD
 - [ ] **Proposal status tracking** (draft, sent, viewed, accepted, expired)
+  - "Viewed" set automatically on first successful PIN entry (timestamp stored)
+  - "Accepted" set when client clicks Accept button on frontend
+  - Admin notification via wp_mail on both view and accept events
 
 ### 9. Product Showcase Page
 - [ ] **Page or section to show off other web products**
