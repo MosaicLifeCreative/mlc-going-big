@@ -46,7 +46,7 @@ function mlc_enqueue_global_assets() {
         'mlc-global-css',
         get_stylesheet_directory_uri() . '/assets/css/landing.css',
         array(),
-        '1.4.9',
+        '1.5.0',
         'all'
     );
 
@@ -578,6 +578,11 @@ function mlc_inject_countdown_footer() {
                     <div class="site-footer__connect-item">
                         <div class="site-footer__connect-key">Location</div>
                         <div class="site-footer__connect-value">Columbus, Ohio</div>
+                    </div>
+                    <div class="site-footer__connect-item">
+                        <div class="site-footer__connect-key">Phone</div>
+                        <a href="tel:+13802013300" class="site-footer__connect-value">(380) 201-3300</a>
+                        <div class="site-footer__connect-hint">Text first. Call after we're friends.</div>
                     </div>
                     <div class="site-footer__connect-item">
                         <div class="site-footer__connect-key">Social</div>

@@ -49,9 +49,7 @@ if (!defined('ABSPATH')) exit;
                 <p>Your site shares a server with thousands of other sites. One of them gets a traffic spike, and suddenly your homepage takes six seconds to load. That's not hosting. That's a liability.</p>
             </div>
             <div class="sp-split__media reveal" style="--delay: 0.2s">
-                <div class="sp-image-placeholder">
-                    IMAGE — Server room chaos vs clean cloud infrastructure
-                </div>
+                <img src="/wp-content/uploads/2026/02/managed-hosting-server-room-chaos.png" alt="Frustrated business owner standing in front of a tangled messy shared hosting server rack" loading="lazy">
             </div>
         </div>
     </section>
@@ -104,9 +102,7 @@ if (!defined('ABSPATH')) exit;
                 <p>Server updates, security patches, PHP versions, SSL renewals, performance monitoring - we handle all of it. 99.99% uptime, backed by an SLA that actually means something. You focus on running your business.</p>
             </div>
             <div class="sp-split__media reveal" style="--delay: 0.2s">
-                <div class="sp-image-placeholder">
-                    IMAGE — Dashboard monitoring or uptime graph
-                </div>
+                <img src="/wp-content/uploads/2026/02/managed-hosting-relaxed-business-owner.png" alt="Relaxed business owner walking away from a clean server room with a confident wave goodbye" loading="lazy">
             </div>
         </div>
     </section>

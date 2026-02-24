@@ -811,6 +811,14 @@ a.site-footer__connect-value:hover {
 }
 
 /* ─── "I don't do social." ─── */
+.site-footer__connect-hint {
+    font-size: 12px;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.35);
+    margin-top: 2px;
+    letter-spacing: 0;
+}
+
 .site-footer__no-social {
     font-size: clamp(16px, 1.8vw, 19px);
     font-weight: 700;
