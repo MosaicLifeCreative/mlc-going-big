@@ -2504,8 +2504,18 @@ body:has(#wheatley-message) .cursor-blink {
 /* Contact info — dark card variant */
 .sp-contact-info--dark {
     background: var(--dark) !important;
-    border-top: 4px solid;
-    border-image: linear-gradient(135deg, var(--primary), var(--secondary)) 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.sp-contact-info--dark::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
 }
 
 .sp-contact-info--dark .sp-contact-info__label {

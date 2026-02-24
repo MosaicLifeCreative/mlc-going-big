@@ -33,16 +33,12 @@ if (!defined('ABSPATH')) exit;
         <div class="sp-hero__accent reveal" style="--delay: 0.3s"></div>
     </section>
 
-    <!-- ═══ STATEMENT ═════════════════════════════════ -->
-    <section class="sp-section sp-section--light">
-        <div class="sp-statement reveal">
-            <p class="sp-statement__text">We don't do ticket queues. We don't do 48-hour SLAs. You send a message, a real person reads it, and you hear back the same day.</p>
-        </div>
-    </section>
-
     <!-- ═══ FORM + CONTACT INFO ═══════════════════════ -->
     <section class="sp-section sp-section--light" data-wheatley-page="contact" data-wheatley-context="Contact page. You are 'helping' by drafting the visitor's inquiry message for them. The text goes directly into the contact form textarea. Stay in character as the bad salesman. Draft something that sounds like Wheatley trying to help someone ask for a website. Rambling, accidentally underselling, saying the quiet part out loud. Write it as a draft message to MLC, not as commentary. Start writing directly, no 'Right so' opener since this is supposed to be the visitor's message.">
         <div class="sp-section__inner">
+            <div class="sp-statement reveal" style="margin-bottom: clamp(40px, 6vw, 80px);">
+                <p class="sp-statement__text">We don't do ticket queues. We don't do 48-hour SLAs. You send a message, a real person reads it, and you hear back the same day.</p>
+            </div>
             <div class="sp-contact-grid">
 
                 <div class="sp-contact-form reveal">
