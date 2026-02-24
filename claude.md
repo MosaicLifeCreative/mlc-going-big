@@ -8,12 +8,12 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 
 ## Quick Start (For New Sessions)
 
-**Current Status:** Email Marketing page rebuilt with sp- system + corrupted inbox Wheatley treatment. Website Design + Email Marketing pages have final Pixar-style images (image placeholders replaced). 5 of 7 pages complete. Hosting page still has 2 image placeholders. Wheatley cursor cycles brand colors on each blink. Em-dash ban site-wide.
+**Current Status:** Maintenance page rebuilt with sp- system + terminal Wheatley treatment. 6 of 7 pages complete. Hosting page has Pixar images. Maintenance page has 2 image placeholders remaining. Wheatley cursor cycles brand colors on each blink. Em-dash ban site-wide.
 
 **Next Priorities:**
-1. Generate Pixar-style images for Hosting page (2 placeholders remaining)
-2. Apply sp- design + Wheatley sections to remaining 2 pages (Maintenance, Contact)
-3. Page-specific Wheatley treatments (terminal screen, minimal)
+1. Generate Pixar-style images for Maintenance page (2 placeholders remaining)
+2. Apply sp- design + Wheatley section to Contact page (last remaining)
+3. Page-specific Wheatley treatment for Contact (minimal, TBD)
 4. Photo slideshow expansion (50-100 photos with hunt clues)
 5. HUNT knowledge base for Chatling
 6. Quest site deployment (4815162342.quest)
@@ -28,11 +28,11 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 | `page-ai-chat-agents.php` | v2 | AI Chat Agents — sp- design + Wheatley void + inline Chatling embed |
 | `page-website-design.php` | v2 | Website Design — full rebuild with sp- system + Portal 2-style oval portal |
 | `page-hosting.php` | v2 | Hosting - sp- system + orange portal linking to Website Design |
-| `page-maintenance.php` | v1 | Maintenance service page (sp- structure) |
+| `page-maintenance.php` | v2 | Maintenance - sp- system + terminal Wheatley treatment |
 | `page-email-marketing.php` | v2 | Email Marketing - sp- system + corrupted inbox Wheatley treatment |
 | `page-about.php` | v2 | About - clean bio + Myst journal records + Wheatley as footnote [42] |
 | `page-contact.php` | v1 | Contact page (sp- structure) |
-| `assets/css/landing.css` | 1.4.9 | All styles + sp- system + sp-journal + Wheatley void + corrupted inbox + global footer + portal + cursor color cycling |
+| `assets/css/landing.css` | 1.5.1 | All styles + sp- system + sp-journal + Wheatley void + corrupted inbox + terminal + global footer + portal + cursor color cycling |
 | `assets/js/landing.js` | 1.7.2 | Interactive behaviors + Wheatley + share API + session persistence |
 | `assets/js/global.js` | 1.5.0 | Nav + Chatling + scroll reveals + countdown + Wheatley page sections |
 | `functions.php` | 1.9.2 | Enqueue + hunt + Wheatley APIs (with SHADE directive) + gradient blobs + countdown footer + global footer + Chatling exclusion |
@@ -359,7 +359,7 @@ RESPONSE RULES:
 - Website Design: Blue oval portal with flame ring + side annotation (COMPLETE)
 - Hosting: Orange portal with flame ring → click navigates to Website Design (COMPLETE)
 - About: Wheatley disguised as footnote [42] in journal section, conspiratorial tone (COMPLETE)
-- Maintenance: Maintenance hatch or terminal screen (TBD)
+- Maintenance: Terminal emulator with fake log lines + Wheatley prompt (COMPLETE)
 - Email Marketing: Corrupted inbox UI with glitching competitor emails (COMPLETE)
 - Contact: Minimal treatment (TBD)
 
@@ -488,6 +488,16 @@ Full-bleed, full-width sections with dramatic scale. No more "cards in a contain
 - `data-wheatley-page="email-marketing"` triggers existing `initWheatleySection()` in global.js
 - Used on Email Marketing page
 
+**14. Terminal (`sp-terminal`)** — Fake CLI panel Wheatley treatment
+- Dark section with wheatley-void grid/scanline/glow background
+- Centered terminal panel card (macOS-style dots, monospace, rounded corners)
+- 5 staggered system log lines (4 green checkmarks, 1 amber warning) with `@keyframes terminalFadeIn`
+- Separator, then `wheatley@mlc ~$` prompt where Wheatley's typewriter message appears
+- Reuses `wheatley-void__grid` perspective layer, `wheatleyCursorBlink` animation
+- `data-wheatley-page="maintenance"` triggers existing `initWheatleySection()` in global.js
+- Wheatley text stays monospace (unlike other treatments) because it's terminal output
+- Used on Maintenance page
+
 ### Scroll Animations
 - `.reveal` class → IntersectionObserver (15% threshold) → `.in-view` class
 - CSS: `opacity: 0` + `translateY(40px)` → `opacity: 1` + `translateY(0)`, 0.8s ease
@@ -512,6 +522,8 @@ General pattern: `sp-hero` → content sections (splits, statement, process, por
 **About page pattern:** `sp-hero` → `sp-statement` manifesto → dark `sp-about-split` (photo + bio) → `sp-values` (3 cards) → `sp-journal` (sidebar + Ages + footnotes with Wheatley as [42]) → `sp-cta`
 
 **Email Marketing page pattern:** `sp-hero` → `sp-statement` manifesto (subscription trap) → dark split (The Subscription Trap) → `sp-features` (4 items: campaigns, automation, segmentation, analytics) → dark split (Infrastructure You Own) → `sp-corrupted-inbox` (Wheatley in fake email UI) → `sp-cta`
+
+**Maintenance page pattern:** `sp-hero` → `sp-statement` manifesto (living systems) → dark split--reverse (The Slow Decline) → `sp-features` (6 items: updates, security, uptime, performance, content, reports) → dark split (Insurance, Not an Expense) → `sp-terminal` (Wheatley in fake CLI panel) → `sp-cta`
 
 ### Hamburger Contrast
 - IntersectionObserver detects dark/light sections for hamburger icon color
@@ -605,7 +617,7 @@ General pattern: `sp-hero` → content sections (splits, statement, process, por
 ## File Versions & Status
 
 **Current Deployed:**
-- CSS: v1.4.9 (sp- system + sp-journal + Wheatley void + corrupted inbox + global footer + portal + cursor color cycling)
+- CSS: v1.5.1 (sp- system + sp-journal + Wheatley void + corrupted inbox + terminal + global footer + portal + cursor color cycling)
 - JS (landing): v1.7.2 (share API integration + session-persistent personalization)
 - JS (global): v1.5.1 (nav + scroll reveals + countdown + Wheatley page sections + hamburger contrast fix)
 - PHP: v1.9.2 (Wheatley APIs with SHADE directive + global footer + Chatling exclusion)
@@ -683,10 +695,9 @@ Current prototype needs refinement:
 - Don't rebuild yet - refinement session needed to determine progression
 
 ### 4. Remaining Site Pages — sp- Design + Wheatley Treatments
-All 7 page templates created. AI Chat Agents, Website Design, Hosting, About, and Email Marketing are complete (5 of 7). Remaining 2 need:
+All 7 page templates created. 6 of 7 complete. Only Contact remains:
 - Content refinement and image placeholders
-- Page-specific Wheatley treatments:
-  - Maintenance: Maintenance hatch or terminal screen (TBD)
+- Page-specific Wheatley treatment:
   - Contact: Minimal treatment (TBD)
 
 ### 5. Page Images — Pixar-Style Generation
@@ -814,7 +825,8 @@ Consistent Pixar-quality 3D animated illustration style across all service pages
 - ✅ Wheatley cursor color cycling (brand colors on each blink)
 - ✅ Hamburger contrast fix (rAF scroll listener backup)
 - ✅ Email Marketing page (sp- system + corrupted inbox Wheatley treatment)
-- 📋 Remaining 2 pages: Maintenance, Contact
+- ✅ Maintenance page (sp- system + terminal Wheatley treatment)
+- 📋 Remaining 1 page: Contact
 - 📋 Quest site completion (Snake 451 + final stages)
 
 ### Phase 6: Polish & Launch (FUTURE)
@@ -952,10 +964,10 @@ Consistent Pixar-quality 3D animated illustration style across all service pages
 - AI Chat Agents: Inline Chatling embed replacing image placeholder (COMPLETE)
 - Hosting: Orange portal with flame ring → Website Design (COMPLETE)
 - About: Wheatley as footnote [42], conspiratorial tone (COMPLETE)
-- Maintenance: Maintenance hatch or terminal screen (TBD)
+- Maintenance: Terminal emulator with fake log lines + Wheatley prompt (COMPLETE)
 - Email Marketing: Corrupted inbox UI with glitching competitor emails (COMPLETE)
 - Contact: Minimal treatment (TBD)
-- Status: 5 of 7 complete
+- Status: 6 of 7 complete
 - Date: Feb 23, 2026
 
 **2026-02-23: Global Site Footer**

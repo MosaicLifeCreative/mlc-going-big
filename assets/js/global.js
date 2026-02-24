@@ -198,7 +198,7 @@
         const hamburger = document.getElementById('hamburgerBtn');
         if (!hamburger) return;
 
-        const darkSections = document.querySelectorAll('.sp-hero, .sp-section--dark, .sp-cta, .sp-corrupted-inbox');
+        const darkSections = document.querySelectorAll('.sp-hero, .sp-section--dark, .sp-cta, .sp-corrupted-inbox, .sp-terminal');
         if (!darkSections.length) return;
 
         // Core check — is the hamburger over a dark section right now?

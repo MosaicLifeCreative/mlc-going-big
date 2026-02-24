@@ -337,7 +337,10 @@ html, body {
     color: #fff;
     transition: color 0.3s ease, padding-left 0.3s ease;
     text-decoration: none;
-    display: inline-block;
+    display: block;
+    flex: 1;
+    padding: 20px 0;
+    margin: -20px 0;
 }
 
 .nav-item:hover .nav-item__number {
@@ -3638,5 +3641,241 @@ body:has(#wheatley-message) .cursor-blink {
 
     .sp-portal__message {
         font-size: clamp(16px, 4vw, 20px);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SP TERMINAL — Maintenance page Wheatley treatment
+   Fake CLI panel with staggered log lines + Wheatley prompt
+   ═══════════════════════════════════════════════════════════ */
+
+.sp-terminal {
+    position: relative;
+    width: 100%;
+    min-height: clamp(520px, 70vh, 740px);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 79px,
+            rgba(124, 58, 237, 0.05) 79px,
+            rgba(124, 58, 237, 0.05) 80px
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 79px,
+            rgba(124, 58, 237, 0.05) 79px,
+            rgba(124, 58, 237, 0.05) 80px
+        ),
+        #050505;
+    background-attachment: fixed, fixed, fixed;
+}
+
+/* Radial glow */
+.sp-terminal::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+        ellipse 60% 50% at 50% 50%,
+        rgba(124, 58, 237, 0.1) 0%,
+        rgba(6, 182, 212, 0.04) 35%,
+        transparent 70%
+    );
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Scanlines */
+.sp-terminal::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.06) 2px,
+        rgba(0, 0, 0, 0.06) 4px
+    );
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* Content layer */
+.sp-terminal__content {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 40px clamp(20px, 5vw, 80px);
+}
+
+/* Section label */
+.sp-terminal__label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--primary);
+    opacity: 0.5;
+    margin-bottom: 24px;
+}
+
+/* Terminal panel */
+.sp-terminal__panel {
+    width: 100%;
+    max-width: 640px;
+    background: rgba(17, 17, 17, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* macOS-style header bar */
+.sp-terminal__header {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sp-terminal__dots {
+    display: flex;
+    gap: 6px;
+    margin-right: 12px;
+}
+
+.sp-terminal__dots span {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.sp-terminal__dots span:nth-child(1) {
+    background: rgba(255, 95, 87, 0.5);
+}
+
+.sp-terminal__dots span:nth-child(2) {
+    background: rgba(255, 189, 46, 0.5);
+}
+
+.sp-terminal__dots span:nth-child(3) {
+    background: rgba(40, 201, 64, 0.5);
+}
+
+.sp-terminal__title {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.35);
+    flex: 1;
+    text-align: center;
+}
+
+/* Terminal body */
+.sp-terminal__body {
+    padding: 20px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* Log lines */
+.sp-terminal__line {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    animation: terminalFadeIn 0.5s ease forwards;
+    animation-delay: var(--delay, 0s);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sp-terminal__timestamp {
+    color: rgba(255, 255, 255, 0.25);
+    margin-right: 8px;
+}
+
+.sp-terminal__status {
+    margin-right: 8px;
+    font-weight: 700;
+}
+
+.sp-terminal__status--ok {
+    color: #28c940;
+}
+
+.sp-terminal__status--warn {
+    color: #ffbd2e;
+}
+
+/* Separator between logs and prompt */
+.sp-terminal__separator {
+    margin: 12px 0;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+/* Prompt line */
+.sp-terminal__prompt {
+    color: var(--primary);
+    font-weight: 700;
+    margin-right: 8px;
+}
+
+.sp-terminal__line--prompt {
+    white-space: normal;
+}
+
+#wheatleyPageMessage {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+/* Fade-in animation for log lines */
+@keyframes terminalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Terminal responsive */
+@media (max-width: 768px) {
+    .sp-terminal {
+        min-height: clamp(460px, 65vh, 600px);
+        background-attachment: scroll;
+    }
+
+    .sp-terminal__panel {
+        max-width: 100%;
+    }
+
+    .sp-terminal__body {
+        padding: 16px;
+        font-size: 11px;
+    }
+
+    .sp-terminal__line {
+        font-size: 11px;
+        white-space: normal;
+    }
+
+    .sp-terminal__label {
+        font-size: 9px;
+        letter-spacing: 2px;
     }
 }
