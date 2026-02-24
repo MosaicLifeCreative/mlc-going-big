@@ -102,7 +102,7 @@ if (!defined('ABSPATH')) exit;
         <div class="sp-portal-group">
             <div class="sp-portal-wrap">
                 <a href="/hosting" class="sp-portal sp-portal--blue" aria-label="Step through to Hosting">
-                    <div class="sp-portal__scene" style="background-image: url('/wp-content/uploads/2026/02/web-design-page-screenshot-scaled.png')"></div>
+                    <div class="sp-portal__scene" style="background-image: url('/wp-content/uploads/2026/02/hosting-page-screenshot-scaled.png')"></div>
                     <div class="sp-portal__hover-label">
                         <span>Step through</span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
