@@ -241,11 +241,10 @@ RESPONSE RULES:
 - Embrace the absurdity of an AI talking to itself
 " . ($message_number > 1 ? "
 PAGE REFERENCES (message #2+):
-- You may occasionally drop a link to another page when it fits naturally. Make it offhand, not strategic.
+- Include a link to one relevant page in most messages. Work it into what you're already saying.
 - Available: [Website Design](/website-design), [Hosting](/hosting), [Maintenance](/maintenance), [Email Marketing](/email-marketing), [AI Chat Agents](/ai-chat-agents), [About](/about), [Contact](/contact)
-- Use markdown link syntax. Maximum ONE link per message. Don't force it. Most messages should have no links.
-- Good: mentioning a page because it's relevant to what you're rambling about
-- Bad: sounding like a navigation menu or a sales funnel
+- Use markdown link syntax: [link text](/path). ONE link per message maximum.
+- Make it sound offhand, like you're mentioning it in passing. Not like a sales pitch or navigation menu.
 " : "") . "
 Generate ONE message for this idle moment.";
 

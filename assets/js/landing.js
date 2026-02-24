@@ -412,28 +412,46 @@
         
         // Clear container
         wheatleyContainer.innerHTML = '';
-        
+
         // Convert text to string if it isn't already
         const messageText = String(text);
-        
-        // Create text node for typewriter effect (safer than textContent +=)
-        const textNode = document.createTextNode('');
-        wheatleyContainer.appendChild(textNode);
-        
-        // Typewriter effect using textNode.nodeValue
-        for (let i = 0; i < messageText.length; i++) {
-            textNode.nodeValue += messageText[i];
-            await sleep(30);
+
+        // Parse message into segments: plain text and markdown links
+        // Splits "[link text](/url)" into typed link text inside <a> tags
+        const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+        const segments = [];
+        let lastIndex = 0;
+        let match;
+        while ((match = linkRegex.exec(messageText)) !== null) {
+            if (match.index > lastIndex) {
+                segments.push({ type: 'text', content: messageText.slice(lastIndex, match.index) });
+            }
+            segments.push({ type: 'link', content: match[1], url: match[2] });
+            lastIndex = match.index + match[0].length;
+        }
+        if (lastIndex < messageText.length) {
+            segments.push({ type: 'text', content: messageText.slice(lastIndex) });
         }
 
-        // Convert markdown links to real <a> tags after typing finishes
-        // Matches [text](url) pattern
-        const raw = wheatleyContainer.textContent;
-        if (raw.includes('](')) {
-            wheatleyContainer.innerHTML = raw.replace(
-                /\[([^\]]+)\]\(([^)]+)\)/g,
-                '<a href="$2" style="color: var(--secondary); text-decoration: underline; text-decoration-color: rgba(6,182,212,0.3); text-underline-offset: 4px; transition: color 0.3s ease;">$1</a>'
-            );
+        // Typewriter through segments, rendering links as <a> tags inline
+        for (const segment of segments) {
+            if (segment.type === 'text') {
+                const textNode = document.createTextNode('');
+                wheatleyContainer.appendChild(textNode);
+                for (let i = 0; i < segment.content.length; i++) {
+                    textNode.nodeValue += segment.content[i];
+                    await sleep(30);
+                }
+            } else {
+                const link = document.createElement('a');
+                link.href = segment.url;
+                link.style.cssText = 'color: var(--secondary); text-decoration: underline; text-decoration-color: rgba(6,182,212,0.3); text-underline-offset: 4px; transition: color 0.3s ease;';
+                wheatleyContainer.appendChild(link);
+                for (let i = 0; i < segment.content.length; i++) {
+                    link.textContent += segment.content[i];
+                    await sleep(30);
+                }
+            }
         }
 
         // Add cursor
