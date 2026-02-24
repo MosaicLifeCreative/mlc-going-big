@@ -3837,7 +3837,7 @@ body:has(#wheatley-message) .cursor-blink {
     white-space: normal;
 }
 
-#wheatleyPageMessage {
+.sp-terminal #wheatleyPageMessage {
     color: rgba(255, 255, 255, 0.75);
 }
 
