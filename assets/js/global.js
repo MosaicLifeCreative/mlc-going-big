@@ -508,6 +508,90 @@
         initWheatleySection();
     }
 
+    // ─── WHEATLEY CONTACT FORM DRAFT ─────────────────────────────
+    // On the Contact page, Wheatley "helps" by drafting a terrible
+    // inquiry message into the CF7 textarea. Stops when user focuses.
+
+    function initWheatleyContactForm() {
+        if (document.body.classList.contains('mlc-landing-page')) return;
+
+        const section = document.querySelector('[data-wheatley-page="contact"]');
+        if (!section) return;
+
+        const textarea = section.querySelector('textarea.wpcf7-textarea, textarea[name="your-message"]');
+        if (!textarea) return;
+
+        const label = section.querySelector('.sp-contact-form__wheatley-label');
+        const pageContext = section.dataset.wheatleyContext || '';
+        const userName = sessionStorage.getItem('mlc_share_name') || null;
+        const visitCount = parseInt(localStorage.getItem('mlc_visit_count') || '1');
+        const isReturning = visitCount > 1;
+
+        let triggered = false;
+        let typing = false;
+
+        // Stop typing when user interacts with textarea
+        textarea.addEventListener('focus', () => {
+            typing = false;
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !triggered) {
+                    triggered = true;
+                    observer.unobserve(section);
+
+                    if (label) label.classList.add('is-visible');
+
+                    fetchWheatleyDraft(pageContext, userName, isReturning, visitCount, textarea);
+                }
+            });
+        }, { threshold: 0.3 });
+
+        observer.observe(section);
+
+        async function fetchWheatleyDraft(context, name, returning, visits, el) {
+            try {
+                const response = await fetch('/wp-json/mlc/v1/wheatley-page', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        page_slug: 'contact',
+                        page_context: context,
+                        user_name: name,
+                        visitor: { isReturning: returning, visitCount: visits },
+                        current_time: new Date().toLocaleTimeString('en-US', {
+                            hour: 'numeric', minute: '2-digit', hour12: true
+                        }),
+                        device: window.innerWidth <= 768 ? 'mobile'
+                              : window.innerWidth <= 1024 ? 'tablet' : 'desktop'
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.message) {
+                    typing = true;
+                    el.value = '';
+                    for (let i = 0; i < data.message.length; i++) {
+                        if (!typing) break;
+                        el.value += data.message[i];
+                        await new Promise(r => setTimeout(r, 28));
+                    }
+                    typing = false;
+                }
+            } catch (err) {
+                console.error('Wheatley contact draft error:', err);
+            }
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initWheatleyContactForm);
+    } else {
+        initWheatleyContactForm();
+    }
+
     // ─── CHATLING FADE-IN OBSERVER (ALL PAGES) ─────────────────
     // Watch for Chatling elements being added to DOM and fade them in
     const chatlingObserver = new MutationObserver((mutations) => {

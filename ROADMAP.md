@@ -112,14 +112,14 @@
 - [x] **About** (sp- system + Myst journal records + Wheatley footnote [42])
 - [x] **Email Marketing** (sp- system + corrupted inbox Wheatley treatment + Pixar images)
 - [x] **Maintenance** (sp- system + terminal Wheatley treatment) — 2 image placeholders remaining
-- [ ] **Contact** (sp- system + minimal Wheatley treatment TBD)
+- [x] **Contact** (sp- system + CF7 form + Wheatley textarea draft)
 
 ### 5b. Page Images (Pixar-Style, Consistent Character)
 - [x] **Email Marketing** — subscription trap (stressed) + infrastructure calm (relaxed)
 - [x] **Website Design** — generic template hallway + custom design excitement
 - [x] **Hosting** — server chaos (stressed) + walking away relaxed (wave)
 - [ ] **Maintenance** — TBD (2 placeholders in page)
-- [ ] **Contact** — TBD (page not yet rebuilt)
+- [ ] **Contact** — TBD (no images, form-focused page)
 
 ### 6. Advanced Wheatley Features (Future)
 - [ ] Hunt meta-commentary based on countdown proximity
@@ -170,7 +170,7 @@ All new page templates follow this structure:
 5. Conditional JS loading (global.js everywhere, landing.js only on landing page)
 
 ### File Versions
-- **landing.css:** v1.5.1 (sp- system + corrupted inbox + terminal + image border-radius + portal + cursor color cycling)
+- **landing.css:** v1.5.3 (sp- system + corrupted inbox + terminal + CF7 overrides + image border-radius + portal + cursor color cycling)
 - **landing.js:** v1.7.2 (Wheatley AI, Chatling, hunt, nav, share API, session-persistent personalization)
 - **global.js:** v1.5.0 (nav + scroll reveals + countdown + Wheatley page sections + hamburger contrast)
 - **functions.php:** v1.9.2 (Wheatley APIs + SHADE + gradient blobs + countdown + global footer)

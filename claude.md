@@ -8,15 +8,15 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 
 ## Quick Start (For New Sessions)
 
-**Current Status:** Maintenance page rebuilt with sp- system + terminal Wheatley treatment. 6 of 7 pages complete. Hosting page has Pixar images. Maintenance page has 2 image placeholders remaining. Wheatley cursor cycles brand colors on each blink. Em-dash ban site-wide.
+**Current Status:** All 7 pages complete with sp- design system and unique Wheatley treatments. Contact page uses CF7 with Wheatley textarea draft. Maintenance page has 2 image placeholders remaining. Em-dash ban site-wide.
 
 **Next Priorities:**
-1. Generate Pixar-style images for Maintenance page (2 placeholders remaining)
-2. Apply sp- design + Wheatley section to Contact page (last remaining)
-3. Page-specific Wheatley treatment for Contact (minimal, TBD)
-4. Photo slideshow expansion (50-100 photos with hunt clues)
-5. HUNT knowledge base for Chatling
-6. Quest site deployment (4815162342.quest)
+1. Configure CF7 form in WP Admin (template provided in plan)
+2. Generate Pixar-style images for Maintenance + Contact pages
+3. Photo slideshow expansion (50-100 photos with hunt clues)
+4. HUNT knowledge base for Chatling
+5. Quest site deployment (4815162342.quest)
+6. Final polish and launch (Phase 6)
 
 ---
 
@@ -31,10 +31,10 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 | `page-maintenance.php` | v2 | Maintenance - sp- system + terminal Wheatley treatment |
 | `page-email-marketing.php` | v2 | Email Marketing - sp- system + corrupted inbox Wheatley treatment |
 | `page-about.php` | v2 | About - clean bio + Myst journal records + Wheatley as footnote [42] |
-| `page-contact.php` | v1 | Contact page (sp- structure) |
-| `assets/css/landing.css` | 1.5.1 | All styles + sp- system + sp-journal + Wheatley void + corrupted inbox + terminal + global footer + portal + cursor color cycling |
+| `page-contact.php` | v2 | Contact - CF7 form + Wheatley textarea draft treatment |
+| `assets/css/landing.css` | 1.5.3 | All styles + sp- system + sp-journal + Wheatley void + corrupted inbox + terminal + CF7 overrides + global footer + portal + cursor color cycling |
 | `assets/js/landing.js` | 1.7.2 | Interactive behaviors + Wheatley + share API + session persistence |
-| `assets/js/global.js` | 1.5.0 | Nav + Chatling + scroll reveals + countdown + Wheatley page sections |
+| `assets/js/global.js` | 1.5.2 | Nav + Chatling + scroll reveals + countdown + Wheatley page sections + contact form draft |
 | `functions.php` | 1.9.2 | Enqueue + hunt + Wheatley APIs (with SHADE directive) + gradient blobs + countdown footer + global footer + Chatling exclusion |
 | `mlc-toolkit/` | 1.0.1 | Plugin: photo management, share analytics, URL shortener, dashboard widget |
 | `services-mockup.html` | Mockup | Original services vision (superseded by sp- system) |
@@ -361,7 +361,7 @@ RESPONSE RULES:
 - About: Wheatley disguised as footnote [42] in journal section, conspiratorial tone (COMPLETE)
 - Maintenance: Terminal emulator with fake log lines + Wheatley prompt (COMPLETE)
 - Email Marketing: Corrupted inbox UI with glitching competitor emails (COMPLETE)
-- Contact: Minimal treatment (TBD)
+- Contact: Wheatley drafts terrible inquiry into CF7 textarea, bad salesman voice (COMPLETE)
 
 **Wheatley Cursor Color Cycling:**
 - Cursor blinks through brand colors: purple → cyan → pink (inspired by Gemini)
@@ -525,6 +525,8 @@ General pattern: `sp-hero` → content sections (splits, statement, process, por
 
 **Maintenance page pattern:** `sp-hero` → `sp-statement` manifesto (living systems) → dark split--reverse (The Slow Decline) → `sp-features` (6 items: updates, security, uptime, performance, content, reports) → dark split (Insurance, Not an Expense) → `sp-terminal` (Wheatley in fake CLI panel) → `sp-cta`
 
+**Contact page pattern:** `sp-hero` → `sp-section--light` with `sp-contact-grid` (CF7 form + contact info). Lean page, no CTA (form IS the CTA). Wheatley drafts into textarea via `initWheatleyContactForm()` in global.js.
+
 ### Hamburger Contrast
 - IntersectionObserver detects dark/light sections for hamburger icon color
 - rAF-throttled scroll listener added as backup (IntersectionObserver alone misses fast scrolling)
@@ -617,7 +619,7 @@ General pattern: `sp-hero` → content sections (splits, statement, process, por
 ## File Versions & Status
 
 **Current Deployed:**
-- CSS: v1.5.1 (sp- system + sp-journal + Wheatley void + corrupted inbox + terminal + global footer + portal + cursor color cycling)
+- CSS: v1.5.3 (sp- system + sp-journal + Wheatley void + corrupted inbox + terminal + CF7 overrides + global footer + portal + cursor color cycling)
 - JS (landing): v1.7.2 (share API integration + session-persistent personalization)
 - JS (global): v1.5.1 (nav + scroll reveals + countdown + Wheatley page sections + hamburger contrast fix)
 - PHP: v1.9.2 (Wheatley APIs with SHADE directive + global footer + Chatling exclusion)
@@ -694,11 +696,8 @@ Current prototype needs refinement:
 - Makes 451 achievable while keeping Fahrenheit 451 reference
 - Don't rebuild yet - refinement session needed to determine progression
 
-### 4. Remaining Site Pages — sp- Design + Wheatley Treatments
-All 7 page templates created. 6 of 7 complete. Only Contact remains:
-- Content refinement and image placeholders
-- Page-specific Wheatley treatment:
-  - Contact: Minimal treatment (TBD)
+### 4. Site Pages — COMPLETE
+All 7 page templates rebuilt with sp- design system and unique Wheatley treatments. Each page has a distinct treatment: void + Chatling embed, blue portal, orange portal, footnote [42], corrupted inbox, terminal, textarea draft.
 
 ### 5. Page Images — Pixar-Style Generation
 Consistent Pixar-quality 3D animated illustration style across all service pages. Recurring character: slim, average-build small business owner with warm skin, short neat brown hair, brown eyebrows, large expressive eyes, dress shirt with loosened necktie.
@@ -826,7 +825,8 @@ Consistent Pixar-quality 3D animated illustration style across all service pages
 - ✅ Hamburger contrast fix (rAF scroll listener backup)
 - ✅ Email Marketing page (sp- system + corrupted inbox Wheatley treatment)
 - ✅ Maintenance page (sp- system + terminal Wheatley treatment)
-- 📋 Remaining 1 page: Contact
+- ✅ Contact page (CF7 form + Wheatley textarea draft treatment)
+- ALL 7 PAGES COMPLETE
 - 📋 Quest site completion (Snake 451 + final stages)
 
 ### Phase 6: Polish & Launch (FUTURE)
@@ -966,8 +966,8 @@ Consistent Pixar-quality 3D animated illustration style across all service pages
 - About: Wheatley as footnote [42], conspiratorial tone (COMPLETE)
 - Maintenance: Terminal emulator with fake log lines + Wheatley prompt (COMPLETE)
 - Email Marketing: Corrupted inbox UI with glitching competitor emails (COMPLETE)
-- Contact: Minimal treatment (TBD)
-- Status: 6 of 7 complete
+- Contact: Wheatley drafts terrible inquiry into CF7 textarea, bad salesman voice (COMPLETE)
+- Status: 7 of 7 complete
 - Date: Feb 23, 2026
 
 **2026-02-23: Global Site Footer**

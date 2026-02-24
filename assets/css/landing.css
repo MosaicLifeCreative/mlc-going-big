@@ -2409,6 +2409,107 @@ body:has(#wheatley-message) .cursor-blink {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
+/* ─── CF7 OVERRIDES ───────────────────────────── */
+
+/* CF7 wraps inputs in spans */
+.sp-contact-form .wpcf7-form-control-wrap {
+    display: block;
+    width: 100%;
+}
+
+/* CF7 input fields */
+.sp-contact-form .wpcf7-text,
+.sp-contact-form .wpcf7-email,
+.sp-contact-form .wpcf7-tel,
+.sp-contact-form .wpcf7-textarea {
+    width: 100%;
+    padding: 18px 22px !important;
+    font-size: 16px !important;
+    font-family: var(--font-main) !important;
+    border-radius: 12px !important;
+    border: 2px solid rgba(0, 0, 0, 0.08) !important;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.95) !important;
+    color: var(--dark) !important;
+}
+
+.sp-contact-form .wpcf7-text:focus,
+.sp-contact-form .wpcf7-email:focus,
+.sp-contact-form .wpcf7-tel:focus,
+.sp-contact-form .wpcf7-textarea:focus {
+    outline: none !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+}
+
+.sp-contact-form .wpcf7-textarea {
+    min-height: 180px;
+    resize: vertical;
+}
+
+/* CF7 submit button */
+.sp-contact-form .wpcf7-submit {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 18px 48px;
+    background: linear-gradient(135deg, var(--primary), var(--accent)) !important;
+    color: #fff !important;
+    font-size: 17px !important;
+    font-weight: 700;
+    font-family: var(--font-main) !important;
+    border: none !important;
+    border-radius: 14px !important;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 20px rgba(124, 58, 237, 0.25);
+    letter-spacing: -0.3px;
+}
+
+.sp-contact-form .wpcf7-submit:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 12px 36px rgba(124, 58, 237, 0.35);
+}
+
+/* CF7 validation messages */
+.sp-contact-form .wpcf7-not-valid-tip {
+    color: var(--accent);
+    font-size: 13px;
+    margin-top: 6px;
+}
+
+.sp-contact-form .wpcf7-response-output {
+    border: none !important;
+    padding: 16px 0 !important;
+    margin: 16px 0 0 !important;
+    font-size: 15px;
+}
+
+/* Wheatley label above form */
+.sp-contact-form__wheatley-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--primary);
+    opacity: 0;
+    margin-bottom: 16px;
+    transition: opacity 0.6s ease;
+}
+
+.sp-contact-form__wheatley-label.is-visible {
+    opacity: 0.5;
+}
+
+/* Contact info hint text */
+.sp-contact-info__hint {
+    font-size: 12px;
+    font-style: italic;
+    color: rgba(0, 0, 0, 0.3);
+    margin-top: 2px;
+    letter-spacing: 0;
+}
+
 /* ─── RESPONSIVE ───────────────────────────────── */
 
 @media (max-width: 768px) {

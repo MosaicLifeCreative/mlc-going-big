@@ -1,7 +1,7 @@
 <?php
 /**
  * Template Name: Contact
- * Description: Contact page with form and info
+ * Description: Contact page with CF7 form + Wheatley textarea draft
  *
  * @package MosaicLifeCreative
  */
@@ -22,70 +22,54 @@ if (!defined('ABSPATH')) exit;
 
     <?php wp_head(); ?>
 </head>
-<body <?php body_class('service-page'); ?>>
+<body <?php body_class('mlc-page'); ?>>
 <?php wp_body_open(); ?>
 
-    <?php mlc_render_gradient_blobs(); ?>
+    <!-- ═══ HERO ═══════════════════════════════════════ -->
+    <section class="sp-hero">
+        <?php mlc_render_gradient_blobs(); ?>
+        <h1 class="sp-hero__title reveal">Let's<br>Talk</h1>
+        <p class="sp-hero__subtitle reveal" style="--delay: 0.15s">We read every message. We respond to every one. No ticket queue, no auto-reply.</p>
+        <div class="sp-hero__accent reveal" style="--delay: 0.3s"></div>
+    </section>
 
-    <main class="service-page">
-        <div class="service-page__container">
+    <!-- ═══ FORM + CONTACT INFO ═══════════════════════ -->
+    <section class="sp-section sp-section--light" data-wheatley-page="contact" data-wheatley-context="Contact page. You are 'helping' by drafting the visitor's inquiry message for them. The text goes directly into the contact form textarea. Stay in character as the bad salesman. Draft something that sounds like Wheatley trying to help someone ask for a website. Rambling, accidentally underselling, saying the quiet part out loud. Write it as a draft message to MLC, not as commentary. Start writing directly, no 'Right so' opener since this is supposed to be the visitor's message.">
+        <div class="sp-section__inner">
+            <div class="sp-contact-grid">
 
-            <section class="service-hero">
-                <h1 class="service-hero__title">Contact</h1>
-                <p class="service-hero__subtitle">Let's figure out what you need.</p>
-            </section>
+                <div class="sp-contact-form reveal">
+                    <div class="sp-contact-form__wheatley-label">MLC Personality Core v2.7.4</div>
+                    <?php echo do_shortcode('[contact-form-7 id="99c0016" title="MLC Contact Form"]'); ?>
+                </div>
 
-            <section class="service-content">
-                <div class="contact-grid">
-                    <div class="contact-form">
-                        <form id="mlcContactForm" method="post" action="">
-                            <?php wp_nonce_field('mlc_contact_form', 'mlc_contact_nonce'); ?>
-                            <div class="contact-form__group">
-                                <label class="contact-form__label" for="contact-name">Name</label>
-                                <input type="text" id="contact-name" name="contact_name" required autocomplete="name" placeholder="Your name">
-                            </div>
-                            <div class="contact-form__group">
-                                <label class="contact-form__label" for="contact-email">Email</label>
-                                <input type="email" id="contact-email" name="contact_email" required autocomplete="email" placeholder="your@email.com">
-                            </div>
-                            <div class="contact-form__group">
-                                <label class="contact-form__label" for="contact-phone">Phone <span style="font-weight: 400; text-transform: none; letter-spacing: 0;">(optional)</span></label>
-                                <input type="tel" id="contact-phone" name="contact_phone" autocomplete="tel" placeholder="(555) 555-5555">
-                            </div>
-                            <div class="contact-form__group">
-                                <label class="contact-form__label" for="contact-message">What are you looking for?</label>
-                                <textarea id="contact-message" name="contact_message" required placeholder="Tell us about your project, your business, or what you're trying to solve."></textarea>
-                            </div>
-                            <button type="submit" class="contact-form__submit">Send Message</button>
-                        </form>
+                <div class="sp-contact-info reveal" style="--delay: 0.15s">
+                    <div class="sp-contact-info__item">
+                        <div class="sp-contact-info__label">Email</div>
+                        <div class="sp-contact-info__value">
+                            <a href="mailto:trey@mosaiclifecreative.com">trey@mosaiclifecreative.com</a>
+                        </div>
                     </div>
-
-                    <div class="contact-info">
-                        <div class="contact-info__item">
-                            <div class="contact-info__label">Email</div>
-                            <div class="contact-info__value">
-                                <a href="mailto:trey@mosaiclifecreative.com">trey@mosaiclifecreative.com</a>
-                            </div>
+                    <div class="sp-contact-info__item">
+                        <div class="sp-contact-info__label">Phone</div>
+                        <div class="sp-contact-info__value">
+                            <a href="tel:+13802013300">(380) 201-3300</a>
                         </div>
-                        <div class="contact-info__item">
-                            <div class="contact-info__label">Location</div>
-                            <div class="contact-info__value">Columbus, Ohio</div>
-                        </div>
-                        <div class="contact-info__item">
-                            <div class="contact-info__label">Response Time</div>
-                            <div class="contact-info__value">Usually within a few hours</div>
-                        </div>
-                        <div class="contact-info__item">
-                            <div class="contact-info__label">Prefer to talk?</div>
-                            <div class="contact-info__value">Skip the form and book a call directly.</div>
-                            <a href="#" class="contact-book-link">Book a Call</a>
-                        </div>
+                        <div class="sp-contact-info__hint">Text first. Call after we're friends.</div>
+                    </div>
+                    <div class="sp-contact-info__item">
+                        <div class="sp-contact-info__label">Location</div>
+                        <div class="sp-contact-info__value">Columbus, Ohio</div>
+                    </div>
+                    <div class="sp-contact-info__item">
+                        <div class="sp-contact-info__label">Response Time</div>
+                        <div class="sp-contact-info__value">Usually within a few hours</div>
                     </div>
                 </div>
-            </section>
 
+            </div>
         </div>
-    </main>
+    </section>
 
     <?php wp_footer(); ?>
 
