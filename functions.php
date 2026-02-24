@@ -46,7 +46,7 @@ function mlc_enqueue_global_assets() {
         'mlc-global-css',
         get_stylesheet_directory_uri() . '/assets/css/landing.css',
         array(),
-        '1.5.5',
+        '1.5.6',
         'all'
     );
 
@@ -573,7 +573,7 @@ function mlc_inject_countdown_footer() {
                     <div class="site-footer__connect-label">Connect</div>
                     <div class="site-footer__connect-item">
                         <div class="site-footer__connect-key">Email</div>
-                        <a href="mailto:trey@mosaiclifecreative.com" class="site-footer__connect-value">trey@mosaiclifecreative.com</a>
+                        <a href="mailto:trey@mosaiclifecreative.com?subject=Found%20You%20on%20the%20Internet" class="site-footer__connect-value">trey@mosaiclifecreative.com</a>
                     </div>
                     <div class="site-footer__connect-item">
                         <div class="site-footer__connect-key">Location</div>

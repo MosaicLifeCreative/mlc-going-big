@@ -50,7 +50,7 @@ if (!defined('ABSPATH')) exit;
                     <div class="sp-contact-info__item">
                         <div class="sp-contact-info__label">Email</div>
                         <div class="sp-contact-info__value">
-                            <a href="mailto:trey@mosaiclifecreative.com">trey@mosaiclifecreative.com</a>
+                            <a href="mailto:trey@mosaiclifecreative.com?subject=Wheatley%20Sent%20Me">trey@mosaiclifecreative.com</a>
                         </div>
                     </div>
                     <div class="sp-contact-info__item">

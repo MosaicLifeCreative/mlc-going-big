@@ -2527,7 +2527,13 @@ body:has(#wheatley-message) .cursor-blink {
 }
 
 .sp-contact-info--dark .sp-contact-info__value a {
+    color: var(--secondary);
+    transition: color 0.3s ease;
+}
+
+.sp-contact-info--dark .sp-contact-info__value a:hover {
     color: var(--primary);
+    opacity: 1;
 }
 
 /* Contact info hint text */
