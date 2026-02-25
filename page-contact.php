@@ -25,6 +25,7 @@ if (!defined('ABSPATH')) exit;
 <body <?php body_class('mlc-page'); ?>>
 <?php wp_body_open(); ?>
 
+    <main>
     <!-- ═══ HERO ═══════════════════════════════════════ -->
     <section class="sp-hero">
         <?php mlc_render_gradient_blobs(); ?>
@@ -73,6 +74,7 @@ if (!defined('ABSPATH')) exit;
             </div>
         </div>
     </section>
+    </main>
 
     <?php wp_footer(); ?>
 

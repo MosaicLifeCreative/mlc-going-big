@@ -8,15 +8,15 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 
 ## Quick Start (For New Sessions)
 
-**Current Status:** All 7 pages complete with sp- design system and unique Wheatley treatments. Contact page uses CF7 with Wheatley textarea draft. Maintenance page has 2 image placeholders remaining. Em-dash ban site-wide.
+**Current Status:** LIVE at mosaiclifecreative.com. All 7 pages complete with sp- design system, unique Wheatley treatments, monogram SVG branding, JSON-LD structured data, semantic HTML, and Slim SEO meta descriptions. CF7 configured. All Pixar images done. Em-dash ban site-wide.
 
 **Next Priorities:**
-1. Configure CF7 form in WP Admin (template provided in plan)
-2. Generate Pixar-style images for Maintenance + Contact pages
+1. OG share graphic (1200x630 branded card for social sharing)
+2. Redirect fresh.mosaiclifecreative.com → mosaiclifecreative.com
 3. Photo slideshow expansion (50-100 photos with hunt clues)
 4. HUNT knowledge base for Chatling
 5. Quest site deployment (4815162342.quest)
-6. Final polish and launch (Phase 6)
+6. Snake 451 point system refinement
 
 ---
 
@@ -32,10 +32,10 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 | `page-email-marketing.php` | v2 | Email Marketing - sp- system + corrupted inbox Wheatley treatment |
 | `page-about.php` | v2 | About - clean bio + Myst journal records + Wheatley as footnote [42] |
 | `page-contact.php` | v2 | Contact - CF7 form + Wheatley textarea draft treatment |
-| `assets/css/landing.css` | 1.5.3 | All styles + sp- system + sp-journal + Wheatley void + corrupted inbox + terminal + CF7 overrides + global footer + portal + cursor color cycling |
+| `assets/css/landing.css` | 1.6.4 | All styles + sp- system + monogram branding + grid line visibility fix + mobile about photo + margin note rotation |
 | `assets/js/landing.js` | 1.7.2 | Interactive behaviors + Wheatley + share API + session persistence |
-| `assets/js/global.js` | 1.5.2 | Nav + Chatling + scroll reveals + countdown + Wheatley page sections + contact form draft |
-| `functions.php` | 1.9.2 | Enqueue + hunt + Wheatley APIs (with SHADE directive) + gradient blobs + countdown footer + global footer + Chatling exclusion |
+| `assets/js/global.js` | 1.5.4 | Nav + Chatling + scroll reveals + countdown + Wheatley page sections + hamburger contrast (footer + void) |
+| `functions.php` | 1.9.3 | Enqueue + hunt + Wheatley APIs + JSON-LD structured data + monogram SVG in nav/footer + Chatling exclusion |
 | `mlc-toolkit/` | 1.0.1 | Plugin: photo management, share analytics, URL shortener, dashboard widget |
 | `services-mockup.html` | Mockup | Original services vision (superseded by sp- system) |
 | `snake-451.html` | Prototype | Hunt game (needs point system refinement) |
@@ -619,11 +619,12 @@ General pattern: `sp-hero` → content sections (splits, statement, process, por
 ## File Versions & Status
 
 **Current Deployed:**
-- CSS: v1.5.3 (sp- system + sp-journal + Wheatley void + corrupted inbox + terminal + CF7 overrides + global footer + portal + cursor color cycling)
+- CSS: v1.6.4 (sp- system + monogram branding + grid line visibility + mobile about photo + margin note rotation)
 - JS (landing): v1.7.2 (share API integration + session-persistent personalization)
-- JS (global): v1.5.1 (nav + scroll reveals + countdown + Wheatley page sections + hamburger contrast fix)
-- PHP: v1.9.2 (Wheatley APIs with SHADE directive + global footer + Chatling exclusion)
+- JS (global): v1.5.4 (nav + scroll reveals + countdown + Wheatley page sections + hamburger contrast with footer/void)
+- PHP: v1.9.3 (Wheatley APIs + JSON-LD structured data + monogram SVG in nav/footer + Chatling exclusion)
 - MLC Toolkit: v1.0.1 (photo management, share analytics, URL shortener, dashboard widget)
+- SEO: Slim SEO Premium (meta descriptions, OG tags, canonical URLs, sitemap)
 
 **Key Functions:**
 
@@ -710,14 +711,14 @@ Consistent Pixar-quality 3D animated illustration style across all service pages
 - Screen content: "Numbers and icons only, no words or text" (AI generates gibberish text)
 - Background must stay in animated world (avoid DSLR bokeh / photorealism)
 
-**Image status:**
-- Email Marketing: 2 images complete (subscription trap + infrastructure calm)
-- Website Design: 2 images complete (template hallway + custom design excitement)
-- Hosting: 2 placeholders remaining (server chaos + dashboard monitoring)
+**Image status:** ALL COMPLETE
+- Email Marketing: 2 images (subscription trap + infrastructure calm)
+- Website Design: 2 images (template hallway + custom design excitement)
+- Hosting: 2 images (server chaos + dashboard monitoring)
+- Maintenance: 2 images
 - AI Chat Agents: No image needed (inline Chatling embed)
-- About: No image placeholders
-- Maintenance: TBD (page not yet rebuilt)
-- Contact: TBD (page not yet rebuilt)
+- About: Photo of Trey
+- Contact: No images needed
 
 ### 6. Advanced Wheatley Features
 - Hunt meta-commentary based on countdown proximity
@@ -811,7 +812,7 @@ Consistent Pixar-quality 3D animated illustration style across all service pages
 - ✅ Session-persistent personalization (survives page reloads)
 - 📋 Chatling HUNT knowledge base
 
-### Phase 5: Site Expansion (IN PROGRESS - Feb 23, 2026)
+### Phase 5: Site Expansion (COMPLETE - Feb 24, 2026)
 - ✅ sp- design system (full-bleed sections, scroll reveals, dark/light rhythm)
 - ✅ AI Chat Agents page (pilot with Wheatley void + inline Chatling embed)
 - ✅ Website Design page (full rebuild with sp- system + blue portal)
@@ -826,16 +827,24 @@ Consistent Pixar-quality 3D animated illustration style across all service pages
 - ✅ Email Marketing page (sp- system + corrupted inbox Wheatley treatment)
 - ✅ Maintenance page (sp- system + terminal Wheatley treatment)
 - ✅ Contact page (CF7 form + Wheatley textarea draft treatment)
+- ✅ All Pixar-style images complete
+- ✅ CF7 form configured
 - ALL 7 PAGES COMPLETE
-- 📋 Quest site completion (Snake 451 + final stages)
 
-### Phase 6: Polish & Launch (FUTURE)
-- Performance optimization
-- SEO implementation
-- Cross-browser testing
-- Mobile QA
-- Analytics setup
-- Launch checklist execution
+### Phase 6: Launch & SEO (COMPLETE - Feb 24, 2026)
+- ✅ Site migrated from fresh.mosaiclifecreative.com to mosaiclifecreative.com
+- ✅ Monogram SVG branding (nav + footer with wordmark weight split)
+- ✅ JSON-LD structured data (Organization, LocalBusiness, Service x5, Person)
+- ✅ Semantic `<main>` wrappers on all 8 templates
+- ✅ Slim SEO Premium (meta descriptions, OG tags, canonical URLs, sitemap)
+- ✅ Google Search Console verified (Domain property) + sitemap submitted
+- ✅ Site Kit connected
+- ✅ Wheatley void grid line visibility bumped
+- ✅ About photo square on mobile, margin notes rotated on mobile
+- ✅ Hamburger contrast: footer + wheatley-void added to dark sections
+- 📋 OG share graphic (1200x630)
+- 📋 Redirect fresh.mosaiclifecreative.com → mosaiclifecreative.com
+- 📋 Quest site completion (Snake 451 + final stages)
 
 ---
 

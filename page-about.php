@@ -25,6 +25,7 @@ if (!defined('ABSPATH')) exit;
 <body <?php body_class('mlc-page'); ?>>
 <?php wp_body_open(); ?>
 
+    <main>
     <!-- ═══════════════════════════════════════════════════════════
          LAYER 1 — CLEAN ABOUT
          ═══════════════════════════════════════════════════════════ -->
@@ -210,6 +211,7 @@ if (!defined('ABSPATH')) exit;
         <p class="sp-cta__subtitle reveal" style="--delay: 0.1s">No pitch decks, no discovery phases, no "synergy." Just a conversation about your business.</p>
         <a href="/contact" class="sp-cta__button reveal" style="--delay: 0.2s">Get in Touch</a>
     </section>
+    </main>
 
     <?php wp_footer(); ?>
 

@@ -289,11 +289,13 @@ html, body {
 }
 
 .nav-overlay__brand {
-    font-size: 14px;
-    color: #666;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.nav-overlay__monogram {
+    width: 48px;
+    height: auto;
+    display: block;
 }
 
 .nav-list {
@@ -694,12 +696,23 @@ html, body {
 }
 
 /* ─── Brand Column ─── */
+.site-footer__monogram {
+    width: 48px;
+    height: auto;
+    display: block;
+    margin-bottom: 16px;
+}
+
 .site-footer__logo {
     font-size: clamp(24px, 3vw, 32px);
     font-weight: 800;
     color: #fff;
     letter-spacing: -0.5px;
     line-height: 1.2;
+}
+
+.site-footer__logo-light {
+    font-weight: 400;
     margin-bottom: 12px;
 }
 
@@ -912,6 +925,11 @@ a.site-footer__connect-value:hover {
     .site-footer__brand {
         grid-column: auto;
         text-align: center;
+    }
+
+    .site-footer__monogram {
+        margin-left: auto;
+        margin-right: auto;
     }
 
     .site-footer__desc {
@@ -1418,6 +1436,10 @@ body:has(#wheatley-message) .cursor-blink {
 
     .nav-overlay__right {
         display: none;
+    }
+
+    .nav-overlay__monogram {
+        width: 64px;
     }
 
     .gradient-orb--1 { width: 300px; height: 300px; }
@@ -2314,8 +2336,15 @@ body:has(#wheatley-message) .cursor-blink {
         right: auto;
         width: 100%;
         max-width: none;
-        transform: none;
         margin: 20px 0;
+    }
+
+    .sp-journal__margin-note {
+        transform: rotate(-1.5deg);
+    }
+
+    .sp-journal__margin-note--alt {
+        transform: rotate(1.2deg);
     }
 
     .sp-journal__entry-title {
@@ -2666,8 +2695,8 @@ body:has(#wheatley-message) .cursor-blink {
     }
 
     .sp-about-photo {
-        aspect-ratio: 16 / 9;
-        max-height: 320px;
+        aspect-ratio: 1 / 1;
+        max-height: none;
     }
 
     .sp-values {
@@ -2721,15 +2750,15 @@ body:has(#wheatley-message) .cursor-blink {
             90deg,
             transparent,
             transparent 79px,
-            rgba(124, 58, 237, 0.04) 79px,
-            rgba(124, 58, 237, 0.04) 80px
+            rgba(124, 58, 237, 0.1) 79px,
+            rgba(124, 58, 237, 0.1) 80px
         ),
         repeating-linear-gradient(
             0deg,
             transparent,
             transparent 79px,
-            rgba(124, 58, 237, 0.04) 79px,
-            rgba(124, 58, 237, 0.04) 80px
+            rgba(124, 58, 237, 0.1) 79px,
+            rgba(124, 58, 237, 0.1) 80px
         );
     transform: perspective(300px) rotateX(40deg);
     transform-origin: center 80%;
@@ -3226,10 +3255,10 @@ body:has(#wheatley-message) .cursor-blink {
 /* Blue-tinted grid */
 .wheatley-void--portal-blue .wheatley-void__grid {
     background: linear-gradient(
-        rgba(59, 130, 246, 0.03) 1px, transparent 1px
+        rgba(59, 130, 246, 0.08) 1px, transparent 1px
     ),
     linear-gradient(
-        90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px
+        90deg, rgba(59, 130, 246, 0.08) 1px, transparent 1px
     );
     background-size: 60px 60px;
 }
@@ -3386,10 +3415,10 @@ body:has(#wheatley-message) .cursor-blink {
 
 .wheatley-void--portal-orange .wheatley-void__grid {
     background: linear-gradient(
-        rgba(249, 115, 22, 0.03) 1px, transparent 1px
+        rgba(249, 115, 22, 0.08) 1px, transparent 1px
     ),
     linear-gradient(
-        90deg, rgba(249, 115, 22, 0.03) 1px, transparent 1px
+        90deg, rgba(249, 115, 22, 0.08) 1px, transparent 1px
     );
     background-size: 60px 60px;
 }

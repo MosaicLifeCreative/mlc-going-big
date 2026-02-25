@@ -26,7 +26,7 @@ if (!defined('ABSPATH')) exit;
 <body <?php body_class('mlc-landing-page'); ?>>
 <?php wp_body_open(); // This triggers nav injection from functions.php ?>
 
-    <div class="mlc-landing">
+    <main class="mlc-landing">
         <!-- Render shared gradient background -->
         <?php mlc_render_gradient_blobs(); ?>
 
@@ -59,7 +59,7 @@ if (!defined('ABSPATH')) exit;
         
         <!-- Share Button (Bottom Left) -->
         <button class="share-btn" id="shareBtn">Personalize & Share //</button>
-    </div>
+    </main>
 
     <!-- Hunt Modal -->
     <div class="hunt-modal" id="huntModal">

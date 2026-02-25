@@ -1,7 +1,7 @@
 <?php
 /**
  * Divi Child Theme Functions
- * Version: 1.8.1 - MLC Toolkit integration, dynamic photos, 9-item nav
+ * Version: 1.9.3 - JSON-LD structured data, monogram SVG in nav + footer
  * 
  * Enqueues parent and child theme styles and custom scripts.
  */
@@ -46,7 +46,7 @@ function mlc_enqueue_global_assets() {
         'mlc-global-css',
         get_stylesheet_directory_uri() . '/assets/css/landing.css',
         array(),
-        '1.6.2',
+        '1.6.4',
         'all'
     );
 
@@ -55,7 +55,7 @@ function mlc_enqueue_global_assets() {
         'mlc-global-js',
         get_stylesheet_directory_uri() . '/assets/js/global.js',
         array(),
-        '1.5.3',
+        '1.5.4',
         true
     );
 }
@@ -147,6 +147,154 @@ function mlc_add_hunt_nonce() {
     <?php
 }
 add_action('wp_head', 'mlc_add_hunt_nonce');
+
+// ============================================
+// SEO: JSON-LD Structured Data
+// ============================================
+
+function mlc_inject_jsonld() {
+    $site_url = home_url();
+    $logo_url = content_url('/uploads/2026/02/mosaic-life-monogram.svg');
+
+    // ─── Organization (every page) ───
+    $org = array(
+        '@context' => 'https://schema.org',
+        '@type'    => 'Organization',
+        '@id'      => $site_url . '/#organization',
+        'name'     => 'Mosaic Life Creative',
+        'url'      => $site_url,
+        'logo'     => $logo_url,
+        'email'    => 'trey@mosaiclifecreative.com',
+        'telephone'=> '+13802013300',
+        'description' => 'Web design and AI chat agents for service businesses in Columbus, Ohio.',
+        'areaServed' => array(
+            '@type' => 'City',
+            'name'  => 'Columbus',
+            'containedInPlace' => array(
+                '@type' => 'State',
+                'name'  => 'Ohio'
+            )
+        ),
+        'sameAs' => array()
+    );
+
+    echo '<script type="application/ld+json">' . wp_json_encode($org, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . '</script>' . "\n";
+
+    // ─── LocalBusiness (homepage + contact) ───
+    if (is_front_page() || is_page_template('page-landing.php') || is_page_template('page-contact.php')) {
+        $local = array(
+            '@context'   => 'https://schema.org',
+            '@type'      => 'ProfessionalService',
+            '@id'        => $site_url . '/#localbusiness',
+            'name'       => 'Mosaic Life Creative',
+            'url'        => $site_url,
+            'logo'       => $logo_url,
+            'image'      => $logo_url,
+            'email'      => 'trey@mosaiclifecreative.com',
+            'telephone'  => '+13802013300',
+            'description'=> 'Web design and AI chat agents for service businesses. HVAC contractors, chimney sweeps, property managers. Columbus, Ohio.',
+            'address'    => array(
+                '@type'           => 'PostalAddress',
+                'addressLocality' => 'Columbus',
+                'addressRegion'   => 'OH',
+                'addressCountry'  => 'US'
+            ),
+            'geo' => array(
+                '@type'     => 'GeoCoordinates',
+                'latitude'  => 39.8819,
+                'longitude' => -83.0858
+            ),
+            'priceRange'       => '$$',
+            'openingHoursSpecification' => array(
+                '@type'     => 'OpeningHoursSpecification',
+                'dayOfWeek' => array('Monday','Tuesday','Wednesday','Thursday','Friday'),
+                'opens'     => '09:00',
+                'closes'    => '17:00'
+            ),
+            'founder' => array(
+                '@type' => 'Person',
+                'name'  => 'Trey Kauffman'
+            )
+        );
+
+        echo '<script type="application/ld+json">' . wp_json_encode($local, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . '</script>' . "\n";
+    }
+
+    // ─── Service schemas (per service page) ───
+    $services = array(
+        'page-website-design.php' => array(
+            'name'        => 'Custom Website Design',
+            'description' => 'Custom WordPress websites for service businesses. No templates. Built around your business, your customers, and how you actually work.',
+            'url'         => $site_url . '/website-design'
+        ),
+        'page-hosting.php' => array(
+            'name'        => 'Managed Website Hosting',
+            'description' => 'Managed WordPress hosting on Google Cloud infrastructure. Daily backups, SSL, CDN, WAF, and proactive monitoring included.',
+            'url'         => $site_url . '/hosting'
+        ),
+        'page-maintenance.php' => array(
+            'name'        => 'Website Maintenance',
+            'description' => 'Ongoing WordPress maintenance. Core updates, plugin updates, security monitoring, performance optimization, and monthly reporting.',
+            'url'         => $site_url . '/maintenance'
+        ),
+        'page-email-marketing.php' => array(
+            'name'        => 'Email Marketing Infrastructure',
+            'description' => 'Self-hosted email marketing on infrastructure you own. No monthly platform fees. Campaigns, automation, segmentation, and analytics.',
+            'url'         => $site_url . '/email-marketing'
+        ),
+        'page-ai-chat-agents.php' => array(
+            'name'        => 'AI Chat Agents',
+            'description' => 'Custom-trained AI chat agents for service businesses. 24/7 customer engagement, lead qualification, and appointment scheduling.',
+            'url'         => $site_url . '/ai-chat-agents'
+        )
+    );
+
+    foreach ($services as $template => $svc) {
+        if (is_page_template($template)) {
+            $service_schema = array(
+                '@context'  => 'https://schema.org',
+                '@type'     => 'Service',
+                'name'      => $svc['name'],
+                'description' => $svc['description'],
+                'url'       => $svc['url'],
+                'provider'  => array(
+                    '@type' => 'Organization',
+                    '@id'   => $site_url . '/#organization'
+                ),
+                'areaServed' => array(
+                    '@type' => 'City',
+                    'name'  => 'Columbus',
+                    'containedInPlace' => array(
+                        '@type' => 'State',
+                        'name'  => 'Ohio'
+                    )
+                )
+            );
+
+            echo '<script type="application/ld+json">' . wp_json_encode($service_schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . '</script>' . "\n";
+            break;
+        }
+    }
+
+    // ─── Person schema (about page) ───
+    if (is_page_template('page-about.php')) {
+        $person = array(
+            '@context'    => 'https://schema.org',
+            '@type'       => 'Person',
+            'name'        => 'Trey Kauffman',
+            'jobTitle'    => 'Founder',
+            'worksFor'    => array(
+                '@type' => 'Organization',
+                '@id'   => $site_url . '/#organization'
+            ),
+            'url'         => $site_url . '/about',
+            'description' => 'Founder of Mosaic Life Creative. Web design and AI chat agents for service businesses in Columbus, Ohio.'
+        );
+
+        echo '<script type="application/ld+json">' . wp_json_encode($person, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . '</script>' . "\n";
+    }
+}
+add_action('wp_head', 'mlc_inject_jsonld');
 
 // ============================================
 // Wheatley AI API Endpoint
@@ -464,7 +612,9 @@ function mlc_inject_nav_html() {
         <button class="nav-overlay__close" id="navClose" aria-label="Close navigation">&times;</button>
 
         <div class="nav-overlay__left">
-            <div class="nav-overlay__brand">Mosaic Life Creative</div>
+            <div class="nav-overlay__brand">
+                <svg class="nav-overlay__monogram" viewBox="0 0 650.55 522.09" xmlns="http://www.w3.org/2000/svg" aria-label="Mosaic Life Creative"><defs><radialGradient id="mlcNavGrad" cx="325.27" cy="261.05" fx="733.95" fy="76.18" r="622.83" gradientTransform="translate(-84.44 208.08) rotate(-30.69) scale(1 .98)" gradientUnits="userSpaceOnUse"><stop offset=".12" stop-color="#06b8d5"/><stop offset=".73" stop-color="#7a3beb"/></radialGradient></defs><path fill="url(#mlcNavGrad)" d="M605.55,522.09h-210.46c-24.85,0-45-20.15-45-45V193.78l-92.59,139.06c-8.34,12.53-22.4,20.06-37.46,20.06s-29.11-7.53-37.46-20.06l-92.59-139.06v211.88c0,24.85-20.15,45-45,45S0,430.52,0,405.66V45C0,25.17,12.99,7.67,31.97,1.93c18.99-5.74,39.49,1.62,50.49,18.13l137.59,206.64L357.63,20.06c10.99-16.51,31.5-23.88,50.48-18.13,18.99,5.74,31.97,23.24,31.97,43.07v387.09h165.46c24.85,0,45,20.15,45,45s-20.15,45-45,45Z"/><circle fill="#fff" cx="397.1" cy="73.17" r="18.17"/></svg>
+            </div>
             <nav>
                 <ul class="nav-list" id="navList">
                     <li class="nav-item" data-index="0">
@@ -554,7 +704,8 @@ function mlc_inject_countdown_footer() {
 
                 <!-- Brand -->
                 <div class="site-footer__brand">
-                    <div class="site-footer__logo">Mosaic Life Creative</div>
+                    <svg class="site-footer__monogram" viewBox="0 0 650.55 522.09" xmlns="http://www.w3.org/2000/svg" aria-label="Mosaic Life Creative"><defs><radialGradient id="mlcFootGrad" cx="325.27" cy="261.05" fx="733.95" fy="76.18" r="622.83" gradientTransform="translate(-84.44 208.08) rotate(-30.69) scale(1 .98)" gradientUnits="userSpaceOnUse"><stop offset=".12" stop-color="#06b8d5"/><stop offset=".73" stop-color="#7a3beb"/></radialGradient></defs><path fill="url(#mlcFootGrad)" d="M605.55,522.09h-210.46c-24.85,0-45-20.15-45-45V193.78l-92.59,139.06c-8.34,12.53-22.4,20.06-37.46,20.06s-29.11-7.53-37.46-20.06l-92.59-139.06v211.88c0,24.85-20.15,45-45,45S0,430.52,0,405.66V45C0,25.17,12.99,7.67,31.97,1.93c18.99-5.74,39.49,1.62,50.49,18.13l137.59,206.64L357.63,20.06c10.99-16.51,31.5-23.88,50.48-18.13,18.99,5.74,31.97,23.24,31.97,43.07v387.09h165.46c24.85,0,45,20.15,45,45s-20.15,45-45,45Z"/><circle fill="#fff" cx="397.1" cy="73.17" r="18.17"/></svg>
+                    <div class="site-footer__logo">Mosaic Life <span class="site-footer__logo-light">Creative</span></div>
                     <div class="site-footer__tagline">Built Different.</div>
                     <p class="site-footer__desc">Web design and AI chat agents for businesses that refuse to blend in.</p>
                 </div>
