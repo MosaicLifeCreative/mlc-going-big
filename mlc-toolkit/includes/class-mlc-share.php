@@ -174,20 +174,30 @@ class MLC_Share {
     }
 
     /**
-     * Get all links with click counts (paginated)
+     * Get all links with click counts (paginated, optional source filter)
      */
-    public static function get_links_with_clicks($page = 1, $per_page = 15) {
+    public static function get_links_with_clicks($page = 1, $per_page = 15, $source = '') {
         global $wpdb;
         $links_table  = $wpdb->prefix . 'mlc_share_links';
         $clicks_table = $wpdb->prefix . 'mlc_share_clicks';
         $offset       = ($page - 1) * $per_page;
 
-        $total = (int) $wpdb->get_var("SELECT COUNT(*) FROM $links_table");
+        $where = '';
+        if ($source) {
+            $where = $wpdb->prepare(" WHERE l.source = %s", $source);
+        }
+
+        $total = (int) $wpdb->get_var(
+            $source
+                ? $wpdb->prepare("SELECT COUNT(*) FROM $links_table WHERE source = %s", $source)
+                : "SELECT COUNT(*) FROM $links_table"
+        );
 
         $rows = $wpdb->get_results($wpdb->prepare(
             "SELECT l.*, COUNT(c.id) AS click_count
              FROM $links_table l
              LEFT JOIN $clicks_table c ON c.link_id = l.id
+             {$where}
              GROUP BY l.id
              ORDER BY l.created_at DESC
              LIMIT %d OFFSET %d",

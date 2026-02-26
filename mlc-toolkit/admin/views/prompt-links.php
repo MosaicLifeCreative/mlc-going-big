@@ -1,10 +1,12 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-$data = MLC_Share::get_links_with_clicks(1, 50);
-$admin_links = array_filter($data['links'], function($l) {
-    return isset($l->source) && $l->source === 'admin';
-});
+$paged = isset($_GET['paged']) ? max(1, absint($_GET['paged'])) : 1;
+$per_page = 15;
+$data = MLC_Share::get_links_with_clicks($paged, $per_page, 'admin');
+$admin_links = $data['links'];
+$total_pages = $data['pages'];
+$total_links = $data['total'];
 
 // Check if we're editing
 $editing = null;
@@ -72,7 +74,7 @@ if (isset($_GET['edit'])) {
     <!-- Existing Admin Links -->
     <?php if (!empty($admin_links)): ?>
     <div class="mlc-prompt-card" style="margin-top: 24px;">
-        <h2>Admin-Created Links</h2>
+        <h2>Admin-Created Links <span class="count">(<?php echo esc_html($total_links); ?>)</span></h2>
         <table class="wp-list-table widefat fixed striped">
             <thead>
                 <tr>
@@ -103,6 +105,35 @@ if (isset($_GET['edit'])) {
                 <?php endforeach; ?>
             </tbody>
         </table>
+
+        <?php if ($total_pages > 1): ?>
+        <div class="tablenav bottom">
+            <div class="tablenav-pages">
+                <span class="displaying-num"><?php echo esc_html($total_links); ?> items</span>
+                <span class="pagination-links">
+                    <?php if ($paged > 1): ?>
+                        <a class="first-page button" href="<?php echo esc_url(admin_url('admin.php?page=mlc-prompt-links&paged=1')); ?>">&laquo;</a>
+                        <a class="prev-page button" href="<?php echo esc_url(admin_url('admin.php?page=mlc-prompt-links&paged=' . ($paged - 1))); ?>">&lsaquo;</a>
+                    <?php else: ?>
+                        <span class="tablenav-pages-navspan button disabled">&laquo;</span>
+                        <span class="tablenav-pages-navspan button disabled">&lsaquo;</span>
+                    <?php endif; ?>
+
+                    <span class="paging-input">
+                        <span class="tablenav-paging-text"><?php echo esc_html($paged); ?> of <span class="total-pages"><?php echo esc_html($total_pages); ?></span></span>
+                    </span>
+
+                    <?php if ($paged < $total_pages): ?>
+                        <a class="next-page button" href="<?php echo esc_url(admin_url('admin.php?page=mlc-prompt-links&paged=' . ($paged + 1))); ?>">&rsaquo;</a>
+                        <a class="last-page button" href="<?php echo esc_url(admin_url('admin.php?page=mlc-prompt-links&paged=' . $total_pages)); ?>">&raquo;</a>
+                    <?php else: ?>
+                        <span class="tablenav-pages-navspan button disabled">&rsaquo;</span>
+                        <span class="tablenav-pages-navspan button disabled">&raquo;</span>
+                    <?php endif; ?>
+                </span>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
     <?php endif; ?>
 
