@@ -199,15 +199,20 @@ class MLC_Admin {
             exit;
         }
 
+        // Determine slug: custom > company name > title
+        $custom_slug = sanitize_title($_POST['proposal_slug'] ?? '');
+        $company     = sanitize_text_field($_POST['client_company'] ?? '');
+        $slug        = $custom_slug ?: ($company ? sanitize_title($company) : sanitize_title($title));
+
         // Create or update
         if ($post_id) {
             wp_update_post([
                 'ID'         => $post_id,
                 'post_title' => $title,
-                'post_name'  => sanitize_title($title),
+                'post_name'  => $slug,
             ]);
         } else {
-            $post_id = MLC_Proposal::create($title);
+            $post_id = MLC_Proposal::create($title, $slug);
         }
 
         if (!$post_id || is_wp_error($post_id)) {

@@ -198,12 +198,12 @@ class MLC_Proposal {
     /**
      * Create a new proposal
      */
-    public static function create($title) {
+    public static function create($title, $slug = '') {
         $post_id = wp_insert_post([
             'post_type'   => self::POST_TYPE,
             'post_title'  => sanitize_text_field($title),
             'post_status' => 'publish',
-            'post_name'   => sanitize_title($title),
+            'post_name'   => $slug ?: sanitize_title($title),
         ]);
 
         if ($post_id && !is_wp_error($post_id)) {

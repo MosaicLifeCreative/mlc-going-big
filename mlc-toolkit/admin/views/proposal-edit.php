@@ -74,7 +74,16 @@ $title = $post ? $post->post_title : '';
                 <div class="mlc-proposal-card">
                     <h2>Proposal Title</h2>
                     <input type="text" name="proposal_title" value="<?php echo esc_attr($title); ?>" class="large-text" placeholder="e.g., Website Redesign for Blackburn's Chimney" required />
-                    <p class="description">Used as the page title and URL slug.</p>
+                    <p class="description">Internal title shown at the top of the proposal.</p>
+
+                    <div style="margin-top: 12px;">
+                        <label for="proposal_slug" style="font-weight: 600; font-size: 13px;">URL Slug</label>
+                        <div style="display: flex; align-items: center; gap: 6px; margin-top: 4px;">
+                            <span class="description" style="margin: 0; white-space: nowrap;"><?php echo esc_html(home_url('/proposal/')); ?></span>
+                            <input type="text" id="proposal_slug" name="proposal_slug" value="<?php echo esc_attr($post ? $post->post_name : ''); ?>" class="regular-text" placeholder="auto-generated from company name" />
+                        </div>
+                        <p class="description">Leave blank to auto-generate from the company name. Lowercase, hyphens only.</p>
+                    </div>
                 </div>
 
                 <!-- Client Information -->
