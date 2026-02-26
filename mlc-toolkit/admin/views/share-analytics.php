@@ -58,7 +58,18 @@ $recent   = MLC_Share::get_recent_activity(10);
                             <tr>
                                 <td><code><?php echo esc_html($link->code); ?></code></td>
                                 <td><strong><?php echo esc_html($link->name_display); ?></strong></td>
-                                <td><?php echo esc_html($link->context ?: '(none)'); ?></td>
+                                <td><?php
+                                    $ctx_text = $link->context ?: '(none)';
+                                    if (strlen($ctx_text) > 80 && $ctx_text !== '(none)'):
+                                ?>
+                                    <span class="mlc-context-truncated">
+                                        <span class="mlc-context-truncated__short"><?php echo esc_html(substr($ctx_text, 0, 80)); ?>&hellip;</span>
+                                        <span class="mlc-context-truncated__full"><?php echo esc_html($ctx_text); ?></span>
+                                        <button type="button" class="mlc-context-toggle" onclick="this.parentElement.classList.toggle('is-expanded');this.textContent=this.parentElement.classList.contains('is-expanded')?'less':'more'">more</button>
+                                    </span>
+                                <?php else: ?>
+                                    <?php echo esc_html($ctx_text); ?>
+                                <?php endif; ?></td>
                                 <td>
                                     <strong><?php echo esc_html($link->click_count); ?></strong>
                                 </td>
@@ -104,7 +115,7 @@ $recent   = MLC_Share::get_recent_activity(10);
                     <ul class="mlc-context-list">
                         <?php foreach ($top_ctx as $ctx): ?>
                             <li>
-                                <span class="mlc-context-list__text"><?php echo esc_html($ctx->context); ?></span>
+                                <span class="mlc-context-list__text"><?php echo esc_html(strlen($ctx->context) > 60 ? substr($ctx->context, 0, 60) . '...' : $ctx->context); ?></span>
                                 <span class="mlc-context-list__count"><?php echo esc_html($ctx->count); ?></span>
                             </li>
                         <?php endforeach; ?>
@@ -128,7 +139,7 @@ $recent   = MLC_Share::get_recent_activity(10);
                                     <strong><?php echo esc_html($event->name_display); ?></strong>
                                     <?php echo $event->event_type === 'created' ? 'created' : 'clicked'; ?>
                                     <?php if ($event->context): ?>
-                                        <em>"<?php echo esc_html($event->context); ?>"</em>
+                                        <em>"<?php echo esc_html(strlen($event->context) > 60 ? substr($event->context, 0, 60) . '...' : $event->context); ?>"</em>
                                     <?php endif; ?>
                                 </span>
                                 <span class="mlc-activity-item__time">

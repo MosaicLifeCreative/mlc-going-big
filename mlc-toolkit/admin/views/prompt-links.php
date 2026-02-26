@@ -94,7 +94,18 @@ if (isset($_GET['edit'])) {
                                 <span class="edit"><a href="<?php echo esc_url(admin_url('admin.php?page=mlc-prompt-links&edit=' . $link->id)); ?>">Edit</a></span>
                             </div>
                         </td>
-                        <td><?php echo esc_html($link->context ?: '(none)'); ?></td>
+                        <td><?php
+                            $ctx_text = $link->context ?: '(none)';
+                            if (strlen($ctx_text) > 80 && $ctx_text !== '(none)'):
+                        ?>
+                            <span class="mlc-context-truncated">
+                                <span class="mlc-context-truncated__short"><?php echo esc_html(substr($ctx_text, 0, 80)); ?>&hellip;</span>
+                                <span class="mlc-context-truncated__full"><?php echo esc_html($ctx_text); ?></span>
+                                <button type="button" class="mlc-context-toggle" onclick="this.parentElement.classList.toggle('is-expanded');this.textContent=this.parentElement.classList.contains('is-expanded')?'less':'more'">more</button>
+                            </span>
+                        <?php else: ?>
+                            <?php echo esc_html($ctx_text); ?>
+                        <?php endif; ?></td>
                         <td><?php echo esc_html($link->click_count); ?></td>
                         <td><?php echo esc_html(date('M j, g:i A', strtotime($link->created_at))); ?></td>
                         <td>

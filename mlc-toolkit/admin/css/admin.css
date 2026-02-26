@@ -258,6 +258,43 @@
     white-space: nowrap;
 }
 
+/* ─── CONTEXT TRUNCATION ──────────────────────────────── */
+
+.mlc-context-truncated {
+    max-width: 320px;
+}
+
+.mlc-context-truncated__short {
+    display: inline;
+}
+
+.mlc-context-truncated__full {
+    display: none;
+}
+
+.mlc-context-truncated.is-expanded .mlc-context-truncated__short {
+    display: none;
+}
+
+.mlc-context-truncated.is-expanded .mlc-context-truncated__full {
+    display: inline;
+}
+
+.mlc-context-toggle {
+    background: none;
+    border: none;
+    color: #2271b1;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0;
+    margin-left: 2px;
+}
+
+.mlc-context-toggle:hover {
+    color: #135e96;
+    text-decoration: underline;
+}
+
 /* ─── PROMPT LINKS ─────────────────────────────────────── */
 
 .mlc-prompt-card {
