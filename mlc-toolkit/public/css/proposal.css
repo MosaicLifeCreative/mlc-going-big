@@ -1,0 +1,578 @@
+/* ═══════════════════════════════════════════════════════════
+   MLC Proposal Frontend Styles v3
+   Clean, professional, on-brand. Client accent via --proposal-accent.
+   Real site footer is injected via wp_footer hook.
+   ═══════════════════════════════════════════════════════════ */
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body.mlc-proposal-page {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #F8F8F8;
+    color: #1d2327;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Content is invisible (not display:none) so it takes up space
+   and pushes the footer down. PIN gate covers everything. */
+.proposal-content--hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* ─── PIN GATE ─────────────────────────────────────────── */
+
+.proposal-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0A0A0A;
+    padding: 20px;
+    overflow: hidden;
+}
+
+/* Gradient blobs (same as sp-hero) */
+.proposal-gate__blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.35;
+    pointer-events: none;
+}
+
+.proposal-gate__blob--1 {
+    width: 500px;
+    height: 500px;
+    top: -10%;
+    left: -15%;
+    background: var(--primary);
+    animation: proposalFloat1 8s ease-in-out infinite;
+}
+
+.proposal-gate__blob--2 {
+    width: 400px;
+    height: 400px;
+    bottom: -5%;
+    right: -10%;
+    background: var(--secondary);
+    animation: proposalFloat2 10s ease-in-out infinite;
+}
+
+.proposal-gate__blob--3 {
+    width: 300px;
+    height: 300px;
+    top: 50%;
+    left: 60%;
+    background: var(--accent);
+    animation: proposalFloat3 12s ease-in-out infinite;
+}
+
+@keyframes proposalFloat1 {
+    0% { transform: translate(0, 0) scale(1); }
+    30% { transform: translate(80px, -60px) scale(1.08); }
+    60% { transform: translate(-40px, 30px) scale(0.95); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes proposalFloat2 {
+    0% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(-90px, 70px) scale(0.92); }
+    55% { transform: translate(50px, -50px) scale(1.06); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+
+@keyframes proposalFloat3 {
+    0% { transform: translate(0, 0) scale(1); }
+    35% { transform: translate(70px, 80px) scale(1.04); }
+    65% { transform: translate(-60px, -40px) scale(0.94); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+
+.proposal-gate__card {
+    position: relative;
+    z-index: 1;
+    background: #fff;
+    border-radius: 16px;
+    padding: 48px 40px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.proposal-gate__logo {
+    max-width: 160px;
+    max-height: 80px;
+    object-fit: contain;
+    margin-bottom: 24px;
+}
+
+.proposal-gate__title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1d2327;
+    margin-bottom: 8px;
+}
+
+.proposal-gate__subtitle {
+    font-size: 15px;
+    color: #646970;
+    margin-bottom: 32px;
+}
+
+.proposal-gate__form label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #646970;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+
+.proposal-gate__form input {
+    display: block;
+    width: 100%;
+    height: 52px;
+    padding: 0 14px;
+    font-size: 18px;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    text-align: center;
+    letter-spacing: 8px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s;
+    color: #1d2327;
+}
+
+.proposal-gate__form input::placeholder {
+    color: #ccc;
+    letter-spacing: 6px;
+}
+
+.proposal-gate__form input:focus {
+    border-color: var(--proposal-accent);
+}
+
+.proposal-gate__error {
+    color: #d63638;
+    font-size: 13px;
+    margin-top: 8px;
+}
+
+.proposal-gate__expired {
+    background: #fef2f2;
+    border: 1px solid #d63638;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 24px;
+}
+
+.proposal-gate__expired p {
+    font-size: 14px;
+    color: #1d2327;
+    margin-bottom: 4px;
+}
+
+.proposal-gate__from {
+    font-size: 12px;
+    color: #999;
+    margin-top: 32px;
+}
+
+/* Gate slide-away animation */
+.proposal-gate--unlocked {
+    animation: gateSlideUp 0.6s ease forwards;
+}
+
+@keyframes gateSlideUp {
+    to {
+        opacity: 0;
+        transform: translateY(-40px);
+        pointer-events: none;
+    }
+}
+
+/* ─── BUTTONS ──────────────────────────────────────────── */
+
+.proposal-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.proposal-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.proposal-btn--accent {
+    background: var(--proposal-accent);
+    color: var(--proposal-accent-text, #fff);
+}
+
+.proposal-btn--full {
+    display: block;
+    width: 100%;
+    height: 52px;
+    padding: 0 14px;
+    font-size: 15px;
+    font-weight: 700;
+    border-radius: 10px;
+    margin-top: 12px;
+}
+
+.proposal-btn--large {
+    padding: 16px 48px;
+    font-size: 18px;
+    border-radius: 12px;
+}
+
+/* ─── HEADER ───────────────────────────────────────────── */
+
+.proposal-header {
+    background: #fff;
+    border-bottom: 3px solid var(--proposal-accent);
+    padding: 32px 0;
+}
+
+.proposal-header__inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+}
+
+.proposal-header__brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.proposal-header__client-logo {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.proposal-header__title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1d2327;
+    line-height: 1.3;
+}
+
+.proposal-header__subtitle {
+    font-size: 14px;
+    color: #646970;
+    margin-top: 2px;
+}
+
+.proposal-header__meta {
+    text-align: right;
+    font-size: 13px;
+    color: #646970;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.proposal-header__meta span {
+    display: block;
+}
+
+/* ─── WHEATLEY COMMENTARY (inline blockquote) ─────────── */
+
+.proposal-wheatley {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 24px 24px;
+}
+
+.proposal-wheatley__inner {
+    border-left: 3px solid var(--proposal-accent);
+    padding: 16px 20px;
+    background: #f5f5f5;
+    border-radius: 0 8px 8px 0;
+}
+
+.proposal-wheatley__label {
+    display: inline-block;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 10px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.proposal-wheatley__text {
+    font-size: 15px;
+    color: #4a4a4a;
+    line-height: 1.6;
+    font-style: italic;
+    min-height: 1.4em;
+}
+
+/* Embedded variant (inside another section like summary) */
+.proposal-wheatley--embedded {
+    max-width: none;
+    padding: 0;
+    margin: 0 0 32px;
+}
+
+/* Cursor — matches site's .wheatley-void__cursor */
+.proposal-wheatley__cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.1em;
+    background: var(--primary);
+    margin-left: 3px;
+    vertical-align: middle;
+    animation: wheatleyCursorBlink 3.6s linear infinite;
+}
+
+/* Use the same keyframes name as the site so it inherits if landing.css
+   is loaded, but define it here as fallback for standalone use */
+@keyframes wheatleyCursorBlink {
+    0%, 16.66%     { background: var(--primary); opacity: 1; }
+    16.67%, 33.33% { opacity: 0; }
+    33.34%, 50%    { background: var(--secondary); opacity: 1; }
+    50.01%, 66.66% { opacity: 0; }
+    66.67%, 83.33% { background: var(--accent); opacity: 1; }
+    83.34%, 100%   { opacity: 0; }
+}
+
+/* ─── SECTIONS ─────────────────────────────────────────── */
+
+.proposal-section {
+    padding: 48px 0;
+}
+
+.proposal-section--alt {
+    background: #fff;
+}
+
+.proposal-section__inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.proposal-section__title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1d2327;
+    margin-bottom: 32px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f0f0f1;
+}
+
+/* ─── SERVICE CARDS ────────────────────────────────────── */
+
+.proposal-service {
+    background: #fff;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+}
+
+.proposal-section--alt .proposal-service {
+    background: #F8F8F8;
+}
+
+.proposal-service:hover {
+    border-color: var(--proposal-accent);
+}
+
+.proposal-service__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.proposal-service__name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1d2327;
+}
+
+.proposal-service__price {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.proposal-service__price strong {
+    font-size: 22px;
+    color: var(--proposal-accent-price, var(--proposal-accent));
+    display: block;
+}
+
+.proposal-service__price span {
+    font-size: 12px;
+    color: #646970;
+    text-transform: uppercase;
+}
+
+.proposal-service__setup {
+    display: block;
+    font-size: 12px;
+    color: #646970;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.proposal-service__description {
+    font-size: 14px;
+    color: #4a4a4a;
+    line-height: 1.7;
+}
+
+.proposal-service__description p {
+    margin-bottom: 12px;
+}
+
+.proposal-service__description p:last-child {
+    margin-bottom: 0;
+}
+
+/* ─── INVESTMENT SUMMARY ───────────────────────────────── */
+
+.proposal-summary {
+    background: #fff;
+    padding: 48px 0 0;
+}
+
+.proposal-summary__inner {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.proposal-summary__title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 24px;
+}
+
+.proposal-summary__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    font-size: 18px;
+}
+
+.proposal-summary__row:last-of-type {
+    border-bottom: none;
+}
+
+.proposal-summary__row strong {
+    font-size: 24px;
+    color: var(--proposal-accent-price, var(--proposal-accent));
+}
+
+.proposal-summary__valid {
+    margin-top: 20px;
+    font-size: 13px;
+    color: #646970;
+}
+
+/* ─── ACCEPT (inside summary) ─────────────────────────── */
+
+.proposal-summary__accept {
+    text-align: center;
+    margin-top: 32px;
+    padding: 32px 0 48px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.proposal-accept__note {
+    font-size: 13px;
+    color: #646970;
+    margin-top: 12px;
+}
+
+.proposal-summary__accepted {
+    text-align: center;
+    margin-top: 32px;
+    padding: 32px 0 48px;
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.proposal-accepted__badge {
+    display: inline-block;
+    background: #00a32a;
+    color: #fff;
+    padding: 8px 24px;
+    border-radius: 24px;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+/* ─── MOBILE ───────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+    .proposal-gate__card {
+        padding: 32px 24px;
+    }
+
+    .proposal-gate__blob--1 { width: 300px; height: 300px; }
+    .proposal-gate__blob--2 { width: 250px; height: 250px; }
+    .proposal-gate__blob--3 { width: 200px; height: 200px; }
+
+    .proposal-header__inner {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .proposal-header__brand {
+        flex-direction: column;
+    }
+
+    .proposal-header__meta {
+        text-align: center;
+    }
+
+    .proposal-service__header {
+        flex-direction: column;
+    }
+
+    .proposal-service__price {
+        text-align: left;
+    }
+
+    .proposal-summary__row {
+        font-size: 16px;
+    }
+
+    .proposal-summary__row strong {
+        font-size: 20px;
+    }
+
+    .proposal-section__title {
+        font-size: 22px;
+    }
+}

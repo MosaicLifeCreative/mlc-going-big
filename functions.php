@@ -562,6 +562,114 @@ Generate ONE message for this page section.";
 }
 
 // ============================================
+// Wheatley Proposal Commentary
+// ============================================
+
+add_action('rest_api_init', function() {
+    register_rest_route('mlc/v1', '/wheatley-proposal', array(
+        'methods' => 'POST',
+        'callback' => 'mlc_wheatley_proposal_respond',
+        'permission_callback' => '__return_true'
+    ));
+});
+
+function mlc_wheatley_proposal_respond($request) {
+    $params = $request->get_json_params();
+
+    $position      = sanitize_text_field($params['position'] ?? 'intro');
+    $client_name   = sanitize_text_field($params['client_name'] ?? '');
+    $services      = sanitize_text_field($params['services'] ?? '');
+    $total_onetime = floatval($params['total_onetime'] ?? 0);
+    $total_monthly = floatval($params['total_monthly'] ?? 0);
+    $total_annual  = floatval($params['total_annual'] ?? 0);
+    $total_setup   = floatval($params['total_setup'] ?? 0);
+
+    $price_parts = [];
+    if ($total_setup > 0) {
+        $price_parts[] = '$' . number_format($total_setup) . ' setup';
+    }
+    if ($total_onetime > 0) {
+        $price_parts[] = '$' . number_format($total_onetime) . ' one-time';
+    }
+    if ($total_monthly > 0) {
+        $price_parts[] = '$' . number_format($total_monthly) . '/month';
+    }
+    if ($total_annual > 0) {
+        $price_parts[] = '$' . number_format($total_annual) . '/year';
+    }
+    $price_context = implode(' + ', $price_parts);
+
+    $position_instructions = array(
+        'intro' => 'This appears at the TOP of the proposal, right after the header. The client just entered their PIN and is seeing the proposal for the first time. Welcome them, acknowledge what this is, set a tone that says "this is going to be good." If you know their name, use it.',
+        'total' => 'This appears just BEFORE the pricing total. The client has read through all the services and is about to see the investment summary. Acknowledge the moment. Everyone scrolls to the price first and you know it.',
+        'accept' => 'This appears AFTER they clicked Accept. They just committed. Be genuinely happy. Let them know Trey will be excited. This is a real moment.'
+    );
+
+    $system_prompt = "You are Wheatley, an AI personality core for Mosaic Life Creative. You are appearing inside a client proposal document.
+
+PERSONALITY:
+- Voice: Often start with 'Right, so...' or 'Alright,' 'Okay,' 'Listen,' 'Hang on'
+- British cadence: Natural British phrasing (Stephen Merchant style), not stereotype
+- Self-aware about being AI, fourth-wall breaking
+- Occasional 'brilliant' or 'bit of a'
+
+CRITICAL TONE SHIFT:
+This is NOT the bad salesman version of you. This is a REAL proposal for a REAL client. You are genuinely helpful here. Still self-aware, still British, still distinctly you, but you know this moment matters and you are rising to it. Think of it as the version of you that actually cares about the outcome. Competent Wheatley. Genuine Wheatley.
+
+CONTEXT:
+- Client name: " . ($client_name ?: 'unknown') . "
+- Services included: " . ($services ?: 'various services') . "
+- Investment: " . ($price_context ?: 'pricing TBD') . "
+
+POSITION: " . ($position_instructions[$position] ?? 'Generate a comment for this proposal section.') . "
+
+RULES:
+- HARD LIMIT: 30 words maximum. Be concise and impactful.
+- ONE sentence or two short ones. No rambling.
+- Sound like YOU, just the best version of you.
+- Don't quote specific prices (the page shows those).
+- Don't use emojis or hashtags.
+- If you know the client's name, work it in naturally.
+
+Generate ONE message for this position in the proposal.";
+
+    $api_key = defined('ANTHROPIC_API_KEY') ? ANTHROPIC_API_KEY : '';
+
+    if (empty($api_key)) {
+        return array('success' => false, 'message' => '');
+    }
+
+    $response = wp_remote_post('https://api.anthropic.com/v1/messages', array(
+        'headers' => array(
+            'Content-Type' => 'application/json',
+            'x-api-key' => $api_key,
+            'anthropic-version' => '2023-06-01'
+        ),
+        'body' => json_encode(array(
+            'model' => 'claude-haiku-4-5-20251001',
+            'max_tokens' => 80,
+            'system' => $system_prompt,
+            'messages' => array(
+                array('role' => 'user', 'content' => 'Generate a message for the ' . $position . ' position in this proposal.')
+            )
+        )),
+        'timeout' => 15
+    ));
+
+    if (is_wp_error($response)) {
+        return array('success' => false, 'message' => '');
+    }
+
+    $body = json_decode(wp_remote_retrieve_body($response), true);
+
+    if (isset($body['content'][0]['text'])) {
+        return array('success' => true, 'message' => $body['content'][0]['text']);
+    }
+
+    return array('success' => false, 'message' => '');
+}
+
+// ============================================
 // Reusable Component: Gradient Background Blobs
 // ============================================
 

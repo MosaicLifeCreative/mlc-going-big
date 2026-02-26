@@ -2,8 +2,8 @@
 /**
  * Plugin Name: MLC Toolkit
  * Plugin URI: https://mosaiclifecreative.com
- * Description: Mosaic Life Creative toolkit — slideshow photo management, share link analytics, URL shortener, and dashboard widget.
- * Version: 1.0.1
+ * Description: Mosaic Life Creative toolkit — slideshow photos, share analytics, URL shortener, client proposals, and dashboard widget.
+ * Version: 1.2.1
  * Author: Trey Kauffman
  * Author URI: https://mosaiclifecreative.com
  * Text Domain: mlc-toolkit
@@ -11,13 +11,16 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('MLC_TOOLKIT_VERSION', '1.1.0');
+define('MLC_TOOLKIT_VERSION', '1.2.1');
 define('MLC_TOOLKIT_PATH', plugin_dir_path(__FILE__));
 define('MLC_TOOLKIT_URL', plugin_dir_url(__FILE__));
 
 // Includes
 require_once MLC_TOOLKIT_PATH . 'includes/class-mlc-photos.php';
 require_once MLC_TOOLKIT_PATH . 'includes/class-mlc-share.php';
+require_once MLC_TOOLKIT_PATH . 'includes/class-mlc-proposal.php';
+
+MLC_Proposal::init();
 
 if (is_admin()) {
     require_once MLC_TOOLKIT_PATH . 'admin/class-mlc-admin.php';
@@ -130,6 +133,18 @@ add_action('rest_api_init', function () {
         'callback'            => 'mlc_toolkit_create_share',
         'permission_callback' => '__return_true',
     ]);
+
+    register_rest_route('mlc/v1', '/proposal/validate-pin', [
+        'methods'             => 'POST',
+        'callback'            => 'mlc_toolkit_validate_proposal_pin',
+        'permission_callback' => '__return_true',
+    ]);
+
+    register_rest_route('mlc/v1', '/proposal/accept', [
+        'methods'             => 'POST',
+        'callback'            => 'mlc_toolkit_accept_proposal',
+        'permission_callback' => '__return_true',
+    ]);
 });
 
 function mlc_toolkit_create_share($request) {
@@ -151,6 +166,99 @@ function mlc_toolkit_create_share($request) {
         'code'      => $result['code'],
     ];
 }
+
+/**
+ * REST: Validate proposal PIN
+ */
+function mlc_toolkit_validate_proposal_pin($request) {
+    $params  = $request->get_json_params();
+    $post_id = absint($params['proposal_id'] ?? 0);
+    $pin     = sanitize_text_field($params['pin'] ?? '');
+
+    if (!$post_id || !$pin) {
+        return new WP_Error('invalid', 'Missing proposal ID or PIN', ['status' => 400]);
+    }
+
+    if (MLC_Proposal::is_expired($post_id)) {
+        return ['success' => false, 'error' => 'expired'];
+    }
+
+    if (!MLC_Proposal::validate_pin($post_id, $pin)) {
+        return ['success' => false, 'error' => 'invalid_pin'];
+    }
+
+    // Mark as viewed on first successful PIN entry
+    MLC_Proposal::mark_viewed($post_id);
+
+    return ['success' => true];
+}
+
+/**
+ * REST: Accept proposal
+ */
+function mlc_toolkit_accept_proposal($request) {
+    $params  = $request->get_json_params();
+    $post_id = absint($params['proposal_id'] ?? 0);
+    $pin     = sanitize_text_field($params['pin'] ?? '');
+
+    if (!$post_id || !$pin) {
+        return new WP_Error('invalid', 'Missing proposal ID or PIN', ['status' => 400]);
+    }
+
+    // Re-validate PIN for security
+    if (!MLC_Proposal::validate_pin($post_id, $pin)) {
+        return new WP_Error('unauthorized', 'Invalid PIN', ['status' => 403]);
+    }
+
+    if (MLC_Proposal::is_expired($post_id)) {
+        return ['success' => false, 'error' => 'expired'];
+    }
+
+    MLC_Proposal::mark_accepted($post_id);
+
+    return ['success' => true];
+}
+
+/**
+ * Enqueue proposal frontend assets on proposal single pages
+ */
+function mlc_toolkit_proposal_assets() {
+    if (!is_singular(MLC_Proposal::POST_TYPE)) return;
+
+    wp_enqueue_style(
+        'mlc-proposal-css',
+        MLC_TOOLKIT_URL . 'public/css/proposal.css',
+        [],
+        MLC_TOOLKIT_VERSION
+    );
+
+    wp_enqueue_script(
+        'mlc-proposal-js',
+        MLC_TOOLKIT_URL . 'public/js/proposal.js',
+        [],
+        MLC_TOOLKIT_VERSION,
+        true
+    );
+
+    $post_id = get_the_ID();
+    $meta    = MLC_Proposal::get_meta($post_id);
+    $totals  = MLC_Proposal::calculate_totals($post_id);
+
+    wp_localize_script('mlc-proposal-js', 'mlcProposal', [
+        'ajaxUrl'      => rest_url('mlc/v1/'),
+        'proposalId'   => $post_id,
+        'clientName'   => $meta['client_name'],
+        'status'       => $meta['status'],
+        'isExpired'    => MLC_Proposal::is_expired($post_id),
+        'wheatleyUrl'  => rest_url('mlc/v1/wheatley-proposal'),
+        'services'     => array_keys($meta['services']),
+        'totalOnce'    => $totals['one_time'],
+        'totalMonthly' => $totals['monthly'],
+        'totalAnnual'  => $totals['annual'],
+        'totalSetup'   => $totals['setup'],
+    ]);
+}
+add_action('wp_enqueue_scripts', 'mlc_toolkit_proposal_assets');
 
 /**
  * Legacy domain redirect for share URLs.
