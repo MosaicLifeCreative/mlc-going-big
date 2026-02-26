@@ -256,6 +256,35 @@ class MLC_Share {
     }
 
     /**
+     * Get a single link by ID
+     */
+    public static function get_link_by_id($id) {
+        global $wpdb;
+        $table = $wpdb->prefix . 'mlc_share_links';
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table WHERE id = %d", absint($id)
+        ));
+    }
+
+    /**
+     * Update an existing link's name and context (re-encodes url_encoded)
+     */
+    public static function update_link($id, $name, $context = '') {
+        global $wpdb;
+        $table = $wpdb->prefix . 'mlc_share_links';
+
+        $payload     = $context ? "{$name}|{$context}" : $name;
+        $url_encoded = base64_encode($payload);
+
+        return $wpdb->update($table, [
+            'name_display' => sanitize_text_field($name),
+            'name_hash'    => hash('sha256', strtolower(trim($name))),
+            'context'      => sanitize_text_field($context),
+            'url_encoded'  => $url_encoded,
+        ], ['id' => absint($id)]);
+    }
+
+    /**
      * Migrate v1 data: unmask names, expand columns
      */
     public static function migrate_v2() {

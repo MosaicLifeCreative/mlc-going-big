@@ -93,10 +93,18 @@ function mlc_toolkit_handle_share_url() {
         exit;
     }
 
-    // Record the click
+    // Social crawlers get a server-side redirect to the homepage so they
+    // scrape the real OG tags from Slim SEO. No click recorded for bots.
+    $ua = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';
+    if (preg_match('/facebookexternalhit|Facebot|Twitterbot|LinkedInBot|WhatsApp|Slackbot|Discordbot|TelegramBot/i', $ua)) {
+        wp_redirect(home_url('/'), 302);
+        exit;
+    }
+
+    // Record the click (real visitors only)
     MLC_Share::record_click($share->id, [
         'referrer'   => isset($_SERVER['HTTP_REFERER']) ? sanitize_url($_SERVER['HTTP_REFERER']) : '',
-        'user_agent' => isset($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field($_SERVER['HTTP_USER_AGENT']) : '',
+        'user_agent' => sanitize_text_field($ua),
     ]);
 
     error_log('[MLC Share] Click recorded for code: ' . $code . ' (link_id: ' . $share->id . ')');

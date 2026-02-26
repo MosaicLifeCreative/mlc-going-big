@@ -121,9 +121,13 @@ class MLC_Admin {
             $this->handle_photos_save();
         }
 
-        // Prompt link create
+        // Prompt link create or edit
         if (isset($_POST['mlc_prompt_nonce'])) {
-            $this->handle_prompt_create();
+            if (!empty($_POST['mlc_prompt_edit_id'])) {
+                $this->handle_prompt_edit();
+            } else {
+                $this->handle_prompt_create();
+            }
         }
 
         // Proposal save
@@ -181,6 +185,28 @@ class MLC_Admin {
         $result = MLC_Share::create_link($name, $context, 'admin');
 
         wp_redirect(admin_url('admin.php?page=mlc-prompt-links&created=' . $result['code']));
+        exit;
+    }
+
+    /**
+     * Handle prompt link edit (form POST)
+     */
+    private function handle_prompt_edit() {
+        if (!wp_verify_nonce($_POST['mlc_prompt_nonce'], 'mlc_prompt_edit')) return;
+        if (!current_user_can('manage_options')) return;
+
+        $id      = absint($_POST['mlc_prompt_edit_id']);
+        $name    = sanitize_text_field($_POST['prompt_name'] ?? '');
+        $context = sanitize_textarea_field($_POST['prompt_context'] ?? '');
+
+        if (empty($name) || empty($id)) {
+            wp_redirect(admin_url('admin.php?page=mlc-prompt-links&error=name'));
+            exit;
+        }
+
+        MLC_Share::update_link($id, $name, $context);
+
+        wp_redirect(admin_url('admin.php?page=mlc-prompt-links&updated=1'));
         exit;
     }
 
