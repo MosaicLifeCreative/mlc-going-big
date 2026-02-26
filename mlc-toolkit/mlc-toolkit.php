@@ -11,7 +11,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('MLC_TOOLKIT_VERSION', '1.0.1');
+define('MLC_TOOLKIT_VERSION', '1.1.0');
 define('MLC_TOOLKIT_PATH', plugin_dir_path(__FILE__));
 define('MLC_TOOLKIT_URL', plugin_dir_url(__FILE__));
 
@@ -32,6 +32,18 @@ function mlc_toolkit_activate() {
     flush_rewrite_rules();
 }
 register_activation_hook(__FILE__, 'mlc_toolkit_activate');
+
+/**
+ * Database migration — runs once on version change
+ */
+function mlc_toolkit_maybe_upgrade() {
+    $installed = get_option('mlc_toolkit_db_version', '1.0.0');
+    if (version_compare($installed, '1.1.0', '<')) {
+        MLC_Share::migrate_v2();
+        update_option('mlc_toolkit_db_version', '1.1.0');
+    }
+}
+add_action('admin_init', 'mlc_toolkit_maybe_upgrade');
 
 /**
  * Plugin deactivation

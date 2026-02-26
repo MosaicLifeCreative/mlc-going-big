@@ -6,12 +6,15 @@
 (function() {
     'use strict';
 
-    // ─── VISIT COUNTER (once per page load, all pages) ───────────
+    // ─── VISIT COUNTER (once per session, all pages) ───────────
     (function incrementVisitCount() {
         try {
-            const count = parseInt(localStorage.getItem('mlc_visit_count') || '0');
-            localStorage.setItem('mlc_visit_count', (count + 1).toString());
-            localStorage.setItem('mlc_visited', Date.now().toString());
+            if (!sessionStorage.getItem('mlc_session_counted')) {
+                const count = parseInt(localStorage.getItem('mlc_visit_count') || '0');
+                localStorage.setItem('mlc_visit_count', (count + 1).toString());
+                localStorage.setItem('mlc_visited', Date.now().toString());
+                sessionStorage.setItem('mlc_session_counted', '1');
+            }
         } catch (e) { /* localStorage blocked */ }
     })();
 

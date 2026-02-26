@@ -257,3 +257,58 @@
     color: #999;
     white-space: nowrap;
 }
+
+/* ─── PROMPT LINKS ─────────────────────────────────────── */
+
+.mlc-prompt-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 24px;
+    margin-top: 20px;
+}
+
+.mlc-prompt-card h2 {
+    margin: 0 0 16px;
+    padding: 0;
+}
+
+.mlc-prompt-success {
+    background: #e7f5ee;
+    border: 1px solid #00a32a;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 20px 0;
+}
+
+.mlc-prompt-success__url {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.mlc-prompt-success__url code {
+    flex: 1;
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid #c3c4c7;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+/* ─── PAGINATION ───────────────────────────────────────── */
+
+.mlc-pagination {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 16px;
+    justify-content: center;
+}
+
+.mlc-pagination__info {
+    margin-right: 12px;
+    font-size: 13px;
+    color: #646970;
+}

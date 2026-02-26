@@ -25,9 +25,10 @@ class MLC_Share {
             id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
             code varchar(12) NOT NULL,
             name_hash varchar(64) NOT NULL,
-            name_display varchar(50) NOT NULL DEFAULT '',
-            context varchar(100) NOT NULL DEFAULT '',
+            name_display varchar(100) NOT NULL DEFAULT '',
+            context text NOT NULL,
             url_encoded text NOT NULL,
+            source varchar(20) NOT NULL DEFAULT 'frontend',
             created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
             PRIMARY KEY (id),
             UNIQUE KEY code (code),
@@ -63,18 +64,9 @@ class MLC_Share {
     }
 
     /**
-     * Create a privacy-safe display name: "J****n" for "Jordan"
-     */
-    private static function mask_name($name) {
-        $len = mb_strlen($name);
-        if ($len <= 2) return str_repeat('*', $len);
-        return mb_substr($name, 0, 1) . str_repeat('*', $len - 2) . mb_substr($name, -1);
-    }
-
-    /**
      * Create a new share link
      */
-    public static function create_link($name, $context = '') {
+    public static function create_link($name, $context = '', $source = 'frontend') {
         global $wpdb;
         $table = $wpdb->prefix . 'mlc_share_links';
 
@@ -93,9 +85,10 @@ class MLC_Share {
         $wpdb->insert($table, [
             'code'         => $code,
             'name_hash'    => hash('sha256', strtolower(trim($name))),
-            'name_display' => self::mask_name($name),
+            'name_display' => sanitize_text_field($name),
             'context'      => sanitize_text_field($context),
             'url_encoded'  => $url_encoded,
+            'source'       => sanitize_text_field($source),
             'created_at'   => current_time('mysql'),
         ]);
 
@@ -183,7 +176,7 @@ class MLC_Share {
     /**
      * Get all links with click counts (paginated)
      */
-    public static function get_links_with_clicks($page = 1, $per_page = 25) {
+    public static function get_links_with_clicks($page = 1, $per_page = 15) {
         global $wpdb;
         $links_table  = $wpdb->prefix . 'mlc_share_links';
         $clicks_table = $wpdb->prefix . 'mlc_share_clicks';
@@ -231,7 +224,7 @@ class MLC_Share {
     /**
      * Recent activity (links + clicks interleaved by time)
      */
-    public static function get_recent_activity($limit = 20) {
+    public static function get_recent_activity($limit = 10) {
         global $wpdb;
         $links_table  = $wpdb->prefix . 'mlc_share_links';
         $clicks_table = $wpdb->prefix . 'mlc_share_clicks';
@@ -260,5 +253,32 @@ class MLC_Share {
         });
 
         return array_slice($activity, 0, $limit);
+    }
+
+    /**
+     * Migrate v1 data: unmask names, expand columns
+     */
+    public static function migrate_v2() {
+        global $wpdb;
+        $table = $wpdb->prefix . 'mlc_share_links';
+
+        // Expand columns if needed (dbDelta in create_tables handles schema)
+        self::create_tables();
+
+        // Unmask existing name_display values by decoding url_encoded
+        $rows = $wpdb->get_results("SELECT id, url_encoded, name_display FROM $table");
+        foreach ($rows as $row) {
+            $decoded = base64_decode($row->url_encoded);
+            if ($decoded === false) continue;
+            $parts = explode('|', $decoded, 2);
+            $real_name = $parts[0];
+
+            // Only update if currently masked (contains asterisks)
+            if (strpos($row->name_display, '*') !== false) {
+                $wpdb->update($table, [
+                    'name_display' => sanitize_text_field($real_name),
+                ], ['id' => $row->id]);
+            }
+        }
     }
 }

@@ -4,8 +4,8 @@ if (!defined('ABSPATH')) exit;
 $stats    = MLC_Share::get_stats();
 $page_num = isset($_GET['paged']) ? max(1, (int) $_GET['paged']) : 1;
 $data     = MLC_Share::get_links_with_clicks($page_num);
-$top_ctx  = MLC_Share::get_top_contexts();
-$recent   = MLC_Share::get_recent_activity();
+$top_ctx  = MLC_Share::get_top_contexts(10);
+$recent   = MLC_Share::get_recent_activity(10);
 ?>
 <div class="wrap mlc-admin">
     <h1>Share Analytics</h1>
@@ -43,11 +43,11 @@ $recent   = MLC_Share::get_recent_activity();
                 <thead>
                     <tr>
                         <th style="width: 60px;">Code</th>
-                        <th style="width: 100px;">Name</th>
+                        <th style="width: 120px;">Name</th>
                         <th>Context</th>
-                        <th style="width: 80px;">Clicks</th>
+                        <th style="width: 60px;">Clicks</th>
                         <th style="width: 140px;">Created</th>
-                        <th style="width: 160px;">Short URL</th>
+                        <th style="width: 200px;">Short URL</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -57,8 +57,8 @@ $recent   = MLC_Share::get_recent_activity();
                         <?php foreach ($data['links'] as $link): ?>
                             <tr>
                                 <td><code><?php echo esc_html($link->code); ?></code></td>
-                                <td><?php echo esc_html($link->name_display); ?></td>
-                                <td><?php echo esc_html($link->context ?: '—'); ?></td>
+                                <td><strong><?php echo esc_html($link->name_display); ?></strong></td>
+                                <td><?php echo esc_html($link->context ?: '(none)'); ?></td>
                                 <td>
                                     <strong><?php echo esc_html($link->click_count); ?></strong>
                                 </td>
@@ -71,16 +71,24 @@ $recent   = MLC_Share::get_recent_activity();
             </table>
 
             <?php if ($data['pages'] > 1): ?>
-                <div class="tablenav bottom">
-                    <div class="tablenav-pages">
-                        <?php for ($p = 1; $p <= $data['pages']; $p++): ?>
-                            <?php if ($p == $page_num): ?>
-                                <span class="tablenav-pages-navspan button disabled"><?php echo $p; ?></span>
-                            <?php else: ?>
-                                <a class="button" href="<?php echo esc_url(admin_url("admin.php?page=mlc-share-analytics&paged={$p}")); ?>"><?php echo $p; ?></a>
-                            <?php endif; ?>
-                        <?php endfor; ?>
-                    </div>
+                <div class="mlc-pagination">
+                    <span class="mlc-pagination__info">
+                        Page <?php echo $data['page']; ?> of <?php echo $data['pages']; ?>
+                        (<?php echo $data['total']; ?> links)
+                    </span>
+                    <?php if ($data['page'] > 1): ?>
+                        <a class="button" href="<?php echo esc_url(admin_url("admin.php?page=mlc-share-analytics&paged=" . ($data['page'] - 1))); ?>">&laquo; Prev</a>
+                    <?php endif; ?>
+                    <?php for ($p = 1; $p <= $data['pages']; $p++): ?>
+                        <?php if ($p == $page_num): ?>
+                            <span class="button button-primary disabled"><?php echo $p; ?></span>
+                        <?php else: ?>
+                            <a class="button" href="<?php echo esc_url(admin_url("admin.php?page=mlc-share-analytics&paged={$p}")); ?>"><?php echo $p; ?></a>
+                        <?php endif; ?>
+                    <?php endfor; ?>
+                    <?php if ($data['page'] < $data['pages']): ?>
+                        <a class="button" href="<?php echo esc_url(admin_url("admin.php?page=mlc-share-analytics&paged=" . ($data['page'] + 1))); ?>">Next &raquo;</a>
+                    <?php endif; ?>
                 </div>
             <?php endif; ?>
         </div>

@@ -11,12 +11,11 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 **Current Status:** LIVE at mosaiclifecreative.com. All 7 pages complete with sp- design system, unique Wheatley treatments, monogram SVG branding, JSON-LD structured data, semantic HTML, and Slim SEO meta descriptions. CF7 configured. All Pixar images done. Em-dash ban site-wide.
 
 **Next Priorities:**
-1. OG share graphic (1200x630 branded card for social sharing)
-2. Redirect fresh.mosaiclifecreative.com → mosaiclifecreative.com
-3. Photo slideshow expansion (50-100 photos with hunt clues)
-4. HUNT knowledge base for Chatling
-5. Quest site deployment (4815162342.quest)
-6. Snake 451 point system refinement
+1. Redirect fresh.mosaiclifecreative.com to mosaiclifecreative.com
+2. Photo slideshow expansion (50-100 photos with hunt clues)
+3. HUNT knowledge base for Chatling
+4. Quest site deployment (4815162342.quest)
+5. Snake 451 point system refinement
 
 ---
 
@@ -32,7 +31,8 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 | `page-email-marketing.php` | v2 | Email Marketing - sp- system + corrupted inbox Wheatley treatment |
 | `page-about.php` | v2 | About - clean bio + Myst journal records + Wheatley as footnote [42] |
 | `page-contact.php` | v2 | Contact - CF7 form + Wheatley textarea draft treatment |
-| `assets/css/landing.css` | 1.6.4 | All styles + sp- system + monogram branding + grid line visibility fix + mobile about photo + margin note rotation |
+| `404.php` | v1 | Custom 404 page with Wheatley alone in void, typewriter messages |
+| `assets/css/landing.css` | 1.6.5 | All styles + sp- system + monogram branding + 404 page styles |
 | `assets/js/landing.js` | 1.7.2 | Interactive behaviors + Wheatley + share API + session persistence |
 | `assets/js/global.js` | 1.5.4 | Nav + Chatling + scroll reveals + countdown + Wheatley page sections + hamburger contrast (footer + void) |
 | `functions.php` | 1.9.3 | Enqueue + hunt + Wheatley APIs + JSON-LD structured data + monogram SVG in nav/footer + Chatling exclusion |
@@ -54,7 +54,8 @@ Working files for the MLC rebrand and production WordPress site. The project sta
 ├── page-email-marketing.php  (Email Marketing - sp- system + corrupted inbox)
 ├── page-about.php            (About - clean bio + Myst journal records)
 ├── page-contact.php          (Contact page)
-├── functions.php              (v1.9.2 - Enqueue + hunt + Wheatley APIs + SHADE + gradient blobs + countdown + footer)
+├── 404.php                    (Custom 404 with Wheatley typewriter messages)
+├── functions.php              (v1.9.3 - Enqueue + hunt + Wheatley APIs + SHADE + gradient blobs + countdown + footer + JSON-LD)
 ├── assets/
 │   ├── css/
 │   │   └── landing.css       (v1.4.9 - sp- system + sp-journal + Wheatley void + corrupted inbox + footer + portal + cursor color cycling)
@@ -619,7 +620,7 @@ General pattern: `sp-hero` → content sections (splits, statement, process, por
 ## File Versions & Status
 
 **Current Deployed:**
-- CSS: v1.6.4 (sp- system + monogram branding + grid line visibility + mobile about photo + margin note rotation)
+- CSS: v1.6.5 (sp- system + monogram branding + 404 page styles)
 - JS (landing): v1.7.2 (share API integration + session-persistent personalization)
 - JS (global): v1.5.4 (nav + scroll reveals + countdown + Wheatley page sections + hamburger contrast with footer/void)
 - PHP: v1.9.3 (Wheatley APIs + JSON-LD structured data + monogram SVG in nav/footer + Chatling exclusion)
@@ -726,6 +727,34 @@ Consistent Pixar-quality 3D animated illustration style across all service pages
 - Tab visibility detection
 - Console easter eggs
 - Weather API context for Wheatley messages
+
+### 7. Custom Prompt Links (MLC Toolkit)
+- Admin UI in MLC Toolkit for creating marketing share links with full control
+- Custom name, context, and optional destination page per link
+- Use case: LinkedIn campaigns, agent footers, Chamber events, email signatures
+- Goes beyond the front-end share modal (which is designed for person-to-person sends)
+- Each link gets its own short URL, tracking, and analytics in the existing share system
+
+### 8. Dedicated Wheatley Page
+- Standalone page for demoing Wheatley to prospects and networking contacts
+- Same dark void aesthetic as homepage, but no welcome text sequence or choice buttons
+- Wheatley triggers immediately on load (no 30s delay)
+- Pure Wheatley experience for showing off the AI personality
+- Could use share name if arrived via share link for extra impact
+
+### 9. Email Subscribe (Sendy)
+- Newsletter signup for MLC brand updates, AI insights, behind-the-scenes
+- Sendy already deployed at `/sendy` on the same server
+- Embed form on site (footer, dedicated page, or modal)
+- Lower priority but valuable if not using social media as primary channel
+- Pairs well with the Email Marketing service page (practice what you preach)
+
+### 10. Automated Facebook Posting (Wheatley Voice)
+- Auto-generate and post to MLC Facebook page using Wheatley's voice
+- Content types: tips, observations, behind-the-scenes, industry commentary
+- Wheatley personality makes generic "business page posts" actually interesting
+- Could use Anthropic API + Facebook Graph API on a cron schedule
+- Replaces manual social media effort with on-brand AI automation
 
 ---
 

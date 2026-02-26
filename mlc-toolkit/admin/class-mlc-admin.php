@@ -38,6 +38,15 @@ class MLC_Admin {
 
         add_submenu_page(
             'mlc-toolkit',
+            'Prompt Links',
+            'Prompt Links',
+            'manage_options',
+            'mlc-prompt-links',
+            [$this, 'render_prompt_links_page']
+        );
+
+        add_submenu_page(
+            'mlc-toolkit',
             'Share Analytics',
             'Share Analytics',
             'manage_options',
@@ -50,7 +59,11 @@ class MLC_Admin {
      * Enqueue admin assets on our pages only
      */
     public function enqueue_assets($hook) {
-        $our_pages = ['toplevel_page_mlc-toolkit', 'mlc-toolkit_page_mlc-share-analytics'];
+        $our_pages = [
+            'toplevel_page_mlc-toolkit',
+            'mlc-toolkit_page_mlc-share-analytics',
+            'mlc-toolkit_page_mlc-prompt-links',
+        ];
         if (!in_array($hook, $our_pages)) return;
 
         wp_enqueue_style(
@@ -75,10 +88,24 @@ class MLC_Admin {
     }
 
     /**
-     * Handle photo save (form POST)
+     * Handle form saves
      */
     public function handle_save() {
-        if (!isset($_POST['mlc_photos_nonce'])) return;
+        // Photo save
+        if (isset($_POST['mlc_photos_nonce'])) {
+            $this->handle_photos_save();
+        }
+
+        // Prompt link create
+        if (isset($_POST['mlc_prompt_nonce'])) {
+            $this->handle_prompt_create();
+        }
+    }
+
+    /**
+     * Handle photo save (form POST)
+     */
+    private function handle_photos_save() {
         if (!wp_verify_nonce($_POST['mlc_photos_nonce'], 'mlc_save_photos')) return;
         if (!current_user_can('manage_options')) return;
 
@@ -102,10 +129,38 @@ class MLC_Admin {
     }
 
     /**
+     * Handle prompt link creation (form POST)
+     */
+    private function handle_prompt_create() {
+        if (!wp_verify_nonce($_POST['mlc_prompt_nonce'], 'mlc_prompt_create')) return;
+        if (!current_user_can('manage_options')) return;
+
+        $name    = sanitize_text_field($_POST['prompt_name'] ?? '');
+        $context = sanitize_textarea_field($_POST['prompt_context'] ?? '');
+
+        if (empty($name)) {
+            wp_redirect(admin_url('admin.php?page=mlc-prompt-links&error=name'));
+            exit;
+        }
+
+        $result = MLC_Share::create_link($name, $context, 'admin');
+
+        wp_redirect(admin_url('admin.php?page=mlc-prompt-links&created=' . $result['code']));
+        exit;
+    }
+
+    /**
      * Render the photos admin page
      */
     public function render_photos_page() {
         include MLC_TOOLKIT_PATH . 'admin/views/photos.php';
+    }
+
+    /**
+     * Render the prompt links admin page
+     */
+    public function render_prompt_links_page() {
+        include MLC_TOOLKIT_PATH . 'admin/views/prompt-links.php';
     }
 
     /**
