@@ -95,6 +95,16 @@
         }
     }
     
+    // ─── NAME VALIDATION ─────────────────────────────────────
+    const BLOCKED_NAMES = ['ass','shit','fuck','bitch','cock','cunt','piss','whore','slut','nigger','nigga','faggot','fag','retard','twat','wanker','pussy','damn','hell'];
+
+    function isValidShareName(name) {
+        if (!name || typeof name !== 'string') return false;
+        if (!/^[A-Za-z\u00C0-\u00FF\s'\-]{1,30}$/.test(name.trim())) return false;
+        var words = name.trim().toLowerCase().split(/[\s'\-]+/).filter(Boolean);
+        return !words.some(function(w) { return BLOCKED_NAMES.indexOf(w) !== -1; });
+    }
+
     function generatePersonalizedURL(name, context) {
         const parts = context ? `${name}|${context}` : name;
         const encoded = btoa(parts);
@@ -140,6 +150,14 @@
 
     if (state.userName || state.userContext) {
         console.log('🔗 Share link detected:', { name: state.userName, context: state.userContext });
+    }
+
+    // Personalize greeting if we have a valid share name
+    if (state.userName && isValidShareName(state.userName)) {
+        state.phases = state.phases.map(function(phase, i) {
+            if (i === 0) return Object.assign({}, phase, { text: 'Hello, ' + state.userName.trim() + '.' });
+            return phase;
+        });
     }
 
     // ─── DOM ELEMENTS ───────────────────────────────────────────
@@ -538,13 +556,19 @@
     function updateSharePreview() {
         const name = els.shareName.value.trim();
         const context = els.shareContext.value.trim();
-        
+
         if (!name) {
             els.sharePreviewText.innerHTML = 'Enter a name to see the preview...';
             els.shareGenerate.disabled = true;
             return;
         }
-        
+
+        if (!isValidShareName(name)) {
+            els.sharePreviewText.innerHTML = 'Please enter a valid first name (letters only, 30 characters max).';
+            els.shareGenerate.disabled = true;
+            return;
+        }
+
         els.shareGenerate.disabled = false;
         
         // Generate example Wheatley greeting based on context
@@ -582,7 +606,7 @@
         const name = els.shareName.value.trim();
         const context = els.shareContext.value.trim();
 
-        if (!name) {
+        if (!name || !isValidShareName(name)) {
             els.shareName.focus();
             return;
         }

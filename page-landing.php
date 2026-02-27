@@ -103,13 +103,15 @@ if (!defined('ABSPATH')) exit;
                     <label class="share-modal__label" for="shareName">
                         Their Name <span class="share-modal__label-required">*</span>
                     </label>
-                    <input 
-                        type="text" 
-                        id="shareName" 
+                    <input
+                        type="text"
+                        id="shareName"
                         class="share-modal__input"
                         placeholder="Jordan"
                         required
                         autocomplete="off"
+                        maxlength="30"
+                        pattern="[A-Za-zÀ-ÿ\s'\-]+"
                     />
                 </div>
 

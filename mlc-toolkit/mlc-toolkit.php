@@ -155,6 +155,18 @@ add_action('rest_api_init', function () {
     ]);
 });
 
+function mlc_toolkit_validate_share_name($name) {
+    if (empty($name) || strlen($name) > 30) return false;
+    if (!preg_match('/^[A-Za-z\x{00C0}-\x{00FF}\s\'\-]+$/u', $name)) return false;
+
+    $blocked = ['ass','shit','fuck','bitch','cock','cunt','piss','whore','slut','nigger','nigga','faggot','fag','retard','twat','wanker','pussy','damn','hell'];
+    $words = preg_split('/[\s\'\-]+/', strtolower($name), -1, PREG_SPLIT_NO_EMPTY);
+    foreach ($words as $w) {
+        if (in_array($w, $blocked, true)) return false;
+    }
+    return true;
+}
+
 function mlc_toolkit_create_share($request) {
     $params = $request->get_json_params();
 
@@ -163,6 +175,10 @@ function mlc_toolkit_create_share($request) {
 
     if (empty($name)) {
         return new WP_Error('missing_name', 'Name is required', ['status' => 400]);
+    }
+
+    if (!mlc_toolkit_validate_share_name($name)) {
+        return new WP_Error('invalid_name', 'Please enter a valid first name', ['status' => 400]);
     }
 
     $result = MLC_Share::create_link($name, $context);

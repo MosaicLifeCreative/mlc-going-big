@@ -72,7 +72,7 @@ function mlc_enqueue_landing_assets() {
             'mlc-landing-js',
             get_stylesheet_directory_uri() . '/assets/js/landing.js',
             array('mlc-global-js'), // Dependency on global
-            '1.7.2',
+            '1.7.3',
             true
         );
     }
