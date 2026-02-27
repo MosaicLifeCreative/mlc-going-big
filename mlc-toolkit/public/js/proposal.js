@@ -1,6 +1,7 @@
 /**
- * MLC Proposal Frontend v2
- * PIN gate, accept button, Wheatley API calls with inline typewriter + cursor.
+ * MLC Proposal Frontend v3
+ * PIN gate, interactive service selection, client notes, auto-save,
+ * dynamic totals, accept button, Wheatley API calls with inline typewriter + cursor.
  */
 (function () {
     'use strict';
@@ -8,7 +9,26 @@
     var config = window.mlcProposal || {};
     var validatedPin = '';
 
-    // ─── PIN GATE ────────────────────────────────────────────
+    // ─── SELECTION STATE ────────────────────────────────────
+    var selections = {};
+    var notes = {};
+    var saveTimer = null;
+    var isSaving = false;
+    var wheatleyFired = { intro: false, total: false, accept: false };
+
+    function initSelections() {
+        var serviceData = config.serviceData || {};
+        var savedSelections = config.clientSelections || {};
+        var savedNotes = config.clientNotes || {};
+        var hasSaved = savedSelections && Object.keys(savedSelections).length > 0;
+
+        Object.keys(serviceData).forEach(function (slug) {
+            selections[slug] = hasSaved ? !!savedSelections[slug] : true;
+            notes[slug] = savedNotes[slug] || '';
+        });
+    }
+
+    // ─── PIN GATE ───────────────────────────────────────────
     var gate     = document.getElementById('proposal-gate');
     var pinInput = document.getElementById('proposal-pin');
     var pinBtn   = document.getElementById('proposal-pin-submit');
@@ -19,7 +39,12 @@
     if (config.status === 'accepted') {
         if (gate) gate.style.display = 'none';
         if (content) content.classList.remove('proposal-content--hidden');
+        initSelections();
         triggerWheatley('intro');
+        triggerWheatley('total');
+        // Hide the post-accept Wheatley box (only relevant during live accept)
+        var wheatleyAcceptBox = document.getElementById('wheatley-accept');
+        if (wheatleyAcceptBox) wheatleyAcceptBox.style.display = 'none';
         return;
     }
 
@@ -88,51 +113,209 @@
     }
 
     function unlockProposal() {
-        // Animate gate away
         gate.classList.add('proposal-gate--unlocked');
 
         setTimeout(function () {
             gate.style.display = 'none';
             content.classList.remove('proposal-content--hidden');
 
-            // Trigger Wheatley intro
+            initSelections();
+            bindServiceInteractions();
             triggerWheatley('intro');
-
-            // Set up total observer
             observeTotalSection();
         }, 600);
     }
 
-    // ─── ACCEPT BUTTON ───────────────────────────────────────
+    // ─── SERVICE INTERACTIONS ───────────────────────────────
+
+    function bindServiceInteractions() {
+        // Checkbox toggles
+        document.addEventListener('change', function (e) {
+            if (!e.target.classList.contains('proposal-service__checkbox')) return;
+
+            var slug = e.target.dataset.slug;
+            var card = e.target.closest('.proposal-service');
+            selections[slug] = e.target.checked;
+
+            if (e.target.checked) {
+                card.classList.remove('proposal-service--dimmed');
+            } else {
+                card.classList.add('proposal-service--dimmed');
+            }
+
+            recalcTotals();
+            debounceSave();
+        });
+
+        // Note inputs
+        document.addEventListener('input', function (e) {
+            if (!e.target.classList.contains('proposal-service__note-input')) return;
+
+            var slug = e.target.dataset.slug;
+            notes[slug] = e.target.value;
+            debounceSave();
+        });
+    }
+
+    // ─── CLIENT-SIDE TOTAL RECALCULATION ────────────────────
+
+    function getSelectedTotals() {
+        var serviceData = config.serviceData || {};
+        var customItems = config.customItems || [];
+        var totals = { one_time: 0, monthly: 0, annual: 0, setup: 0 };
+
+        Object.keys(serviceData).forEach(function (slug) {
+            if (!selections[slug]) return;
+            var svc = serviceData[slug];
+            var amount = parseFloat((svc.price || '0').replace(/[^0-9.]/g, '')) || 0;
+            var type = svc.price_type || 'monthly';
+
+            if (type === 'one-time') totals.one_time += amount;
+            else if (type === 'annual') totals.annual += amount;
+            else totals.monthly += amount;
+
+            var setupAmt = parseFloat((svc.setup_price || '0').replace(/[^0-9.]/g, '')) || 0;
+            if (setupAmt > 0) totals.setup += setupAmt;
+        });
+
+        customItems.forEach(function (item) {
+            var amount = parseFloat((item.price || '0').replace(/[^0-9.]/g, '')) || 0;
+            var type = item.price_type || 'one-time';
+            if (type === 'one-time') totals.one_time += amount;
+            else if (type === 'annual') totals.annual += amount;
+            else totals.monthly += amount;
+        });
+
+        return totals;
+    }
+
+    function recalcTotals() {
+        var totals = getSelectedTotals();
+        updateRow('summary-setup', totals.setup, '');
+        updateRow('summary-onetime', totals.one_time, '');
+        updateRow('summary-monthly', totals.monthly, '/mo');
+        updateRow('summary-annual', totals.annual, '/yr');
+    }
+
+    function updateRow(id, amount, suffix) {
+        var row = document.getElementById(id);
+        if (!row) return;
+        if (amount > 0) {
+            row.style.display = '';
+            var strong = row.querySelector('strong');
+            if (strong) {
+                strong.textContent = '$' + amount.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }) + suffix;
+            }
+        } else {
+            row.style.display = 'none';
+        }
+    }
+
+    // ─── DEBOUNCED AUTO-SAVE ────────────────────────────────
+
+    function debounceSave() {
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(function () {
+            saveSelections();
+        }, 1500);
+    }
+
+    function saveSelections() {
+        if (isSaving || !validatedPin) return;
+        isSaving = true;
+        showSaveIndicator('saving');
+
+        fetch(config.ajaxUrl + 'proposal/save-selections', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                proposal_id: config.proposalId,
+                pin: validatedPin,
+                selections: selections,
+                notes: notes
+            })
+        })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+            isSaving = false;
+            if (data.success) {
+                showSaveIndicator('saved');
+            } else {
+                showSaveIndicator('error');
+            }
+        })
+        .catch(function () {
+            isSaving = false;
+            showSaveIndicator('error');
+        });
+    }
+
+    function showSaveIndicator(state) {
+        var el = document.getElementById('proposal-save-indicator');
+        if (!el) return;
+
+        if (state === 'saving') {
+            el.textContent = 'Saving\u2026';
+            el.className = 'proposal-save-indicator proposal-save-indicator--saving';
+            el.style.opacity = '1';
+        } else if (state === 'saved') {
+            el.textContent = 'Saved';
+            el.className = 'proposal-save-indicator proposal-save-indicator--saved';
+            el.style.opacity = '1';
+            setTimeout(function () { el.style.opacity = '0'; }, 2000);
+        } else {
+            el.textContent = 'Save failed';
+            el.className = 'proposal-save-indicator proposal-save-indicator--error';
+            el.style.opacity = '1';
+            setTimeout(function () { el.style.opacity = '0'; }, 3000);
+        }
+    }
+
+    // ─── ACCEPT BUTTON ─────────────────────────────────────
+
     var acceptBtn = document.getElementById('proposal-accept-btn');
     if (acceptBtn) {
         acceptBtn.addEventListener('click', function () {
-            if (!confirm('Accept this proposal? This will notify Mosaic Life Creative that you\'re ready to move forward.')) {
+            var generalNote = '';
+            var gnEl = document.getElementById('proposal-general-note');
+            if (gnEl) generalNote = gnEl.value || '';
+
+            if (!confirm('Send your selections and notes to Mosaic Life Creative? Trey will follow up to discuss next steps.')) {
                 return;
             }
 
             acceptBtn.disabled = true;
-            acceptBtn.textContent = 'Accepting...';
+            acceptBtn.textContent = 'Sending\u2026';
 
             fetch(config.ajaxUrl + 'proposal/accept', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     proposal_id: config.proposalId,
-                    pin: validatedPin
+                    pin: validatedPin,
+                    selections: selections,
+                    notes: notes,
+                    general_note: generalNote
                 })
             })
             .then(function (r) { return r.json(); })
             .then(function (data) {
                 if (data.success) {
-                    // Replace accept section with confirmation
                     var section = document.getElementById('proposal-accept-section');
                     section.innerHTML =
-                        '<div class="proposal-accepted__badge">Accepted</div>' +
-                        '<p>Thank you. Trey will be in touch shortly.</p>';
+                        '<div class="proposal-accepted__badge">Interested</div>' +
+                        '<p>Thank you. Trey will be in touch shortly to discuss next steps.</p>';
                     section.className = 'proposal-summary__accepted';
 
-                    // Show Wheatley post-accept
+                    // Disable all checkboxes and note inputs
+                    var checkboxes = document.querySelectorAll('.proposal-service__checkbox');
+                    checkboxes.forEach(function (cb) { cb.disabled = true; });
+                    var noteInputs = document.querySelectorAll('.proposal-service__note-input');
+                    noteInputs.forEach(function (n) { n.readOnly = true; });
+
                     var wheatleyAccept = document.getElementById('wheatley-accept');
                     if (wheatleyAccept) {
                         wheatleyAccept.style.display = 'block';
@@ -140,20 +323,19 @@
                     }
                 } else {
                     acceptBtn.disabled = false;
-                    acceptBtn.textContent = 'Accept Proposal';
+                    acceptBtn.textContent = 'I\u2019m Interested. Let\u2019s Talk.';
                     alert('Something went wrong. Please try again.');
                 }
             })
             .catch(function () {
                 acceptBtn.disabled = false;
-                acceptBtn.textContent = 'Accept Proposal';
+                acceptBtn.textContent = 'I\u2019m Interested. Let\u2019s Talk.';
                 alert('Something went wrong. Please try again.');
             });
         });
     }
 
-    // ─── WHEATLEY COMMENTARY ─────────────────────────────────
-    var wheatleyFired = { intro: false, total: false, accept: false };
+    // ─── WHEATLEY COMMENTARY ────────────────────────────────
 
     function triggerWheatley(position) {
         if (wheatleyFired[position]) return;
@@ -161,8 +343,19 @@
 
         if (!config.wheatleyUrl) return;
 
-        // Build service names for context
-        var serviceNames = (config.services || []).join(', ');
+        // Build selected service names
+        var serviceData = config.serviceData || {};
+        var selectedNames = [];
+        var deselectedCount = 0;
+        Object.keys(serviceData).forEach(function (slug) {
+            if (selections[slug]) {
+                selectedNames.push(serviceData[slug].name);
+            } else {
+                deselectedCount++;
+            }
+        });
+
+        var selectedTotals = getSelectedTotals();
 
         fetch(config.wheatleyUrl, {
             method: 'POST',
@@ -170,11 +363,12 @@
             body: JSON.stringify({
                 position: position,
                 client_name: config.clientName || '',
-                services: serviceNames,
-                total_onetime: config.totalOnce || 0,
-                total_monthly: config.totalMonthly || 0,
-                total_annual: config.totalAnnual || 0,
-                total_setup: config.totalSetup || 0
+                services: selectedNames.join(', '),
+                total_onetime: selectedTotals.one_time,
+                total_monthly: selectedTotals.monthly,
+                total_annual: selectedTotals.annual,
+                total_setup: selectedTotals.setup,
+                deselected_count: deselectedCount
             })
         })
         .then(function (r) { return r.json(); })
@@ -192,7 +386,6 @@
         var textEl = document.getElementById('wheatley-' + position + '-text');
         if (!textEl) return;
 
-        // Create thin bar cursor inline within the text element (matches site cursor)
         var cursor = document.createElement('span');
         cursor.className = 'proposal-wheatley__cursor';
         textEl.textContent = '';
@@ -202,7 +395,6 @@
 
         function type() {
             if (i < text.length) {
-                // Insert character before the cursor
                 cursor.insertAdjacentText('beforebegin', text.charAt(i));
                 i++;
                 setTimeout(type, 28);
@@ -212,7 +404,7 @@
         type();
     }
 
-    // ─── TOTAL SECTION OBSERVER ──────────────────────────────
+    // ─── TOTAL SECTION OBSERVER ─────────────────────────────
     function observeTotalSection() {
         var totalSection = document.getElementById('wheatley-total');
         if (!totalSection) return;

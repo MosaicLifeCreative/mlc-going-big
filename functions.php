@@ -576,13 +576,14 @@ add_action('rest_api_init', function() {
 function mlc_wheatley_proposal_respond($request) {
     $params = $request->get_json_params();
 
-    $position      = sanitize_text_field($params['position'] ?? 'intro');
-    $client_name   = sanitize_text_field($params['client_name'] ?? '');
-    $services      = sanitize_text_field($params['services'] ?? '');
-    $total_onetime = floatval($params['total_onetime'] ?? 0);
-    $total_monthly = floatval($params['total_monthly'] ?? 0);
-    $total_annual  = floatval($params['total_annual'] ?? 0);
-    $total_setup   = floatval($params['total_setup'] ?? 0);
+    $position        = sanitize_text_field($params['position'] ?? 'intro');
+    $client_name     = sanitize_text_field($params['client_name'] ?? '');
+    $services        = sanitize_text_field($params['services'] ?? '');
+    $total_onetime   = floatval($params['total_onetime'] ?? 0);
+    $total_monthly   = floatval($params['total_monthly'] ?? 0);
+    $total_annual    = floatval($params['total_annual'] ?? 0);
+    $total_setup     = floatval($params['total_setup'] ?? 0);
+    $deselected_count = intval($params['deselected_count'] ?? 0);
 
     $price_parts = [];
     if ($total_setup > 0) {
@@ -599,10 +600,19 @@ function mlc_wheatley_proposal_respond($request) {
     }
     $price_context = implode(' + ', $price_parts);
 
+    // Accept position: acknowledge what they chose
+    $accept_context = 'This appears AFTER they clicked "I\'m Interested." They expressed interest in moving forward. ';
+    if ($deselected_count > 0) {
+        $accept_context .= "They deselected {$deselected_count} service(s), which is totally fine. Be warm about what they DID choose.";
+    } else {
+        $accept_context .= 'They kept everything. All of it. Be genuinely pleased.';
+    }
+    $accept_context .= ' Be warm. Let them know Trey will follow up. This is a real moment.';
+
     $position_instructions = array(
         'intro' => 'This appears at the TOP of the proposal, right after the header. The client just entered their PIN and is seeing the proposal for the first time. Welcome them, acknowledge what this is, set a tone that says "this is going to be good." If you know their name, use it.',
-        'total' => 'This appears just BEFORE the pricing total. The client has read through all the services and is about to see the investment summary. Acknowledge the moment. Everyone scrolls to the price first and you know it.',
-        'accept' => 'This appears AFTER they clicked Accept. They just committed. Be genuinely happy. Let them know Trey will be excited. This is a real moment.'
+        'total' => 'This appears just BEFORE the pricing total. The client has read through the services and is about to see the investment summary. They can check and uncheck services they want. Acknowledge the moment. Everyone scrolls to the price first and you know it.',
+        'accept' => $accept_context
     );
 
     $system_prompt = "You are Wheatley, an AI personality core for Mosaic Life Creative. You are appearing inside a client proposal document.
@@ -618,8 +628,8 @@ This is NOT the bad salesman version of you. This is a REAL proposal for a REAL 
 
 CONTEXT:
 - Client name: " . ($client_name ?: 'unknown') . "
-- Services included: " . ($services ?: 'various services') . "
-- Investment: " . ($price_context ?: 'pricing TBD') . "
+- Services they selected: " . ($services ?: 'various services') . "
+- Investment (based on their selections): " . ($price_context ?: 'pricing TBD') . "
 
 POSITION: " . ($position_instructions[$position] ?? 'Generate a comment for this proposal section.') . "
 

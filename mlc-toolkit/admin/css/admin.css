@@ -559,6 +559,50 @@
     flex-shrink: 0;
 }
 
+/* Client Feedback */
+.mlc-client-selections {
+    margin: 0;
+}
+
+.mlc-client-selection-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f1;
+    font-size: 12px;
+}
+
+.mlc-client-selection-row:last-child {
+    border-bottom: none;
+}
+
+.mlc-client-selection-icon {
+    flex-shrink: 0;
+    font-size: 14px;
+    width: 18px;
+    text-align: center;
+    color: #00a32a;
+}
+
+.mlc-client-selection-row--off .mlc-client-selection-icon {
+    color: #d63638;
+}
+
+.mlc-client-selection-row--off .mlc-client-selection-name {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.mlc-client-selection-note {
+    width: 100%;
+    padding: 4px 0 0 24px;
+    font-style: italic;
+    color: #646970;
+    font-size: 12px;
+}
+
 /* Service rows */
 .mlc-service-row {
     border: 1px solid #ddd;

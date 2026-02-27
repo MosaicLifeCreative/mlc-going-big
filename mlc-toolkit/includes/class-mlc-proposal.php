@@ -131,8 +131,11 @@ class MLC_Proposal {
             'status'         => get_post_meta($post_id, '_mlc_proposal_status', true) ?: 'draft',
             'viewed_at'      => get_post_meta($post_id, '_mlc_proposal_viewed_at', true) ?: '',
             'accepted_at'    => get_post_meta($post_id, '_mlc_proposal_accepted_at', true) ?: '',
-            'notes'          => get_post_meta($post_id, '_mlc_proposal_notes', true) ?: '',
-            'valid_days'     => get_post_meta($post_id, '_mlc_proposal_valid_days', true) ?: 30,
+            'notes'              => get_post_meta($post_id, '_mlc_proposal_notes', true) ?: '',
+            'valid_days'         => get_post_meta($post_id, '_mlc_proposal_valid_days', true) ?: 30,
+            'client_selections'  => get_post_meta($post_id, '_mlc_proposal_client_selections', true) ?: [],
+            'client_notes'       => get_post_meta($post_id, '_mlc_proposal_client_notes', true) ?: [],
+            'client_general_note'=> get_post_meta($post_id, '_mlc_proposal_client_general_note', true) ?: '',
         ];
     }
 
@@ -335,6 +338,62 @@ class MLC_Proposal {
     }
 
     /**
+     * Calculate totals filtered by client selections.
+     * If the client hasn't interacted yet (empty selections), includes all services.
+     * Custom items are always included (not toggleable).
+     */
+    public static function calculate_selected_totals($post_id) {
+        $meta       = self::get_meta($post_id);
+        $selections = $meta['client_selections'];
+        $one_time   = 0;
+        $monthly    = 0;
+        $annual     = 0;
+        $setup      = 0;
+
+        foreach ($meta['services'] as $slug => $svc) {
+            // If selections exist, respect them. If empty (no interaction), include all.
+            if (!empty($selections) && empty($selections[$slug])) {
+                continue;
+            }
+
+            $amount = (float) preg_replace('/[^0-9.]/', '', $svc['price'] ?? '0');
+            $type   = $svc['price_type'] ?? 'monthly';
+            if ($type === 'one-time') {
+                $one_time += $amount;
+            } elseif ($type === 'annual') {
+                $annual += $amount;
+            } else {
+                $monthly += $amount;
+            }
+
+            $setup_amount = (float) preg_replace('/[^0-9.]/', '', $svc['setup_price'] ?? '0');
+            if ($setup_amount > 0) {
+                $setup += $setup_amount;
+            }
+        }
+
+        // Custom items always included
+        foreach ($meta['custom_items'] as $item) {
+            $amount = (float) preg_replace('/[^0-9.]/', '', $item['price'] ?? '0');
+            $type   = $item['price_type'] ?? 'one-time';
+            if ($type === 'one-time') {
+                $one_time += $amount;
+            } elseif ($type === 'annual') {
+                $annual += $amount;
+            } else {
+                $monthly += $amount;
+            }
+        }
+
+        return [
+            'one_time' => $one_time,
+            'monthly'  => $monthly,
+            'annual'   => $annual,
+            'setup'    => $setup,
+        ];
+    }
+
+    /**
      * Send admin notification email
      */
     private static function notify_admin($post_id, $event) {
@@ -352,11 +411,54 @@ class MLC_Proposal {
             $body   .= "Proposal URL: {$url}\n";
         } else {
             $subject = "Proposal Accepted: {$client}{$company}";
-            $body    = "{$client}{$company} accepted your proposal.\n\n";
+            $body    = "{$client}{$company} expressed interest in your proposal.\n\n";
             $body   .= "View in admin: " . admin_url("admin.php?page=mlc-proposals&action=edit&id={$post_id}") . "\n";
             $body   .= "Proposal URL: {$url}\n";
 
-            $totals = self::calculate_totals($post_id);
+            // Show selected vs declined services
+            $selections   = $meta['client_selections'];
+            $client_notes = $meta['client_notes'];
+            if (!empty($selections)) {
+                $selected   = [];
+                $deselected = [];
+                foreach ($meta['services'] as $slug => $svc) {
+                    if (!empty($selections[$slug])) {
+                        $selected[] = $svc['name'];
+                    } else {
+                        $deselected[] = $svc['name'];
+                    }
+                }
+                if (!empty($selected)) {
+                    $body .= "\nSelected services:\n- " . implode("\n- ", $selected);
+                }
+                if (!empty($deselected)) {
+                    $body .= "\n\nDeclined:\n- " . implode("\n- ", $deselected);
+                }
+            }
+
+            // Include per-service notes
+            if (!empty($client_notes)) {
+                $has_notes = false;
+                foreach ($client_notes as $slug => $note) {
+                    if (!empty($note) && isset($meta['services'][$slug])) {
+                        if (!$has_notes) {
+                            $body .= "\n\nClient notes:";
+                            $has_notes = true;
+                        }
+                        $body .= "\n- {$meta['services'][$slug]['name']}: \"{$note}\"";
+                    }
+                }
+            }
+
+            // General note
+            $general = $meta['client_general_note'];
+            if (!empty($general)) {
+                $body .= "\n\nGeneral note: \"{$general}\"";
+            }
+
+            // Totals based on client selections
+            $totals = self::calculate_selected_totals($post_id);
+            $body .= "\n\nSelected investment:";
             if ($totals['setup'] > 0) {
                 $body .= "\nSetup: $" . number_format($totals['setup'], 2);
             }

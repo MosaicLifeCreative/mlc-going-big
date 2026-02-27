@@ -11,7 +11,7 @@
 
 if (!defined('ABSPATH')) exit;
 
-define('MLC_TOOLKIT_VERSION', '1.2.2');
+define('MLC_TOOLKIT_VERSION', '1.3.0');
 define('MLC_TOOLKIT_PATH', plugin_dir_path(__FILE__));
 define('MLC_TOOLKIT_URL', plugin_dir_url(__FILE__));
 
@@ -153,6 +153,12 @@ add_action('rest_api_init', function () {
         'callback'            => 'mlc_toolkit_accept_proposal',
         'permission_callback' => '__return_true',
     ]);
+
+    register_rest_route('mlc/v1', '/proposal/save-selections', [
+        'methods'             => 'POST',
+        'callback'            => 'mlc_toolkit_save_proposal_selections',
+        'permission_callback' => '__return_true',
+    ]);
 });
 
 function mlc_toolkit_validate_share_name($name) {
@@ -218,6 +224,59 @@ function mlc_toolkit_validate_proposal_pin($request) {
 }
 
 /**
+ * REST: Save client selections and notes (auto-save)
+ */
+function mlc_toolkit_save_proposal_selections($request) {
+    $params  = $request->get_json_params();
+    $post_id = absint($params['proposal_id'] ?? 0);
+    $pin     = sanitize_text_field($params['pin'] ?? '');
+
+    if (!$post_id || !$pin) {
+        return new WP_Error('invalid', 'Missing proposal ID or PIN', ['status' => 400]);
+    }
+
+    if (!MLC_Proposal::validate_pin($post_id, $pin)) {
+        return new WP_Error('unauthorized', 'Invalid PIN', ['status' => 403]);
+    }
+
+    if (MLC_Proposal::is_expired($post_id)) {
+        return ['success' => false, 'error' => 'expired'];
+    }
+
+    $meta        = MLC_Proposal::get_meta($post_id);
+    $valid_slugs = array_keys($meta['services']);
+
+    // Sanitize selections (boolean per service slug)
+    $selections = [];
+    if (isset($params['selections']) && is_array($params['selections'])) {
+        foreach ($params['selections'] as $slug => $checked) {
+            $slug = sanitize_key($slug);
+            if (in_array($slug, $valid_slugs, true)) {
+                $selections[$slug] = (bool) $checked;
+            }
+        }
+    }
+
+    // Sanitize notes (text per service slug)
+    $notes = [];
+    if (isset($params['notes']) && is_array($params['notes'])) {
+        foreach ($params['notes'] as $slug => $note) {
+            $slug = sanitize_key($slug);
+            if (in_array($slug, $valid_slugs, true)) {
+                $notes[$slug] = sanitize_textarea_field($note);
+            }
+        }
+    }
+
+    update_post_meta($post_id, '_mlc_proposal_client_selections', $selections);
+    update_post_meta($post_id, '_mlc_proposal_client_notes', $notes);
+
+    $totals = MLC_Proposal::calculate_selected_totals($post_id);
+
+    return ['success' => true, 'totals' => $totals];
+}
+
+/**
  * REST: Accept proposal
  */
 function mlc_toolkit_accept_proposal($request) {
@@ -236,6 +295,37 @@ function mlc_toolkit_accept_proposal($request) {
 
     if (MLC_Proposal::is_expired($post_id)) {
         return ['success' => false, 'error' => 'expired'];
+    }
+
+    $meta        = MLC_Proposal::get_meta($post_id);
+    $valid_slugs = array_keys($meta['services']);
+
+    // Save final selections + notes alongside acceptance
+    if (isset($params['selections']) && is_array($params['selections'])) {
+        $selections = [];
+        foreach ($params['selections'] as $slug => $checked) {
+            $slug = sanitize_key($slug);
+            if (in_array($slug, $valid_slugs, true)) {
+                $selections[$slug] = (bool) $checked;
+            }
+        }
+        update_post_meta($post_id, '_mlc_proposal_client_selections', $selections);
+    }
+
+    if (isset($params['notes']) && is_array($params['notes'])) {
+        $notes = [];
+        foreach ($params['notes'] as $slug => $note) {
+            $slug = sanitize_key($slug);
+            if (in_array($slug, $valid_slugs, true)) {
+                $notes[$slug] = sanitize_textarea_field($note);
+            }
+        }
+        update_post_meta($post_id, '_mlc_proposal_client_notes', $notes);
+    }
+
+    if (isset($params['general_note'])) {
+        update_post_meta($post_id, '_mlc_proposal_client_general_note',
+            sanitize_textarea_field($params['general_note']));
     }
 
     MLC_Proposal::mark_accepted($post_id);
@@ -266,20 +356,35 @@ function mlc_toolkit_proposal_assets() {
 
     $post_id = get_the_ID();
     $meta    = MLC_Proposal::get_meta($post_id);
-    $totals  = MLC_Proposal::calculate_totals($post_id);
+    $totals  = MLC_Proposal::calculate_selected_totals($post_id);
+
+    // Build service data for client-side total recalculation
+    $service_data = [];
+    foreach ($meta['services'] as $slug => $svc) {
+        $service_data[$slug] = [
+            'name'        => $svc['name'],
+            'price'       => $svc['price'] ?? '0',
+            'price_type'  => $svc['price_type'] ?? 'monthly',
+            'setup_price' => $svc['setup_price'] ?? '0',
+        ];
+    }
 
     wp_localize_script('mlc-proposal-js', 'mlcProposal', [
-        'ajaxUrl'      => rest_url('mlc/v1/'),
-        'proposalId'   => $post_id,
-        'clientName'   => $meta['client_name'],
-        'status'       => $meta['status'],
-        'isExpired'    => MLC_Proposal::is_expired($post_id),
-        'wheatleyUrl'  => rest_url('mlc/v1/wheatley-proposal'),
-        'services'     => array_keys($meta['services']),
-        'totalOnce'    => $totals['one_time'],
-        'totalMonthly' => $totals['monthly'],
-        'totalAnnual'  => $totals['annual'],
-        'totalSetup'   => $totals['setup'],
+        'ajaxUrl'          => rest_url('mlc/v1/'),
+        'proposalId'       => $post_id,
+        'clientName'       => $meta['client_name'],
+        'status'           => $meta['status'],
+        'isExpired'        => MLC_Proposal::is_expired($post_id),
+        'wheatleyUrl'      => rest_url('mlc/v1/wheatley-proposal'),
+        'services'         => array_keys($meta['services']),
+        'serviceData'      => $service_data,
+        'customItems'      => $meta['custom_items'],
+        'clientSelections' => $meta['client_selections'],
+        'clientNotes'      => $meta['client_notes'],
+        'totalOnce'        => $totals['one_time'],
+        'totalMonthly'     => $totals['monthly'],
+        'totalAnnual'      => $totals['annual'],
+        'totalSetup'       => $totals['setup'],
     ]);
 }
 add_action('wp_enqueue_scripts', 'mlc_toolkit_proposal_assets');

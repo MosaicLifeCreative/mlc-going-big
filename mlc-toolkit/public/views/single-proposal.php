@@ -7,9 +7,13 @@
  */
 if (!defined('ABSPATH')) exit;
 
+// Proposals have per-user state (selections, notes, acceptance).
+// Prevent SiteGround Dynamic Cache and browser from serving stale HTML.
+nocache_headers();
+
 $post_id = get_the_ID();
 $meta    = MLC_Proposal::get_meta($post_id);
-$totals  = MLC_Proposal::calculate_totals($post_id);
+$totals  = MLC_Proposal::calculate_selected_totals($post_id);
 $expired = MLC_Proposal::is_expired($post_id);
 $accent  = $meta['accent_color'] ?: '#7C3AED';
 $logo_url = $meta['client_logo'] ? wp_get_attachment_image_url($meta['client_logo'], 'medium') : '';
@@ -131,12 +135,35 @@ $custom_items = $meta['custom_items'];
         <?php if (!empty($services)): ?>
         <section class="proposal-section">
             <div class="proposal-section__inner">
-                <h2 class="proposal-section__title">What We're Building</h2>
+                <h2 class="proposal-section__title">
+                    What We're Building
+                    <span id="proposal-save-indicator" class="proposal-save-indicator"></span>
+                </h2>
 
-                <?php foreach ($services as $slug => $svc): ?>
-                    <div class="proposal-service">
+                <?php
+                $client_selections = $meta['client_selections'];
+                $client_notes_data = $meta['client_notes'];
+                $is_accepted = ($meta['status'] === 'accepted');
+                ?>
+
+                <?php foreach ($services as $slug => $svc):
+                    $is_checked = empty($client_selections) || !empty($client_selections[$slug]);
+                    $client_note = $client_notes_data[$slug] ?? '';
+                ?>
+                    <div class="proposal-service <?php echo $is_checked ? '' : 'proposal-service--dimmed'; ?>" data-service-slug="<?php echo esc_attr($slug); ?>">
                         <div class="proposal-service__header">
-                            <h3 class="proposal-service__name"><?php echo esc_html($svc['name']); ?></h3>
+                            <div class="proposal-service__toggle-row">
+                                <?php if (!$is_accepted): ?>
+                                    <label class="proposal-service__check">
+                                        <input type="checkbox"
+                                               class="proposal-service__checkbox"
+                                               data-slug="<?php echo esc_attr($slug); ?>"
+                                               <?php checked($is_checked); ?> />
+                                        <span class="proposal-service__checkmark"></span>
+                                    </label>
+                                <?php endif; ?>
+                                <h3 class="proposal-service__name"><?php echo esc_html($svc['name']); ?></h3>
+                            </div>
                             <div class="proposal-service__price">
                                 <?php if ($svc['price']): ?>
                                     <strong>$<?php echo esc_html(number_format((float) preg_replace('/[^0-9.]/', '', $svc['price']))); ?></strong>
@@ -158,6 +185,21 @@ $custom_items = $meta['custom_items'];
                         <?php if ($svc['description']): ?>
                             <div class="proposal-service__description">
                                 <?php echo wpautop(esc_html($svc['description'])); ?>
+                            </div>
+                        <?php endif; ?>
+
+                        <?php if (!$is_accepted): ?>
+                            <div class="proposal-service__note">
+                                <textarea class="proposal-service__note-input"
+                                          data-slug="<?php echo esc_attr($slug); ?>"
+                                          placeholder="Any questions or notes about this service?"
+                                          rows="2"
+                                          maxlength="500"><?php echo esc_textarea($client_note); ?></textarea>
+                            </div>
+                        <?php elseif ($client_note): ?>
+                            <div class="proposal-service__note proposal-service__note--readonly">
+                                <p class="proposal-service__note-label">Your note:</p>
+                                <p><?php echo esc_html($client_note); ?></p>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -212,33 +254,27 @@ $custom_items = $meta['custom_items'];
                     </div>
                 </div>
 
-                <?php if ($totals['setup'] > 0): ?>
-                <div class="proposal-summary__row">
-                    <span>Setup</span>
-                    <strong>$<?php echo esc_html(number_format($totals['setup'], 2)); ?></strong>
-                </div>
-                <?php endif; ?>
+                <div id="proposal-summary-rows">
+                    <div class="proposal-summary__row" id="summary-setup" <?php echo $totals['setup'] > 0 ? '' : 'style="display:none;"'; ?>>
+                        <span>Setup</span>
+                        <strong>$<?php echo esc_html(number_format($totals['setup'], 2)); ?></strong>
+                    </div>
 
-                <?php if ($totals['one_time'] > 0): ?>
-                <div class="proposal-summary__row">
-                    <span>One-time</span>
-                    <strong>$<?php echo esc_html(number_format($totals['one_time'], 2)); ?></strong>
-                </div>
-                <?php endif; ?>
+                    <div class="proposal-summary__row" id="summary-onetime" <?php echo $totals['one_time'] > 0 ? '' : 'style="display:none;"'; ?>>
+                        <span>One-time</span>
+                        <strong>$<?php echo esc_html(number_format($totals['one_time'], 2)); ?></strong>
+                    </div>
 
-                <?php if ($totals['monthly'] > 0): ?>
-                <div class="proposal-summary__row">
-                    <span>Monthly</span>
-                    <strong>$<?php echo esc_html(number_format($totals['monthly'], 2)); ?>/mo</strong>
-                </div>
-                <?php endif; ?>
+                    <div class="proposal-summary__row" id="summary-monthly" <?php echo $totals['monthly'] > 0 ? '' : 'style="display:none;"'; ?>>
+                        <span>Monthly</span>
+                        <strong>$<?php echo esc_html(number_format($totals['monthly'], 2)); ?>/mo</strong>
+                    </div>
 
-                <?php if ($totals['annual'] > 0): ?>
-                <div class="proposal-summary__row">
-                    <span>Annual</span>
-                    <strong>$<?php echo esc_html(number_format($totals['annual'], 2)); ?>/yr</strong>
+                    <div class="proposal-summary__row" id="summary-annual" <?php echo $totals['annual'] > 0 ? '' : 'style="display:none;"'; ?>>
+                        <span>Annual</span>
+                        <strong>$<?php echo esc_html(number_format($totals['annual'], 2)); ?>/yr</strong>
+                    </div>
                 </div>
-                <?php endif; ?>
 
                 <div class="proposal-summary__valid">
                     This proposal is valid through <?php echo esc_html($expiry); ?>.
@@ -247,10 +283,16 @@ $custom_items = $meta['custom_items'];
                 <!-- Accept (inside summary) -->
                 <?php if ($meta['status'] !== 'accepted'): ?>
                 <div class="proposal-summary__accept" id="proposal-accept-section">
+                    <div class="proposal-accept__general-note">
+                        <textarea id="proposal-general-note"
+                                  placeholder="Anything else you'd like us to know? (optional)"
+                                  rows="3"
+                                  maxlength="1000"><?php echo esc_textarea($meta['client_general_note']); ?></textarea>
+                    </div>
                     <button type="button" id="proposal-accept-btn" class="proposal-btn proposal-btn--accent proposal-btn--large">
-                        Accept Proposal
+                        I'm Interested. Let's Talk.
                     </button>
-                    <p class="proposal-accept__note">By accepting, you agree to proceed with the services outlined above.</p>
+                    <p class="proposal-accept__note">This saves your selections and notes. Trey will follow up to discuss next steps.</p>
                 </div>
                 <?php else: ?>
                 <div class="proposal-summary__accepted">

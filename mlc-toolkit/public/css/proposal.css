@@ -337,6 +337,11 @@ body.mlc-proposal-page {
     margin: 0 0 32px;
 }
 
+/* Post-accept Wheatley: breathing room from footer below */
+#wheatley-accept {
+    margin-bottom: 48px;
+}
+
 /* Cursor — matches site's .wheatley-void__cursor */
 .proposal-wheatley__cursor {
     display: inline-block;
@@ -392,7 +397,7 @@ body.mlc-proposal-page {
     border-radius: 12px;
     padding: 28px;
     margin-bottom: 16px;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, opacity 0.3s ease;
 }
 
 .proposal-section--alt .proposal-service {
@@ -403,12 +408,82 @@ body.mlc-proposal-page {
     border-color: var(--proposal-accent);
 }
 
+/* ─── Dimmed / unchecked state ─── */
+.proposal-service--dimmed {
+    opacity: 0.5;
+    border-color: #e8e8e8;
+}
+
+.proposal-service--dimmed:hover {
+    opacity: 0.7;
+    border-color: #ddd;
+}
+
+.proposal-service--dimmed .proposal-service__price strong {
+    text-decoration: line-through;
+    color: #999;
+}
+
 .proposal-service__header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     gap: 16px;
     margin-bottom: 16px;
+}
+
+/* ─── Checkbox toggle row ─── */
+.proposal-service__toggle-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.proposal-service__check {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.proposal-service__checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.proposal-service__checkmark {
+    width: 22px;
+    height: 22px;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+.proposal-service__checkbox:checked + .proposal-service__checkmark {
+    background: var(--proposal-accent);
+    border-color: var(--proposal-accent);
+}
+
+.proposal-service__checkbox:checked + .proposal-service__checkmark::after {
+    content: '';
+    width: 6px;
+    height: 10px;
+    border: solid var(--proposal-accent-text, #fff);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+    margin-top: -2px;
+}
+
+.proposal-service__checkbox:focus-visible + .proposal-service__checkmark {
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.25);
 }
 
 .proposal-service__name {
@@ -456,11 +531,119 @@ body.mlc-proposal-page {
     margin-bottom: 0;
 }
 
+/* ─── SERVICE NOTES ────────────────────────────────────── */
+
+.proposal-service__note {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f1;
+}
+
+.proposal-service__note-input {
+    width: 100%;
+    padding: 10px 14px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    resize: vertical;
+    color: #1d2327;
+    background: #fafafa;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.proposal-service__note-input:focus {
+    outline: none;
+    border-color: var(--proposal-accent);
+    background: #fff;
+}
+
+.proposal-service__note-input::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
+/* Read-only state (after acceptance) */
+.proposal-service__note--readonly {
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 16px;
+    border-top: 1px solid #f0f0f1;
+}
+
+.proposal-service__note-label {
+    font-size: 11px;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+/* ─── SAVE INDICATOR ───────────────────────────────────── */
+
+.proposal-save-indicator {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    display: inline-block;
+    margin-left: 12px;
+    vertical-align: middle;
+}
+
+.proposal-save-indicator--saving {
+    color: #646970;
+}
+
+.proposal-save-indicator--saved {
+    color: #00a32a;
+}
+
+.proposal-save-indicator--error {
+    color: #d63638;
+}
+
+/* ─── GENERAL NOTE (accept section) ────────────────────── */
+
+.proposal-accept__general-note {
+    margin-bottom: 24px;
+}
+
+.proposal-accept__general-note textarea {
+    width: 100%;
+    padding: 12px 16px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    resize: vertical;
+    color: #1d2327;
+    background: #fafafa;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.proposal-accept__general-note textarea:focus {
+    outline: none;
+    border-color: var(--proposal-accent);
+    background: #fff;
+}
+
+.proposal-accept__general-note textarea::placeholder {
+    color: #aaa;
+    font-style: italic;
+}
+
 /* ─── INVESTMENT SUMMARY ───────────────────────────────── */
 
 .proposal-summary {
     background: #fff;
-    padding: 48px 0 0;
+    padding: 48px 0 64px;
 }
 
 .proposal-summary__inner {
@@ -562,6 +745,14 @@ body.mlc-proposal-page {
 
     .proposal-service__price {
         text-align: left;
+    }
+
+    .proposal-service__toggle-row {
+        gap: 10px;
+    }
+
+    .proposal-service__note-input {
+        font-size: 14px;
     }
 
     .proposal-summary__row {

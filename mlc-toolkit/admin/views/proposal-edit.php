@@ -247,6 +247,45 @@ $title = $post ? $post->post_title : '';
                     <textarea name="notes" rows="5" class="large-text" placeholder="Notes visible only to you..."><?php echo esc_textarea($meta['notes']); ?></textarea>
                 </div>
 
+                <!-- Client Feedback -->
+                <?php
+                $client_selections   = $meta['client_selections'] ?? [];
+                $client_notes_admin  = $meta['client_notes'] ?? [];
+                $client_general_note = $meta['client_general_note'] ?? '';
+                $has_client_data     = !empty($client_selections) || !empty($client_notes_admin) || !empty($client_general_note);
+                ?>
+                <?php if ($has_client_data && !$is_new): ?>
+                <div class="mlc-proposal-card">
+                    <h2>Client Feedback</h2>
+
+                    <?php if (!empty($client_selections)): ?>
+                        <div class="mlc-client-selections">
+                            <?php foreach ($meta['services'] as $slug => $svc):
+                                $selected = isset($client_selections[$slug]) ? $client_selections[$slug] : true;
+                                $note = $client_notes_admin[$slug] ?? '';
+                            ?>
+                                <div class="mlc-client-selection-row <?php echo $selected ? '' : 'mlc-client-selection-row--off'; ?>">
+                                    <span class="mlc-client-selection-icon"><?php echo $selected ? '&#10003;' : '&#10007;'; ?></span>
+                                    <span class="mlc-client-selection-name"><?php echo esc_html($svc['name']); ?></span>
+                                    <?php if ($note): ?>
+                                        <div class="mlc-client-selection-note">
+                                            "<?php echo esc_html($note); ?>"
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if ($client_general_note): ?>
+                        <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0f1;">
+                            <strong style="font-size: 12px; color: #646970;">General Note:</strong>
+                            <p style="margin: 4px 0 0; font-style: italic; font-size: 13px;"><?php echo esc_html($client_general_note); ?></p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <?php endif; ?>
+
                 <!-- Timeline -->
                 <?php if (!$is_new): ?>
                 <div class="mlc-proposal-card">
